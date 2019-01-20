@@ -26,13 +26,13 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     	this.SetIsReversed(isReversed);
     }   
     
-    public void ArcadeDrive(double speed, double rotate, double maxOutput)
+    public void arcadeDrive(double speed, double rotate, double maxOutput)
     {
     	this.driver.setMaxOutput(maxOutput);
     	
     	rotate = MathHelper.handleDeadband(rotate, rotateDeadband);
     	
-    	if(this.IsReversed())
+    	if (this.IsReversed())
     	{
     		driver.arcadeDrive(-speed,-rotate, this.isSquared);
     	}
@@ -42,18 +42,18 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     	}
     }
     
-    public void TankDrive(double leftSpeed ,double rightSpeed, double maxOutput)
+    public void tankDrive(double leftSpeed ,double rightSpeed, double maxOutput)
     {
     	this.driver.setMaxOutput(maxOutput);
     	
-    	if(Math.abs(leftSpeed - rightSpeed) < rotateDeadband)
+    	if (Math.abs(leftSpeed - rightSpeed) < rotateDeadband)
     	{
     		double speed = (leftSpeed + rightSpeed)/2;
     		leftSpeed = speed;
     		rightSpeed = speed;
     	}
     	
-    	if(this.IsReversed())
+    	if (this.IsReversed())
     	{
         	driver.tankDrive(-leftSpeed , -rightSpeed, this.isSquared);
     	}
@@ -61,7 +61,55 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     	{
         	driver.tankDrive(leftSpeed , rightSpeed, this.isSquared);
     	}
-    }
+	}
+	
+	/*
+	public void controllerDrive(double forwardSpeed, double backwardsSpeed, double turn, double maxOutput)
+	{    
+	  double speed = forwardSpeed - backwardsSpeed;
+	  double leftSpeed = Math.signum(speed) * Math.pow(Math.abs(speed), 1.5);
+	  double rightSpeed = Math.signum(speed) * Math.pow(Math.abs(speed), 1.5);
+	  turn = MathHelper.handleDeadband(turn, rotateDeadband);
+  
+	  this.driver.setMaxOutput(maxOutput);
+
+	  if (turn < 0)
+	  {
+		leftSpeed *= MathHelper.mapRange(0, -1, 1, 0, turn);
+	  }
+	  else
+	  {
+		rightSpeed *= MathHelper.mapRange(0, 1, 1, 0, turn);
+	  }
+	  
+	  if (this.IsReversed())
+	  {
+		driver.tankDrive(-leftSpeed , -rightSpeed, this.isSquared);
+	  }
+	  else
+	  {
+		driver.tankDrive(leftSpeed, rightSpeed);
+	  }
+	}
+	*/
+
+	public void controllerDrive(double forwardSpeed, double backwardsSpeed, double turn, double maxOutput)
+	{    
+		double speed = forwardSpeed - backwardsSpeed;
+
+		this.driver.setMaxOutput(maxOutput);
+    	
+    	turn = MathHelper.handleDeadband(turn, rotateDeadband);
+    	
+    	if (this.IsReversed())
+    	{
+    		driver.arcadeDrive(-speed,-turn, this.isSquared);
+    	}
+    	else
+    	{
+    		driver.arcadeDrive(speed, turn, this.isSquared);
+    	}
+	}
     
     public int getRawLeftPosition()
     {
@@ -78,12 +126,12 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     	return 0;
     }
     
-    public void SetIsSquared (boolean isSquared)
+    public void SetIsSquared(boolean isSquared)
     {
     	this.isSquared = isSquared;
     }
     
-    public boolean GetIsSquared ()
+    public boolean GetIsSquared()
     {
     	return this.isSquared;
     }
@@ -113,15 +161,12 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
 	{
 		this.driver.stopMotor();
 	}
-    
 
 	@Override
 	public Subsystem GetSubsystem() 
 	{
 		return this;
 	}
-	
-
 }
 
 
