@@ -1,0 +1,10 @@
+{
+  "lengthUnit": "Meter",
+  "timeStep": 0.05,
+  "maxVelocity": 10.0,
+  "maxAcceleration": 2.0,
+  "maxJerk": 1.0,
+  "wheelBase": 0.75,
+  "gameName": "Destination: Deep Space",
+  "outputDir": "../src/main/java/frc/paths"
+}
