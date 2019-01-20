@@ -8,12 +8,11 @@ public class DifferentialDriver extends DifferentialDrive
 	
 	private SpeedController leftController;
 	private SpeedController rightController;
-	
 
-	public DifferentialDriver(SpeedController leftSize, SpeedController rightSide) 
+	public DifferentialDriver(SpeedController leftSide, SpeedController rightSide) 
 	{
-		super(leftSize, rightSide);
-		this.leftController = leftSize;
+		super(leftSide, rightSide);
+		this.leftController = leftSide;
 		this.rightController = rightSide;
 		this.setSafetyEnabled(false);
 	}
@@ -22,14 +21,12 @@ public class DifferentialDriver extends DifferentialDrive
 	{
 		this.leftController.pidWrite(output);		
 		this.rightController.pidWrite(output);
-
 	}
 	
 	public void PidDrive(double output)
 	{
 		this.leftController.pidWrite(output);		
 		this.rightController.pidWrite(-output);
-
 	}
 	
 }
