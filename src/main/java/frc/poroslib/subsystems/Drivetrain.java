@@ -69,9 +69,8 @@ public class Drivetrain extends Subsystem
     }
 
 	@Override
-	protected void initDefaultCommand() {
-		// TODO Auto-generated method stub
-		
+    protected void initDefaultCommand()
+    {
 	}
 	
 

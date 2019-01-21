@@ -45,7 +45,7 @@ public class TankDrive extends Command
     		this.maxOutput = 1;
     	}
     	
-    	this.drivetrain.TankDrive(leftValue, rightValue, this.maxOutput);
+    	this.drivetrain.tankDrive(leftValue, rightValue, this.maxOutput);
     }
 
     protected boolean isFinished()
@@ -55,7 +55,7 @@ public class TankDrive extends Command
 
     protected void end()
     {
-    	this.drivetrain.TankDrive(0, 0, this.maxOutput);
+    	this.drivetrain.tankDrive(0, 0, this.maxOutput);
     }
 
     protected void interrupted()

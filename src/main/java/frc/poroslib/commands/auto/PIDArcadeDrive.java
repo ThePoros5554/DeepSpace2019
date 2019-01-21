@@ -75,7 +75,7 @@ public class PIDArcadeDrive extends Command {
     		turnOutput = this.turnProc.GetOutputValue();
     	}
     	
-		this.drivetrain.ArcadeDrive(speedOutput, turnOutput, 1);
+		this.drivetrain.arcadeDrive(speedOutput, turnOutput, 1);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -109,7 +109,7 @@ public class PIDArcadeDrive extends Command {
     		this.turnProc.reset();
     	}
     	
-    	this.drivetrain.ArcadeDrive(0, 0, 1);
+    	this.drivetrain.arcadeDrive(0, 0, 1);
     	
     	System.out.println("End Auto Drive");
     }

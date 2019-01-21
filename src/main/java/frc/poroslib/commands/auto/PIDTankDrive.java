@@ -97,7 +97,7 @@ public class PIDTankDrive extends Command {
     		leftOutput = this.leftProc.GetOutputValue() + angleOutput;
     	}
     	
-		this.drivetrain.TankDrive(leftOutput, rightOutput, 1);
+		this.drivetrain.tankDrive(leftOutput, rightOutput, 1);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -141,7 +141,7 @@ public class PIDTankDrive extends Command {
     		this.angleProc.reset();
     	}
     	
-    	this.drivetrain.TankDrive(0, 0, 1);
+    	this.drivetrain.tankDrive(0, 0, 1);
     	
     	System.out.println("End Auto Drive");
     }

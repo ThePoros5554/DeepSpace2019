@@ -89,7 +89,7 @@ public class FollowPath extends Command{
 				
 				lastAngleDifference = angleDifference;
 				
-				dt.TankDrive(l + turn, r - turn, 1);		
+				dt.tankDrive(l + turn, r - turn, 1);		
 			}
 		});
 		
@@ -100,7 +100,6 @@ public class FollowPath extends Command{
 	@Override
 	protected void execute()
 	{
-
 	}
 	
 	@Override

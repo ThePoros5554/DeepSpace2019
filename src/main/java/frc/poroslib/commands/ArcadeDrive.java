@@ -42,7 +42,7 @@ public class ArcadeDrive extends Command
     		this.maxOutput = 1;
     	}
     	
-		this.drivetrain.ArcadeDrive(speedValue, rotateValue, maxOutput);
+		this.drivetrain.arcadeDrive(speedValue, rotateValue, maxOutput);
     }
 
     protected boolean isFinished()
@@ -52,7 +52,7 @@ public class ArcadeDrive extends Command
 
     protected void end()
     {
-    	this.drivetrain.ArcadeDrive(0, 0, this.maxOutput);
+    	this.drivetrain.arcadeDrive(0, 0, this.maxOutput);
     }
 
 

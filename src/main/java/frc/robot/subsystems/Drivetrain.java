@@ -23,7 +23,7 @@ import frc.poroslib.subsystems.DiffDrivetrain;
  */
 public class Drivetrain extends DiffDrivetrain
 {
-   WPI_TalonSRX masterLeft;
+  private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
   private WPI_VictorSPX middleLeft;
   private WPI_VictorSPX middleRight;
@@ -35,7 +35,7 @@ public class Drivetrain extends DiffDrivetrain
   private ControlMode controlMode;
 
   public Drivetrain(WPI_TalonSRX frontLeft, WPI_VictorSPX middleLeft, WPI_VictorSPX rearLeft,
-  WPI_TalonSRX frontRight, WPI_VictorSPX middleRight, WPI_VictorSPX rearRight, double rampRate)
+  WPI_TalonSRX frontRight, WPI_VictorSPX middleRight, WPI_VictorSPX rearRight, double rampRate, double voltage)
   {
     super(frontLeft, frontRight);
 
@@ -60,13 +60,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearLeft.setInverted(InvertType.FollowMaster);
     this.rearRight.setInverted(InvertType.FollowMaster);
 
-    // ramp rate
-    this.masterLeft.configClosedloopRamp(rampRate);
-    this.masterRight.configClosedloopRamp(rampRate);
-    this.middleLeft.configClosedloopRamp(rampRate);
-    this.middleRight.configClosedloopRamp(rampRate);
-    this.rearLeft.configClosedloopRamp(rampRate);
-    this.rearRight.configClosedloopRamp(rampRate);
+    // ramp
+    this.configRamp(rampRate);
 
     // sensors
     this.masterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
@@ -78,7 +73,7 @@ public class Drivetrain extends DiffDrivetrain
     this.setNeutralMode(NeutralMode.Brake);
 
     // voltage compensation
-    this.configVoltageCompSaturation(10, true);
+    this.configVoltageCompSaturation(voltage, true);
 
     this.controlMode = ControlMode.PercentOutput;
     this.set(0, 0);
@@ -107,6 +102,23 @@ public class Drivetrain extends DiffDrivetrain
     this.middleRight.enableVoltageCompensation(enableVoltageCompensation);
     this.rearLeft.enableVoltageCompensation(enableVoltageCompensation);
     this.rearRight.enableVoltageCompensation(enableVoltageCompensation);
+  }
+
+  public void configRamp(double rampRate)
+  {
+    this.masterLeft.configClosedloopRamp(rampRate);
+    this.masterRight.configClosedloopRamp(rampRate);
+    this.middleLeft.configClosedloopRamp(rampRate);
+    this.middleRight.configClosedloopRamp(rampRate);
+    this.rearLeft.configClosedloopRamp(rampRate);
+    this.rearRight.configClosedloopRamp(rampRate);
+
+    this.masterLeft.configOpenloopRamp(rampRate);
+    this.masterRight.configOpenloopRamp(rampRate);
+    this.middleLeft.configOpenloopRamp(rampRate);
+    this.middleRight.configOpenloopRamp(rampRate);
+    this.rearLeft.configOpenloopRamp(rampRate);
+    this.rearRight.configOpenloopRamp(rampRate);
   }
 
   public void setControlMode(ControlMode controlMode)
