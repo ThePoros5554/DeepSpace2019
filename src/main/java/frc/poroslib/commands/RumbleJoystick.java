@@ -15,11 +15,13 @@ public class RumbleJoystick extends Command {
   
   private SmartJoystick joystick;
   private double rumble = 0;
+  private boolean onlyInit = false;
   
   public RumbleJoystick(SmartJoystick joystick, double rumblePower)
   {
     this.joystick = joystick;
     this.rumble = rumblePower;
+    this.onlyInit = true;
   }
 
   public RumbleJoystick(SmartJoystick joystick, double rumblePower, double seconds)
@@ -45,14 +47,14 @@ public class RumbleJoystick extends Command {
   @Override
   protected boolean isFinished()
   {
-    return this.isTimedOut();
+    return this.isTimedOut() || this.onlyInit;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
-    if (joystick != null)
+    if (!onlyInit && joystick != null)
     {
       this.joystick.setRumble(RumbleType.kRightRumble, 0);
       this.joystick.setRumble(RumbleType.kLeftRumble, 0);
