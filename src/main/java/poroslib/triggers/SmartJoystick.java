@@ -13,11 +13,11 @@ public class SmartJoystick extends Joystick
 	private int twistAxis = 2;
 	
 	private int sliderAxis = 3;
-	private int oldMinSlider = -1;
-	private int oldMaxSlider = 1;
+	private int oldMinSlider = 1;
+	private int oldMaxSlider = -1;
 	private int minSlider = 0;
 	private int maxSlider = 1;
-	
+
 	public SmartJoystick(int port) 
 	{
 		super(port);
