@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.poroslib.commands;
+package poroslib.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.DiffDrivetrain;
+import poroslib.subsystems.DiffDrivetrain;
 
 public class GTADrive extends Command {
   private DiffDrivetrain drivetrain;

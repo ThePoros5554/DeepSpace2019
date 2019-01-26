@@ -1,13 +1,13 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.followers.EncoderFollower;
 import jaci.pathfinder.modifiers.TankModifier;
-import frc.poroslib.subsystems.DiffDrivetrain;
-import frc.poroslib.systems.RobotProfile;
-import frc.poroslib.util.Path;
+import poroslib.subsystems.DiffDrivetrain;
+import poroslib.systems.RobotProfile;
+import poroslib.util.Path;
 
 public class FollowPath extends Command{
 

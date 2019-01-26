@@ -1,7 +1,7 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.MechDrivetrain;
+import poroslib.subsystems.MechDrivetrain;
 
 public class TimedMechDrive extends Command
 {

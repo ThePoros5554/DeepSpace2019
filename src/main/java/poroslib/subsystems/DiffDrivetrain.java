@@ -1,9 +1,9 @@
-package frc.poroslib.subsystems;
+package poroslib.subsystems;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import frc.poroslib.systems.DifferentialDriver;
-import frc.poroslib.util.MathHelper;
+import poroslib.systems.DifferentialDriver;
+import poroslib.util.MathHelper;
 
 /**
  *

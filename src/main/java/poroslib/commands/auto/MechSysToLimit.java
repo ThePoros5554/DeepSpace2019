@@ -1,8 +1,8 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.sensors.SysPosition;
-import frc.poroslib.subsystems.MechSys;
+import poroslib.sensors.SysPosition;
+import poroslib.subsystems.MechSys;
 
 /**
  *

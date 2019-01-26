@@ -1,7 +1,7 @@
-package frc.poroslib.systems;
+package poroslib.systems;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import frc.poroslib.util.MotorCurrent;
+import poroslib.util.MotorCurrent;
 
 public class SystemCurrent 
 {

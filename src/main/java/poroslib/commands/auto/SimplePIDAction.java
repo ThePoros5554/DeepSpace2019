@@ -1,8 +1,8 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.PidActionSubsys;
-import frc.poroslib.systems.PIDProcessor;
+import poroslib.subsystems.PidActionSubsys;
+import poroslib.systems.PIDProcessor;
 
 /**
  *

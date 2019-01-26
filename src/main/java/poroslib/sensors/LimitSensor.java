@@ -1,4 +1,4 @@
-package frc.poroslib.sensors;
+package poroslib.sensors;
 
 public interface LimitSensor 
 {

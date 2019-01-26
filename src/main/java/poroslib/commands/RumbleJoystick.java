@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.poroslib.commands;
+package poroslib.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.triggers.SmartJoystick;
+import poroslib.triggers.SmartJoystick;
 
 public class RumbleJoystick extends Command {
   

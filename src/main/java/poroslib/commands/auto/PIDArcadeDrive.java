@@ -1,8 +1,8 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.DiffDrivetrain;
-import frc.poroslib.systems.PIDProcessor;
+import poroslib.subsystems.DiffDrivetrain;
+import poroslib.systems.PIDProcessor;
 
 /**
  *

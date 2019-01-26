@@ -16,7 +16,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
-import frc.poroslib.subsystems.DiffDrivetrain;
+import poroslib.subsystems.DiffDrivetrain;
 
 /**
  * Add your docs here.

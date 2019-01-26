@@ -1,9 +1,9 @@
-package frc.poroslib.commands;
+package poroslib.commands;
 
-import frc.poroslib.triggers.JoyAxis;
-import frc.poroslib.util.Speed;
+import poroslib.triggers.JoyAxis;
+import poroslib.util.Speed;
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.MechSys;
+import poroslib.subsystems.MechSys;
 
 /**
  *

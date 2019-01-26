@@ -1,15 +1,15 @@
-package frc.poroslib.subsystems;
+package poroslib.subsystems;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import frc.poroslib.sensors.LimitSensor;
-import frc.poroslib.sensors.SysPosition;
-import frc.poroslib.systems.CurrentSafety;
-import frc.poroslib.systems.SafeSubsystem;
-import frc.poroslib.systems.SystemCurrent;
-import frc.poroslib.util.MotorCurrent;
+import poroslib.sensors.LimitSensor;
+import poroslib.sensors.SysPosition;
+import poroslib.systems.CurrentSafety;
+import poroslib.systems.SafeSubsystem;
+import poroslib.systems.SystemCurrent;
+import poroslib.util.MotorCurrent;
 
 
 public class MechSys extends Subsystem implements PidActionSubsys, SafeSubsystem {

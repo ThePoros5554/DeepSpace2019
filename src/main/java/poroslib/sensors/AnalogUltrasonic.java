@@ -1,4 +1,4 @@
-package frc.poroslib.sensors;
+package poroslib.sensors;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDSource;

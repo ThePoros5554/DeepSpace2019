@@ -1,4 +1,4 @@
-package frc.poroslib.vision;
+package poroslib.vision;
 
 import java.util.HashMap;
 import java.util.Map;

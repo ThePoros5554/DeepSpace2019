@@ -1,4 +1,4 @@
-package frc.poroslib.util;
+package poroslib.util;
 
 public class Speed 
 {

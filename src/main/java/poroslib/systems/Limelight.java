@@ -1,4 +1,4 @@
-package frc.poroslib.systems;
+package poroslib.systems;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -17,9 +17,9 @@ public class Limelight
     {
         limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-        tHorizontalOffset = table.getEntry("tx"); 
-        tVerticalOffset = table.getEntry("ty");
-        tArea = table.getEntry("ta");
+        tHorizontalOffset = limelightTable.getEntry("tx"); 
+        tVerticalOffset = limelightTable.getEntry("ty");
+        tArea = limelightTable.getEntry("ta");
     }
 
     public double GetHorizontalOffset()

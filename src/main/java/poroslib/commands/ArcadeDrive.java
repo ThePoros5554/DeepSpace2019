@@ -1,8 +1,8 @@
-package frc.poroslib.commands;
+package poroslib.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.DiffDrivetrain;
-import frc.poroslib.triggers.SmartJoystick;
+import poroslib.subsystems.DiffDrivetrain;
+import poroslib.triggers.SmartJoystick;
 
 /**
  *

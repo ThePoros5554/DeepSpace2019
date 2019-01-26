@@ -1,9 +1,9 @@
-package frc.poroslib.commands.auto;
+package poroslib.commands.auto;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.subsystems.MechDrivetrain;
-import frc.poroslib.subsystems.MechDrivetrain.MechDrivingDirection;
-import frc.poroslib.systems.PIDProcessor;
+import poroslib.subsystems.MechDrivetrain;
+import poroslib.subsystems.MechDrivetrain.MechDrivingDirection;
+import poroslib.systems.PIDProcessor;
 
 public class PIDMechDrive extends Command
 {

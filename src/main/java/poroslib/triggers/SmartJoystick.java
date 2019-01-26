@@ -1,7 +1,7 @@
-package frc.poroslib.triggers;
+package poroslib.triggers;
 
 import edu.wpi.first.wpilibj.Joystick;
-import frc.poroslib.util.MathHelper;
+import poroslib.util.MathHelper;
 
 public class SmartJoystick extends Joystick
 {

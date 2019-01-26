@@ -1,8 +1,8 @@
-package frc.poroslib.subsystems;
+package poroslib.subsystems;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import frc.poroslib.systems.MechaumDriver;
+import poroslib.systems.MechaumDriver;
 
 /**
  *

@@ -1,11 +1,11 @@
-package frc.poroslib.systems;
+package poroslib.systems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
-import frc.poroslib.util.ControllerOutput;
+import poroslib.util.ControllerOutput;
 
 
 public class PIDProcessor extends PIDController 

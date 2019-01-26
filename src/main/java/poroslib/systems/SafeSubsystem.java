@@ -1,4 +1,4 @@
-package frc.poroslib.systems;
+package poroslib.systems;
 
 public interface SafeSubsystem 
 {

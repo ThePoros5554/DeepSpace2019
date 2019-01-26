@@ -1,4 +1,4 @@
-package frc.poroslib.sensors;
+package poroslib.sensors;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 

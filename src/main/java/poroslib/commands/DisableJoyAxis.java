@@ -1,7 +1,7 @@
-package frc.poroslib.commands;
+package poroslib.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.poroslib.triggers.SmartJoystick;
+import poroslib.triggers.SmartJoystick;
 
 /**
  *

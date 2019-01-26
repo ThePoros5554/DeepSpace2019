@@ -1,4 +1,4 @@
-package frc.poroslib.triggers;
+package poroslib.triggers;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.buttons.Trigger;
