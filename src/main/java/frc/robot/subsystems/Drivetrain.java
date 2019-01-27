@@ -23,14 +23,27 @@ import poroslib.subsystems.DiffDrivetrain;
  */
 public class Drivetrain extends DiffDrivetrain
 {
-  private static final double kMaxVoltage = 12;
-  private static final boolean kInvertEncLeft = false;
-  private static final boolean kInvertEncRight = false;
-  private static final double kP = 0;
-  private static final double kI = 0;
-  private static final double kD = 0;
-  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final double kRamp = 0.4;
+  /**** constants: ****/
+  public static final int kFrontRightPort = 0;
+  public static final int kMiddleRightPort = 1;
+  public static final int kRearRightPort = 2;
+  public static final int kFrontLeftPort = 3;
+  public static final int kMiddleLeftPort = 4;
+  public static final int kRearLeftPort = 5;
+
+  public static final boolean kInvertEncLeft = false;
+  public static final boolean kInvertEncRight = false;
+
+  public static final double kVoltage = 12;
+
+  public static final double kP = 0;
+  public static final double kI = 0;
+  public static final double kD = 0;
+  
+  public static final NeutralMode kNeutralMode = NeutralMode.Brake;
+  
+  public static final double kRamp = 0.4;
+  /*****/
 
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
@@ -43,17 +56,16 @@ public class Drivetrain extends DiffDrivetrain
 
   private ControlMode controlMode;
 
-  public Drivetrain(WPI_TalonSRX frontLeft, WPI_VictorSPX middleLeft, WPI_VictorSPX rearLeft,
-  WPI_TalonSRX frontRight, WPI_VictorSPX middleRight, WPI_VictorSPX rearRight)
+  public Drivetrain(WPI_TalonSRX masterLeft, WPI_TalonSRX masterRight)
   {
-    super(frontLeft, frontRight);
+    super(masterLeft, masterRight);
 
-    this.masterLeft = frontLeft;
-    this.masterRight = frontRight;
-    this.middleLeft = middleLeft;
-    this.middleRight = middleRight;;
-    this.rearLeft = rearLeft;
-    this.rearRight = rearRight;
+    this.masterLeft = masterLeft;
+    this.masterRight = masterRight;
+    this.middleLeft = new WPI_VictorSPX(kMiddleLeftPort);
+    this.middleRight = new WPI_VictorSPX(kMiddleRightPort);
+    this.rearLeft = new WPI_VictorSPX(kRearLeftPort);
+    this.rearRight = new WPI_VictorSPX(kRearRightPort);
     
     // followers
     this.middleLeft.follow(this.masterLeft);
@@ -82,7 +94,7 @@ public class Drivetrain extends DiffDrivetrain
     this.setNeutralMode(kNeutralMode);
 
     // voltage compensation
-    this.configVoltageCompSaturation(kMaxVoltage, true);
+    this.configVoltageCompSaturation(kVoltage, true);
 
     this.controlMode = ControlMode.PercentOutput;
     this.set(0, 0);

@@ -7,8 +7,12 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Elevator;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,6 +25,13 @@ public class Robot extends TimedRobot
 {
   public static OI oi;
   
+  public static Drivetrain drivetrain;
+  private WPI_TalonSRX masterLeft;
+  private WPI_TalonSRX masterRight;
+
+  public static Elevator elevator;
+
+  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -28,7 +39,13 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
-    OI oi = new OI();
+    this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
+    this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
+    drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
+
+    elevator = new Elevator();
+
+    oi = new OI();
   }
 
   /**
@@ -74,6 +91,8 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+    drivetrain.resetHeading();
+    drivetrain.resetRawPosition();
   }
 
   /**
