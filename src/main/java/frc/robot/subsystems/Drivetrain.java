@@ -23,6 +23,28 @@ import poroslib.subsystems.DiffDrivetrain;
  */
 public class Drivetrain extends DiffDrivetrain
 {
+  /**** constants: ****/
+  public static final int kFrontRightPort = 0;
+  public static final int kMiddleRightPort = 1;
+  public static final int kRearRightPort = 2;
+  public static final int kFrontLeftPort = 3;
+  public static final int kMiddleLeftPort = 4;
+  public static final int kRearLeftPort = 5;
+
+  public static final boolean kInvertEncLeft = false;
+  public static final boolean kInvertEncRight = false;
+
+  public static final double kVoltage = 12;
+
+  public static final double kP = 0;
+  public static final double kI = 0;
+  public static final double kD = 0;
+  
+  public static final NeutralMode kNeutralMode = NeutralMode.Brake;
+  
+  public static final double kRamp = 0.4;
+  /*****/
+
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
   private WPI_VictorSPX middleLeft;
@@ -34,17 +56,16 @@ public class Drivetrain extends DiffDrivetrain
 
   private ControlMode controlMode;
 
-  public Drivetrain(WPI_TalonSRX frontLeft, WPI_VictorSPX middleLeft, WPI_VictorSPX rearLeft,
-  WPI_TalonSRX frontRight, WPI_VictorSPX middleRight, WPI_VictorSPX rearRight, double rampRate, double voltage)
+  public Drivetrain(WPI_TalonSRX masterLeft, WPI_TalonSRX masterRight)
   {
-    super(frontLeft, frontRight);
+    super(masterLeft, masterRight);
 
-    this.masterLeft = frontLeft;
-    this.masterRight = frontRight;
-    this.middleLeft = middleLeft;
-    this.middleRight = middleRight;;
-    this.rearLeft = rearLeft;
-    this.rearRight = rearRight;
+    this.masterLeft = masterLeft;
+    this.masterRight = masterRight;
+    this.middleLeft = new WPI_VictorSPX(kMiddleLeftPort);
+    this.middleRight = new WPI_VictorSPX(kMiddleRightPort);
+    this.rearLeft = new WPI_VictorSPX(kRearLeftPort);
+    this.rearRight = new WPI_VictorSPX(kRearRightPort);
     
     // followers
     this.middleLeft.follow(this.masterLeft);
@@ -61,19 +82,19 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.setInverted(InvertType.FollowMaster);
 
     // ramp
-    this.configRamp(rampRate);
+    this.configRamp(kRamp);
 
     // sensors
     this.masterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     this.masterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    this.masterLeft.setSensorPhase(false);
-    this.masterRight.setSensorPhase(false);
+    this.masterLeft.setSensorPhase(kInvertEncLeft);
+    this.masterRight.setSensorPhase(kInvertEncRight);
 
     // neutral mode
-    this.setNeutralMode(NeutralMode.Brake);
+    this.setNeutralMode(kNeutralMode);
 
     // voltage compensation
-    this.configVoltageCompSaturation(voltage, true);
+    this.configVoltageCompSaturation(kVoltage, true);
 
     this.controlMode = ControlMode.PercentOutput;
     this.set(0, 0);
@@ -81,10 +102,10 @@ public class Drivetrain extends DiffDrivetrain
     this.navx = new AHRS(SPI.Port.kMXP);
   }
 
-  public void set(double speedLeft, double speedRight)
+  public void set(double valueLeft, double valueRight)
   {
-    this.masterLeft.set(controlMode, speedLeft);
-    this.masterRight.set(controlMode, speedRight);
+    this.masterLeft.set(controlMode, valueLeft);
+    this.masterRight.set(controlMode, valueRight);
   }
 
   public void configVoltageCompSaturation(double voltage, boolean enableVoltageCompensation)
@@ -173,6 +194,73 @@ public class Drivetrain extends DiffDrivetrain
   {
     this.masterLeft.setSelectedSensorPosition(0);
     this.masterRight.setSelectedSensorPosition(0);
+  }
+
+  //TODO check if profile configs of followers is necessary (since they should follow the master output anyways)
+
+  public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
+  {
+    this.masterLeft.config_kP(profileSlot, kP);
+    this.masterLeft.config_kI(profileSlot, kI);
+    this.masterLeft.config_kD(profileSlot, kD);
+    this.masterLeft.config_kF(profileSlot, kF);
+
+/*  this.middleLeft.config_kP(profileSlot, kP);
+    this.middleLeft.config_kI(profileSlot, kI);
+    this.middleLeft.config_kD(profileSlot, kD);
+    this.middleLeft.config_kF(profileSlot, kF);
+    
+    this.rearLeft.config_kP(profileSlot, kP);
+    this.rearLeft.config_kI(profileSlot, kI);
+    this.rearLeft.config_kD(profileSlot, kD);
+    this.rearLeft.config_kF(profileSlot, kF); */
+
+    this.masterRight.config_kP(profileSlot, kP);
+    this.masterRight.config_kI(profileSlot, kI);
+    this.masterRight.config_kD(profileSlot, kD);
+    this.masterRight.config_kF(profileSlot, kF);
+
+/*  this.middleRight.config_kP(profileSlot, kP);
+    this.middleRight.config_kI(profileSlot, kI);
+    this.middleRight.config_kD(profileSlot, kD);
+    this.middleRight.config_kF(profileSlot, kF);
+    
+    this.rearRight.config_kP(profileSlot, kP);
+    this.rearRight.config_kI(profileSlot, kI);
+    this.rearRight.config_kD(profileSlot, kD);
+    this.rearRight.config_kF(profileSlot, kF); */
+  }
+
+  public void configMotionValues(int sensorUnitsPer100msPerSec, int sensorUnitsPer100ms)
+  {
+    this.masterLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.masterLeft.configMotionCruiseVelocity(sensorUnitsPer100ms);
+    
+/*  this.middleLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.middleLeft.configMotionCruiseVelocity(sensorUnitsPer100ms);
+    
+    this.rearLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.rearLeft.configMotionCruiseVelocity(sensorUnitsPer100ms); */
+
+    this.masterRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.masterRight.configMotionCruiseVelocity(sensorUnitsPer100ms);
+    
+/*  this.middleRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.middleRight.configMotionCruiseVelocity(sensorUnitsPer100ms);
+    
+    this.rearRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
+    this.rearRight.configMotionCruiseVelocity(sensorUnitsPer100ms); */
+  }
+
+  public void selectProfileSlot(int profileSlot)
+  {
+    this.masterLeft.selectProfileSlot(profileSlot, 0);
+/*  this.middleLeft.selectProfileSlot(profileSlot, 0);
+    this.rearLeft.selectProfileSlot(profileSlot, 0); */
+
+    this.masterRight.selectProfileSlot(profileSlot, 0);
+/*  this.middleRight.selectProfileSlot(profileSlot, 0);
+    this.rearRight.selectProfileSlot(profileSlot, 0); */
   }
 
   @Override
