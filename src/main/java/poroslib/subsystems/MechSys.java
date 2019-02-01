@@ -45,9 +45,8 @@ public class MechSys extends Subsystem implements PidActionSubsys, SafeSubsystem
 	
 
 	@Override
-	protected void initDefaultCommand() {
-		// TODO Auto-generated method stub
-		
+	protected void initDefaultCommand()
+	{
 	}
 	
 	public void Activate(double speed)

@@ -12,26 +12,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Elevator extends Subsystem
 {
-    //TODO add real values and decide on the final place of constants
-    public static final int kMasterPort = 6;
-    
-    public static final int kMaxAcceleration = 2;
-    public static final int kMaxVelocity = 6;
-    
-    public static final double kVoltage = 10;
-    
-    public static final boolean kInvertEnc = false;
-    
-    public static final double kP = 0;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    
-    public static final NeutralMode kNeutralMode = NeutralMode.Brake;
-    
-    public static final double kRamp = 0.4;
-    
-    public static final int kMaxHeight = 500;
-    public static final int kMinHeight = 0;
+    public static final int kFloor = 0;
     public static final int kHatchLowHeight = 10;
     public static final int kHatchMiddleHeight = 200;
     public static final int kHatchHighHeight = 480;
@@ -39,12 +20,31 @@ public class Elevator extends Subsystem
     public static final int kCargoMiddleHeight = 245;
     public static final int kCargoHighHeight = 500;
 
+    private static final int kElevatorPort = 6;
+    private static final int kMaxAcceleration = 2;
+    private static final int kMaxVelocity = 6;
+    private static final double kVoltage = 10;
+    private static final boolean kInvertEnc = false;
+    private static final double kP = 0;
+    private static final double kI = 0;
+    private static final double kD = 0;
+    private static final NeutralMode kNeutralMode = NeutralMode.Brake;
+    private static final double kRamp = 0.4;
+    private static final int kMaxHeight = 500;
+    private static final int kMinHeight = 0;
+
     private WPI_TalonSRX master;
     private ControlMode controlMode;
+    private ElevatorLevel currentLevel;
+
+    public enum ElevatorLevel
+    {
+        FLOOR, FIRST, SECOND, THIRD
+    }
 
     public Elevator()
     {
-        master = new WPI_TalonSRX(6);
+        master = new WPI_TalonSRX(kElevatorPort);
 
         master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
@@ -72,6 +72,8 @@ public class Elevator extends Subsystem
         this.setNeutralMode(kNeutralMode);
 
         this.master.configOpenloopRamp(kRamp);
+
+        currentLevel = ElevatorLevel.FLOOR;
 
         controlMode = ControlMode.PercentOutput;
         set(0);
@@ -150,6 +152,21 @@ public class Elevator extends Subsystem
     public void setSensorPosition(int position)
     {
         master.setSelectedSensorPosition(position);
+    }
+
+    public int getSensorPosition()
+    {
+        return master.getSelectedSensorPosition();
+    }
+
+    public void setCurrentLevel(ElevatorLevel currentLevel)
+    {
+        this.currentLevel = currentLevel;
+    }
+
+    public ElevatorLevel getCurrentLevel()
+    {
+        return this.currentLevel;
     }
 
     @Override

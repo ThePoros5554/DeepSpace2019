@@ -11,8 +11,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.HatchLauncher;
+import frc.robot.subsystems.Lifter;
+import frc.robot.subsystems.Wrist;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,8 +34,18 @@ public class Robot extends TimedRobot
   private WPI_TalonSRX masterRight;
 
   public static Elevator elevator;
-
+  public static Wrist wrist;
+  public static CargoIntake cargoIntake;
+  public static HatchLauncher hatchLauncher;
+  public static Lifter lifter;
   
+  public enum RobotMode
+  {
+    CARGO, HATCH, CLIMB
+  }
+
+  public static RobotMode mode = RobotMode.HATCH;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -42,8 +56,12 @@ public class Robot extends TimedRobot
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
-
+    
     elevator = new Elevator();
+    wrist = new Wrist();
+    cargoIntake = new CargoIntake();
+    hatchLauncher = new HatchLauncher();
+    lifter = new Lifter();
 
     oi = new OI();
   }

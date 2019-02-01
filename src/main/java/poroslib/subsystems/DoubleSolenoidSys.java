@@ -8,17 +8,17 @@ public class DoubleSolenoidSys extends Subsystem {
 	
 	private DoubleSolenoid piston;
 	
-	public DoubleSolenoidSys(int foward, int reverse)
+	public DoubleSolenoidSys(int forward, int reverse)
 	{
-		piston = new DoubleSolenoid(foward, reverse);
+		piston = new DoubleSolenoid(forward, reverse);
 	}
 	
-	public void foward()
+	public void open()
 	{
 		piston.set(DoubleSolenoid.Value.kForward);
 	}
 	
-	public void reverse()
+	public void close()
 	{
 		piston.set(DoubleSolenoid.Value.kReverse);
 	}

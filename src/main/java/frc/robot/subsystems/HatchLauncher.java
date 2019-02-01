@@ -7,14 +7,34 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
+import poroslib.subsystems.DoubleSolenoidSys;
 
 /**
  * Add your docs here.
  */
-public class Feeder extends Subsystem {
-  // Put methods for controlling this subsystem
-  // here. Call these from Commands.
+public class HatchLauncher extends DoubleSolenoidSys {
+
+  public static final int kSolenoidForwardPort = 0;
+  public static final int kSolenoidReversePort = 1;
+
+  public enum LauncherPistonsMode
+  {
+    OPENED, CLOSED
+  }
+
+  private LauncherPistonsMode currentMode;
+
+  public HatchLauncher()
+  {
+    super(kSolenoidForwardPort, kSolenoidReversePort);
+
+    this.currentMode = LauncherPistonsMode.OPENED;
+  }
+
+  public LauncherPistonsMode getCurrentMode()
+  {
+    return this.currentMode;
+  }
 
   @Override
   public void initDefaultCommand() {
