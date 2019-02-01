@@ -7,27 +7,21 @@
 
 package frc.robot.commands;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.Robot.RobotMode;
 
-public class ElevatorGoToHeight extends Command
-{ 
-  private int height;
-  
-  public ElevatorGoToHeight(int height)
+public class SetClimbMode extends Command
+{
+  public SetClimbMode()
   {
-    requires(Robot.elevator);
-    this.height = height;
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize()
   {
-    Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    Robot.elevator.set(height);
+    Robot.mode = RobotMode.CLIMB;
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -54,7 +48,5 @@ public class ElevatorGoToHeight extends Command
   @Override
   protected void interrupted()
   {
-    Robot.elevator.setControlMode(ControlMode.PercentOutput);
-    Robot.elevator.set(0);
   }
 }

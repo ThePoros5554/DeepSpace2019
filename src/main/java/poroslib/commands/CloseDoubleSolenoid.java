@@ -20,7 +20,7 @@ public class CloseDoubleSolenoid extends Command {
  
     protected void initialize()
     {
-    	this.subsystem.reverse();
+    	this.subsystem.close();
     }
 
    

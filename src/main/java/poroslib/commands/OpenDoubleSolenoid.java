@@ -18,7 +18,7 @@ public class OpenDoubleSolenoid extends Command {
 
     protected void initialize()
     {
-    	this.subsystem.foward();
+    	this.subsystem.open();
     }
 
     protected void execute() 
