@@ -7,7 +7,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import frc.robot.commands.InitCollectMode;
+import frc.robot.commands.InitHighMode;
+import frc.robot.commands.InitLowMode;
+import frc.robot.commands.InitMiddleMode;
+import frc.robot.commands.ToggleGamepieceMode;
 import poroslib.commands.TankDrive;
 import poroslib.triggers.SmartJoystick;
 
@@ -17,26 +23,72 @@ import poroslib.triggers.SmartJoystick;
  */
 public class OI
 {
-    public static final int kDriverLeftJoystickPort = 0;
-    public static final int kDriverRightJoystickPort = 1;
-    public static final int kOperatorJoystickPort = 2;
+    //Button Ports
+    private static final int kCollectModeButton = 2; // B
+    private static final int kLowModeButton = 1; // A
+    private static final int kMiddleModeButton = 3; // X
+    private static final int kHighModeButton = 4; // Y
+    private static final int kRobotModeButton = 0; // TODO
+    
+    //Joystick Ports
+    private static final int kDriverLeftJoystickPort = 0;
+    private static final int kDriverRightJoystickPort = 1;
+    private static final int kOperatorJoystickPort = 2;
+
+    //
 
     private SmartJoystick leftJoy;
     private SmartJoystick rightJoy;
     private SmartJoystick operatorJoy;
 
+    private Button modeButton;
+    private Button collectButton;
+    private Button lowButton;
+    private Button middleButton;
+    private Button highButton;
+
+    private TankDrive defaultDrive;
+
+    private InitCollectMode collectMode;
+    private InitLowMode lowMode;
+    private InitMiddleMode middleMode;
+    private InitHighMode highMode;
+
+    private ToggleGamepieceMode toggleGamepiece;
+
     public OI()
     {
-        initMembers();
-    }
+        /************** Initialize **************/
 
-    private void initMembers()
-    {
-        this.leftJoy = new SmartJoystick(kDriverLeftJoystickPort); 
-        this.rightJoy = new SmartJoystick(kDriverRightJoystickPort); 
-        this.operatorJoy = new SmartJoystick(kOperatorJoystickPort); 
+        //joysticks
+        leftJoy = new SmartJoystick(kDriverLeftJoystickPort); 
+        rightJoy = new SmartJoystick(kDriverRightJoystickPort); 
+        operatorJoy = new SmartJoystick(kOperatorJoystickPort); 
 
-        Robot.drivetrain.setDefaultCommand(new TankDrive(Robot.drivetrain, this.leftJoy, this.rightJoy));
+        //buttons
+        modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
+        highButton = new JoystickButton(operatorJoy, kHighModeButton);
+        middleButton = new JoystickButton(operatorJoy, kMiddleModeButton);
+        lowButton = new JoystickButton(operatorJoy, kLowModeButton);
+        collectButton  = new JoystickButton(operatorJoy, kCollectModeButton);
+        
+        //commands
+        defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
+        collectMode = new InitCollectMode();
+        lowMode = new InitLowMode();
+        middleMode = new InitMiddleMode();
+        highMode = new InitHighMode();
+        toggleGamepiece = new ToggleGamepieceMode();
+
+        /****************************************/
+
+        Robot.drivetrain.setDefaultCommand(defaultDrive);
         Robot.drivetrain.SetIsRanged(true);
+
+        collectButton.whenPressed(collectMode);
+        lowButton.whenPressed(lowMode);
+        middleButton.whenPressed(middleMode);
+        highButton.whenPressed(highMode);
+        modeButton.whenPressed(toggleGamepiece);
     }
 }
