@@ -27,17 +27,21 @@ import frc.robot.subsystems.Wrist;
  */
 public class Robot extends TimedRobot
 {
-  public static OI oi;
   
   public static Drivetrain drivetrain;
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
 
   public static Elevator elevator;
+<<<<<<< HEAD
   public static Wrist wrist;
   public static CargoIntake cargoIntake;
   public static HatchLauncher hatchLauncher;
   public static Lifter lifter;
+=======
+
+  private OI oi;
+>>>>>>> 2149ea26afd0ee5a2f5865ad64f8784d31032da2
   
   public enum RobotMode
   {
