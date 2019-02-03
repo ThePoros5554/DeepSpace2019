@@ -28,11 +28,11 @@ public class Drivetrain extends DiffDrivetrain
   public static final int kFrontLeftPort = 0;
   public static final int kFrontRightPort = 1;
 
-  public static final int kMiddleRightPort = 1;
-  public static final int kRearRightPort = 2;
+  public static final int kMiddleRightPort = 2;
+  public static final int kRearRightPort = 3;
   
-  public static final int kMiddleLeftPort = 4;
-  public static final int kRearLeftPort = 5;
+  public static final int kMiddleLeftPort = 0;
+  public static final int kRearLeftPort = 1;
   //
 
   public static final boolean kInvertEncLeft = false;
