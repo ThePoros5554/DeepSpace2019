@@ -17,10 +17,18 @@ public class AdjustWrist extends Command
 {
 
   private int targetPosition = 0;
+  private boolean overrideAutomatic = false;
 
   public AdjustWrist()
   {
     requires(Robot.wrist);
+  }
+
+  public AdjustWrist(int targetPosition)
+  {
+    requires(Robot.wrist);
+    this.targetPosition = targetPosition;
+    this.overrideAutomatic = true;
   }
 
   // Called just before this Command runs the first time
@@ -29,19 +37,22 @@ public class AdjustWrist extends Command
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
     
-    switch (Robot.mode)
+    if (!this.overrideAutomatic)
     {
-      case HATCH:
-        this.targetPosition = Wrist.kStraight;
-        break;
-      
-      case CARGO:
-        this.targetPosition = Wrist.kFloor;
-        break;
+      switch (Robot.mode)
+      {
+        case HATCH:
+          this.targetPosition = Wrist.kStraight;
+          break;
+        
+        case CARGO:
+          this.targetPosition = Wrist.kFloor;
+          break;
 
-      case CLIMB:
-        this.targetPosition = Wrist.kInside;
-        break;
+        case CLIMB:
+          this.targetPosition = Wrist.kInside;
+          break;
+      }
     }
 
     Robot.wrist.set(this.targetPosition);
