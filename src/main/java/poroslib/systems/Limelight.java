@@ -20,7 +20,17 @@ public class Limelight
     private NetworkTableEntry tPipeline;
     private NetworkTableEntry tLedMode;
 
+    private int imgWidth = 320;
+    private int horizontalFov = 54;
+    private double focalLength = this.imgWidth / (2 * Math.tan(this.horizontalFov/2.0));
+    
+    private double camHeight;
+    private double camHorizontalOffset;
+    private double camVerticalOffset;
+    private double camHorizontalDegreeOffset;
+
     private double lastNTUpdate;
+
 
     public Limelight()
     {
@@ -58,6 +68,26 @@ public class Limelight
         return tIsTarget.getDouble(0) == 1;
     }
 
+    public void setCamDisplacement(double height)
+    {
+        this.camHeight = height;
+    }
+
+    public void setHorizontalOffset(double horizontalOffset)
+    {
+        this.camHorizontalOffset = horizontalOffset;
+    }
+
+    public void setVerticalOffset(double verticalOffset)
+    {
+        this.camHorizontalOffset = verticalOffset;
+    }
+
+    public void setHorizontalDegreeOffset(double horizontalDegreeOffset)
+    {
+        this.camHorizontalDegreeOffset = horizontalDegreeOffset;
+    }
+
     public enum LimelightCamMode
     {
         VisionProcessor(0),
@@ -78,7 +108,7 @@ public class Limelight
 
     public void setPipeline(int pipeline)
     {
-        if(pipeline <= 9)
+        if (pipeline >= 0 && pipeline <= 9)
         {
             tPipeline.setNumber(pipeline);
         }
@@ -106,5 +136,12 @@ public class Limelight
     public void setLastUpdateTimeStamp()
     {
         this.lastNTUpdate = Timer.getFPGATimestamp();
+    }
+
+    public double calculateDistance(double targerHeight)
+    {
+        double camDistance = this.focalLength * targerHeight/this.camHeight;
+        double robotHorizontalOffset = this.camHorizontalDegreeOffset - getHorizontalOffset();
+        return Math.sqrt(Math.pow(camDistance*Math.sin(Math.abs(robotHorizontalOffset))+this.camHorizontalOffset, 2) + Math.pow(camDistance * Math.cos(robotHorizontalOffset) + this.camVerticalOffset, 2));
     }
 }
