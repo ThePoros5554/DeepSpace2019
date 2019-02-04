@@ -24,8 +24,10 @@ public class Lifter extends Subsystem {
   private static final int kFrontSolenoidReversePort = 0;
   private static final int kRearSolenoidForwardPort = 0;
   private static final int kRearSolenoidReversePort = 0;
-  private static final int kRearLeftMotorPort = 1;
+  //
+  private static final int kRearLeftMotorPort = 0;
   private static final int kRearRightMotorPort = 1;
+  //
 
   private DoubleSolenoid frontPistons;
   private DoubleSolenoid rearPistons;

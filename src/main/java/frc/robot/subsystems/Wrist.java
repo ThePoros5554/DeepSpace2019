@@ -25,7 +25,10 @@ public class Wrist extends Subsystem {
   public static final double kManualPowerUp = 0.9;
   public static final double kManualPowerDown = -0.7;
 
-  private static final int kWristPort = 5;
+  //
+  private static final int kWristPort = 3;
+  //
+
   private static final int kMaxTilt = 0;
   private static final int kMinTilt = 1;
   private static final double kVoltage = 0;

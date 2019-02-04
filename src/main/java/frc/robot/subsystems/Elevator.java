@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -20,7 +21,11 @@ public class Elevator extends Subsystem
     public static final int kCargoMiddleHeight = 245;
     public static final int kCargoHighHeight = 500;
 
-    private static final int kElevatorPort = 6;
+    //
+    private static final int kElevatorMasterPort = 2;
+    private static final int kElevatorFollowerPort = 4;
+    //
+
     private static final int kMaxAcceleration = 2;
     private static final int kMaxVelocity = 6;
     private static final double kVoltage = 10;
@@ -34,6 +39,7 @@ public class Elevator extends Subsystem
     private static final int kMinHeight = 0;
 
     private WPI_TalonSRX master;
+    private WPI_VictorSPX follower;
     private ControlMode controlMode;
     private ElevatorLevel currentLevel;
 
@@ -44,7 +50,8 @@ public class Elevator extends Subsystem
 
     public Elevator()
     {
-        master = new WPI_TalonSRX(kElevatorPort);
+        master = new WPI_TalonSRX(kElevatorMasterPort);
+        follower = new WPI_VictorSPX(kElevatorFollowerPort);
 
         master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
@@ -60,9 +67,13 @@ public class Elevator extends Subsystem
         //config motion magic
         this.configMotionValues(kMaxAcceleration, kMaxVelocity);
         
+        // rampi
+        this.configRamp(kRamp);
+
         //config (if needed) pid loops
 
         //followers + slaves
+        follower.follow(master);
 
         //Config direction of master and slaves
         master.setSensorPhase(kInvertEnc);
@@ -79,9 +90,18 @@ public class Elevator extends Subsystem
         set(0);
     }
 
-    public void setNeutralMode(NeutralMode neturalMode)
+    public void setNeutralMode(NeutralMode neutralMode)
     {
-        master.setNeutralMode(neturalMode);
+        master.setNeutralMode(neutralMode);
+        follower.setNeutralMode(neutralMode);
+    }
+
+    public void configRamp(double ramp)
+    {
+        this.master.configOpenloopRamp(ramp);
+        this.follower.configOpenloopRamp(ramp);
+        this.master.configClosedloopRamp(ramp);
+        this.follower.configClosedloopRamp(ramp);
     }
 
     public void configReverseLimit(LimitSwitchSource switchSource, LimitSwitchNormal switchNormal)
@@ -101,23 +121,33 @@ public class Elevator extends Subsystem
     {
         master.configForwardSoftLimitThreshold(forwardSensorLimit);
         master.configForwardSoftLimitEnable(enableForwardLimit);
+
+        follower.configForwardSoftLimitThreshold(forwardSensorLimit);
+        follower.configForwardSoftLimitEnable(enableForwardLimit);
     }
 
     public void configReverseSoftLimitThreshold(int reverseSensorLimit, boolean enableReverseLimit)
     {
         master.configReverseSoftLimitThreshold(reverseSensorLimit);
         master.configReverseSoftLimitEnable(enableReverseLimit);
+
+        follower.configForwardSoftLimitThreshold(reverseSensorLimit);
+        follower.configForwardSoftLimitEnable(enableReverseLimit);
     }
 
     public void overrideSoftLimitsEnable(boolean isLimitsEnabled)
     {
         master.overrideSoftLimitsEnable(isLimitsEnabled);
+        follower.overrideSoftLimitsEnable(isLimitsEnabled);
     }
 
     public void configVoltageCompSaturation(double voltage, boolean enableVoltageCompensation)
     {
         master.configVoltageCompSaturation(voltage);
         master.enableVoltageCompensation(enableVoltageCompensation);
+
+        follower.configVoltageCompSaturation(voltage);
+        follower.enableVoltageCompensation(enableVoltageCompensation);
     }
 
     public void setControlMode(ControlMode controlMode)
