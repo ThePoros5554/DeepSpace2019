@@ -110,8 +110,8 @@ public class OI
     private InitLiftMode prepareLift;
     private MoveLifterWheels moveForwardLifter;
     private MoveLifterWheels moveBackwardLifter;
-    private CloseFrontLifters cFront;
-    private CloseRearLifters cRear;
+    private CloseFrontLifters closeFrontLifters;
+    private CloseRearLifters closeRearLifters;
     private MoveElevator elevatorUp;
     private MoveElevator elevatorDown;
 
@@ -168,17 +168,17 @@ public class OI
         prepareCargoLow = new InitCargoLowMode();
         prepareCargoMiddle = new InitCargoMiddleMode();
         prepareCargoHigh = new InitCargoHighMode();
-        toggleGamepiece = new ToggleGamepieceMode();
-
-        prepareLift = new InitLiftMode();
-
         collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
         ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
+
+        prepareLift = new InitLiftMode();
         liftRobot = new LiftRobot();
         moveForwardLifter = new MoveLifterWheels(Lifter.wheelForwardPower);
         moveBackwardLifter = new MoveLifterWheels(Lifter.wheelReversePower);
-        cRear = new CloseRearLifters();
-        cFront = new CloseFrontLifters();
+        closeRearLifters = new CloseRearLifters();
+        closeFrontLifters = new CloseFrontLifters();
+
+        toggleGamepiece = new ToggleGamepieceMode();
         elevatorDown = new MoveElevator(elevatorDownAxis);
         elevatorUp = new MoveElevator(elevatorUpAxis);
 
@@ -187,20 +187,15 @@ public class OI
         Robot.drivetrain.setDefaultCommand(defaultDrive);
         Robot.drivetrain.SetIsRanged(true);
 
-        elevatorUpAxis.whileActive(elevatorUp);
-        elevatorDownAxis.whileActive(elevatorDown);
-        
         modeButton.whenPressed(toggleGamepiece);
         
-        liftRobotTrigger.whenActive(liftRobot);
-
+        // climb
         prepareLiftButton.whenPressed(prepareLift);
-
+        liftRobotTrigger.whenActive(liftRobot);
+        liftCloseFrontTrigger.whenActive(closeFrontLifters);
+        liftCloseRearTrigger.whenActive(closeRearLifters);
         moveForwardLifterTrigger.whenActive(moveForwardLifter);
         moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
-        
-        liftCloseFrontTrigger.whenActive(cFront);
-        liftCloseRearTrigger.whenActive(cRear);
 
         // hatch
         prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
@@ -217,5 +212,9 @@ public class OI
         prepareCargoHighTrigger.whenActive(prepareCargoHigh);
         collectCargoTrigger.whenActive(collectCargo);
         ejectCargoTrigger.whenActive(ejectCargo);
+
+        // manual
+        elevatorUpAxis.whileActive(elevatorUp);
+        elevatorDownAxis.whileActive(elevatorDown);
     }
 }

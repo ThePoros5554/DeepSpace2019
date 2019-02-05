@@ -41,7 +41,7 @@ public class Wrist extends Subsystem {
   private static final boolean kInvertPot = false;
   private static final int kMaxVelocity = 5;
   private static final double kRamp = 0.2;
-  private static final int targetThreshold = 2;
+  private static final int kTargetThreshold = 2;
 
   private WPI_TalonSRX master;
   private ControlMode controlMode;
@@ -192,7 +192,7 @@ public class Wrist extends Subsystem {
   {
     int sensorpos = getSensorPosition();
 
-    return (target >= (sensorpos - targetThreshold) && target <= (sensorpos + targetThreshold));
+    return (target >= (sensorpos - kTargetThreshold) && target <= (sensorpos + kTargetThreshold));
   }
 
   public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)

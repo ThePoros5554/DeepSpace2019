@@ -28,25 +28,25 @@ public class Drivetrain extends DiffDrivetrain
   public static final int kFrontLeftPort = 0;
   public static final int kFrontRightPort = 1;
 
-  public static final int kMiddleRightPort = 2;
-  public static final int kRearRightPort = 3;
+  private static final int kMiddleRightPort = 2;
+  private static final int kRearRightPort = 3;
   
-  public static final int kMiddleLeftPort = 0;
-  public static final int kRearLeftPort = 1;
+  private static final int kMiddleLeftPort = 0;
+  private static final int kRearLeftPort = 1;
   //
 
-  public static final boolean kInvertEncLeft = false;
-  public static final boolean kInvertEncRight = false;
+  private static final boolean kInvertEncLeft = false;
+  private static final boolean kInvertEncRight = false;
 
-  public static final double kVoltage = 12;
+  private static final double kVoltage = 12;
 
-  public static final double kP = 0;
-  public static final double kI = 0;
-  public static final double kD = 0;
+  private static final double kP = 0;
+  private static final double kI = 0;
+  private static final double kD = 0;
   public static final double kEjectDriveBackDistance = 14.3;
-  public static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  
-  public static final double kRamp = 0.4;
+  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
+  private static final int kTargetThreshold = 0;
+  private static final double kRamp = 0.4;
   /*****/
 
   private WPI_TalonSRX masterLeft;
@@ -265,6 +265,15 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.selectProfileSlot(profileSlot, 0);
 /*  this.middleRight.selectProfileSlot(profileSlot, 0);
     this.rearRight.selectProfileSlot(profileSlot, 0); */
+  }
+
+  public boolean isInTarget(double rightTarget, double leftTarget)
+  {
+    int rightpos = getRawRightPosition();
+    int leftpos = getRawLeftPosition();
+
+    return (rightTarget >= (rightpos - kTargetThreshold) && rightTarget <= (rightpos + kTargetThreshold)) &&
+    (leftTarget >= (leftpos - kTargetThreshold) && leftTarget <= (leftpos + kTargetThreshold));
   }
 
   @Override
