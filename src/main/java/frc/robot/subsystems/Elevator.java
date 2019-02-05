@@ -13,13 +13,13 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Elevator extends Subsystem
 {
-    public static final int kFloor = 0;
-    public static final int kHatchLowHeight = 10;
-    public static final int kHatchMiddleHeight = 200;
-    public static final int kHatchHighHeight = 480;
-    public static final int kCargoLowHeight = 50;
-    public static final int kCargoMiddleHeight = 245;
-    public static final int kCargoHighHeight = 500;
+    public static final int kFloorPosition = 0;
+    public static final int kHatchLowPosition = 10;
+    public static final int kHatchMiddlePosition = 200;
+    public static final int kHatchHighPosition = 480;
+    public static final int kCargoLowPosition = 50;
+    public static final int kCargoMiddlePosition = 245;
+    public static final int kCargoHighPosition = 500;
 
     //
     private static final int kElevatorMasterPort = 2;
@@ -37,15 +37,16 @@ public class Elevator extends Subsystem
     private static final double kRamp = 0.4;
     private static final int kMaxHeight = 500;
     private static final int kMinHeight = 0;
+    private static final int targetThreshold = 2;
 
     private WPI_TalonSRX master;
     private WPI_VictorSPX follower;
     private ControlMode controlMode;
-    private ElevatorLevel currentLevel;
+    private ElevatorMode currentMode;
 
-    public enum ElevatorLevel
+    public enum ElevatorMode
     {
-        FLOOR, FIRST, SECOND, THIRD
+        FLOOR, LOW_HATCH, LOW_CARGO, MIDDLE_HATCH, MIDDLE_CARGO, HIGH_HATCH, HIGH_CARGO
     }
 
     public Elevator()
@@ -84,7 +85,7 @@ public class Elevator extends Subsystem
 
         this.master.configOpenloopRamp(kRamp);
 
-        currentLevel = ElevatorLevel.FLOOR;
+        currentMode = ElevatorMode.FLOOR;
 
         controlMode = ControlMode.PercentOutput;
         set(0);
@@ -160,6 +161,83 @@ public class Elevator extends Subsystem
         master.set(controlMode, output);
     }
 
+    public void set(ElevatorMode mode)
+    {
+      if (this.controlMode == ControlMode.MotionMagic || this.controlMode == ControlMode.Position)
+      {
+        switch (this.currentMode)
+        {
+          case FLOOR:
+          set(kFloorPosition);
+          break;
+  
+          case LOW_HATCH:
+          set(kHatchLowPosition);
+          break;
+  
+          case LOW_CARGO:
+          set(kCargoLowPosition);
+          break;
+  
+          case MIDDLE_HATCH:
+          set(kHatchMiddlePosition);
+          break;
+  
+          case MIDDLE_CARGO:
+          set(kCargoMiddlePosition);
+          break;
+
+          case HIGH_HATCH:
+          set(kHatchHighPosition);
+          break;
+  
+          case HIGH_CARGO:
+          set(kCargoHighPosition);
+          break;
+        }
+      }
+    }
+  
+    public boolean isInMode(ElevatorMode mode)
+    {
+      if (mode == this.currentMode)
+        return true;
+  
+        switch (mode)
+        {
+          case FLOOR:
+          return isInTarget(kFloorPosition);
+  
+          case LOW_HATCH:
+          return isInTarget(kHatchLowPosition);
+  
+          case LOW_CARGO:
+          return isInTarget(kCargoLowPosition);
+  
+          case MIDDLE_HATCH:
+          return isInTarget(kHatchMiddlePosition);
+  
+          case MIDDLE_CARGO:
+          return isInTarget(kCargoMiddlePosition);
+
+          case HIGH_HATCH:
+          return isInTarget(kHatchHighPosition);
+  
+          case HIGH_CARGO:
+          return isInTarget(kCargoHighPosition);
+
+          default:
+          return false;
+        }
+    }
+
+    public boolean isInTarget(int target)
+    {
+      int sensorpos = getSensorPosition();
+  
+      return (target >= (sensorpos - targetThreshold) && target <= (sensorpos + targetThreshold));
+    }
+
     public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
     {
 		master.config_kP(profileSlot, kP);
@@ -189,14 +267,14 @@ public class Elevator extends Subsystem
         return master.getSelectedSensorPosition();
     }
 
-    public void setCurrentLevel(ElevatorLevel currentLevel)
+    public void setElevatorMode(ElevatorMode currentLevel)
     {
-        this.currentLevel = currentLevel;
+        this.currentMode = currentLevel;
     }
 
-    public ElevatorLevel getCurrentLevel()
+    public ElevatorMode getsetElevatorMode()
     {
-        return this.currentLevel;
+        return this.currentMode;
     }
 
     @Override

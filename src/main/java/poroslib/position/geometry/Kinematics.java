@@ -1,4 +1,4 @@
-package poroslib.position.geomatry;
+package poroslib.position.geometry;
 
 public class Kinematics
 {

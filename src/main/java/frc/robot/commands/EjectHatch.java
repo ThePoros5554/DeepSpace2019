@@ -8,19 +8,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import frc.robot.commands.elevator.AdjustElevator;
-import frc.robot.commands.wrist.AdjustWrist;
-import frc.robot.subsystems.Elevator.ElevatorMode;
-import frc.robot.subsystems.Wrist.WristMode;
+import frc.robot.commands.drive.MagicDrive;
+import frc.robot.commands.hatch_launcher.ActivateLauncher;
+import frc.robot.commands.hatch_launcher.RetractLauncher;
 
-public class InitLiftMode extends CommandGroup {
+public class EjectHatch extends CommandGroup {
   /**
    * Add your docs here.
    */
-  public InitLiftMode()
+  public EjectHatch(double backDistance)
   {
-    addSequential(new SetClimbMode());
-    addSequential(new AdjustElevator(ElevatorMode.FLOOR)); 
-    addSequential(new AdjustWrist(WristMode.INSIDE));
+    addSequential(new ActivateLauncher());
+    addSequential(new MagicDrive(backDistance, backDistance, true));
+    addSequential(new RetractLauncher());
   }
 }

@@ -11,65 +11,24 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.ElevatorLevel;
+import frc.robot.subsystems.Elevator.ElevatorMode;
 
 public class AdjustElevator extends Command
 {
-  private ElevatorLevel targetLevel = ElevatorLevel.FLOOR;
-  private int targetPosition = 0;
+  private ElevatorMode targetMode;
   
-  public AdjustElevator(ElevatorLevel level)
+  public AdjustElevator(ElevatorMode mode)
   {
     requires(Robot.elevator);
-    this.targetLevel = level;
-  }
-
-  private void autoSetPosition()
-  {
-    switch (this.targetLevel)
-    {
-      case FLOOR:
-        this.targetPosition = Elevator.kFloor;
-        break;
-      
-      case FIRST:
-        switch (Robot.mode)
-        {
-          case HATCH: this.targetPosition = Elevator.kHatchLowHeight; break;
-          case CARGO: this.targetPosition = Elevator.kCargoLowHeight; break;
-          case CLIMB: this.targetPosition = Elevator.kFloor; break;
-        }
-        break;
-
-      case SECOND:
-        switch (Robot.mode)
-        {
-          case HATCH: this.targetPosition = Elevator.kHatchMiddleHeight; break;
-          case CARGO: this.targetPosition = Elevator.kCargoMiddleHeight; break;
-          case CLIMB: this.targetPosition = Elevator.kFloor; break;
-        }
-        break;
-        
-      case THIRD:
-        switch (Robot.mode)
-        {
-          case HATCH: this.targetPosition = Elevator.kHatchHighHeight; break;
-          case CARGO: this.targetPosition = Elevator.kCargoHighHeight; break;
-          case CLIMB: this.targetPosition = Elevator.kFloor; break;
-        }
-        break;
-    }
+    this.targetMode = mode;
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize()
   {
-    autoSetPosition();
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    Robot.elevator.set(this.targetPosition);
-    Robot.elevator.setCurrentLevel(this.targetLevel);
+    Robot.elevator.set(this.targetMode);
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -82,13 +41,18 @@ public class AdjustElevator extends Command
   @Override
   protected boolean isFinished()
   {
-    return Robot.elevator.getSensorPosition() == this.targetPosition;
+    return Robot.elevator.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
+    if (isFinished())
+    {
+      Robot.elevator.setElevatorMode(this.targetMode);
+    }
+
     Robot.elevator.setControlMode(ControlMode.PercentOutput);
     Robot.elevator.set(0);
   }

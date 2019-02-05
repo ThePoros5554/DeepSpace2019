@@ -13,14 +13,14 @@ import frc.robot.commands.wrist.AdjustWrist;
 import frc.robot.subsystems.Elevator.ElevatorMode;
 import frc.robot.subsystems.Wrist.WristMode;
 
-public class InitLiftMode extends CommandGroup {
+public class InitCargoLowMode extends CommandGroup
+{
   /**
    * Add your docs here.
    */
-  public InitLiftMode()
+  public InitCargoLowMode()
   {
-    addSequential(new SetClimbMode());
-    addSequential(new AdjustElevator(ElevatorMode.FLOOR)); 
-    addSequential(new AdjustWrist(WristMode.INSIDE));
+    addSequential(new AdjustElevator(ElevatorMode.LOW_CARGO));
+    addParallel(new AdjustWrist(WristMode.DOWN));
   }
 }

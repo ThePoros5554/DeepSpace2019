@@ -1,6 +1,6 @@
 package poroslib.position;
 
-import poroslib.position.geomatry.Pose2d;
+import poroslib.position.geometry.Pose2d;
 
 public class VisionInfo
 {

@@ -5,56 +5,44 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.wrist;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
+package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 
-public class MoveWrist extends Command
+public class MagicDrive extends Command
 {
-  private double power;
-
-  public MoveWrist(double power)
+  public MagicDrive(double rightDistance, double leftDistance, boolean reverse)
   {
-    requires(Robot.wrist);
-    this.power = power;
+    requires(Robot.drivetrain);
+    // Use requires() here to declare subsystem dependencies
+    // eg. requires(chassis);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize()
-  {
-    Robot.wrist.setControlMode(ControlMode.PercentOutput);
-    Robot.wrist.set(this.power);
+  protected void initialize() {
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
-  protected void execute() 
-  {
+  protected void execute() {
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished()
-  {
+  protected boolean isFinished() {
     return false;
   }
 
   // Called once after isFinished returns true
   @Override
-  protected void end()
-  {
-    Robot.wrist.set(0);
+  protected void end() {
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
-  protected void interrupted()
-  {
-    end();
+  protected void interrupted() {
   }
 }

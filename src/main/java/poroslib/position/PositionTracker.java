@@ -2,9 +2,9 @@ package poroslib.position;
 
 import java.util.Map.Entry;
 
-import poroslib.position.geomatry.Kinematics;
-import poroslib.position.geomatry.Pose2d;
-import poroslib.position.geomatry.Rotation2d;
+import poroslib.position.geometry.Kinematics;
+import poroslib.position.geometry.Pose2d;
+import poroslib.position.geometry.Rotation2d;
 import poroslib.util.InterpolatingDouble;
 import poroslib.util.InterpolatingTreeMap;
 

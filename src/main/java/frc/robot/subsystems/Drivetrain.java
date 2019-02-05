@@ -43,7 +43,7 @@ public class Drivetrain extends DiffDrivetrain
   public static final double kP = 0;
   public static final double kI = 0;
   public static final double kD = 0;
-  
+  public static final double kEjectDriveBackDistance = 14.3;
   public static final NeutralMode kNeutralMode = NeutralMode.Brake;
   
   public static final double kRamp = 0.4;

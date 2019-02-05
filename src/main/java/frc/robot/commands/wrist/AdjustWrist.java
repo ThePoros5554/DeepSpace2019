@@ -11,24 +11,16 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist.WristMode;
 
 public class AdjustWrist extends Command
 {
+  private WristMode targetMode;
 
-  private int targetPosition = 0;
-  private boolean overrideAutomatic = false;
-
-  public AdjustWrist()
+  public AdjustWrist(WristMode mode)
   {
     requires(Robot.wrist);
-  }
-
-  public AdjustWrist(int targetPosition)
-  {
-    requires(Robot.wrist);
-    this.targetPosition = targetPosition;
-    this.overrideAutomatic = true;
+    this.targetMode = mode;
   }
 
   // Called just before this Command runs the first time
@@ -36,26 +28,7 @@ public class AdjustWrist extends Command
   protected void initialize()
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
-    
-    if (!this.overrideAutomatic)
-    {
-      switch (Robot.mode)
-      {
-        case HATCH:
-          this.targetPosition = Wrist.kStraight;
-          break;
-        
-        case CARGO:
-          this.targetPosition = Wrist.kFloor;
-          break;
-
-        case CLIMB:
-          this.targetPosition = Wrist.kInside;
-          break;
-      }
-    }
-
-    Robot.wrist.set(this.targetPosition);
+    Robot.wrist.set(this.targetMode);
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -68,13 +41,18 @@ public class AdjustWrist extends Command
   @Override
   protected boolean isFinished()
   {
-    return Robot.wrist.getSensorPosition() == this.targetPosition;
+    return Robot.wrist.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
+    if (isFinished())
+    {
+      Robot.wrist.setWristMode(this.targetMode);
+    }
+
     Robot.wrist.setControlMode(ControlMode.PercentOutput);
     Robot.wrist.set(0);
   }

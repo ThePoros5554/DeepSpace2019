@@ -10,16 +10,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.wrist.AdjustWrist;
-import frc.robot.subsystems.Elevator.ElevatorLevel;
+import frc.robot.subsystems.Elevator.ElevatorMode;
+import frc.robot.subsystems.Wrist.WristMode;
 
-public class InitLowMode extends CommandGroup
+public class InitCargoCollectMode extends CommandGroup
 {
   /**
    * Add your docs here.
    */
-  public InitLowMode()
+  public InitCargoCollectMode()
   {
-    addSequential(new AdjustElevator(ElevatorLevel.FIRST));
-    addParallel(new AdjustWrist());
+    addSequential(new AdjustElevator(ElevatorMode.FLOOR));
+    addParallel(new AdjustWrist(WristMode.DOWN));
   }
 }

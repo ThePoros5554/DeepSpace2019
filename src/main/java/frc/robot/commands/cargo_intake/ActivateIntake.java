@@ -10,9 +10,9 @@ package frc.robot.commands.cargo_intake;
 import frc.robot.Robot;
 import poroslib.commands.ActivateMechSys;
 
-public class IntakeCargo extends ActivateMechSys
+public class ActivateIntake extends ActivateMechSys
 {  
-  public IntakeCargo(double power)
+  public ActivateIntake(double power)
   {
     super(Robot.cargoIntake, power);
   }

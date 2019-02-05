@@ -10,27 +10,32 @@ package frc.robot;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.Robot.RobotMode;
-import frc.robot.commands.InitCollectMode;
-import frc.robot.commands.InitHighMode;
-import frc.robot.commands.InitLowMode;
-import frc.robot.commands.InitMiddleMode;
+import frc.robot.commands.InitHatchCollectMode;
+import frc.robot.commands.InitCargoCollectMode;
+import frc.robot.commands.InitHatchLowMode;
+import frc.robot.commands.InitCargoLowMode;
+import frc.robot.commands.InitHatchMiddleMode;
+import frc.robot.commands.InitLiftMode;
+import frc.robot.commands.InitCargoMiddleMode;
+import frc.robot.commands.InitHatchHighMode;
+import frc.robot.commands.InitCargoHighMode;
 import frc.robot.commands.ToggleGamepieceMode;
-import frc.robot.commands.cargo_intake.IntakeCargo;
+import frc.robot.commands.cargo_intake.ActivateIntake;
 import frc.robot.commands.elevator.MoveElevator;
-import frc.robot.commands.hatch_launcher.LaunchHatch;
+import frc.robot.commands.EjectHatch;
 import frc.robot.commands.lifter.CloseFrontLifters;
 import frc.robot.commands.lifter.CloseRearLifters;
 import frc.robot.commands.lifter.LiftRobot;
 import frc.robot.commands.lifter.MoveLifterWheels;
 import frc.robot.commands.wrist.AdjustWrist;
 import frc.robot.subsystems.CargoIntake;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Lifter;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist.WristMode;
 import frc.robot.triggers.ModeTrigger;
 import poroslib.commands.TankDrive;
 import poroslib.triggers.JoyAxis;
 import poroslib.triggers.SmartJoystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -46,12 +51,14 @@ public class OI
     private static final int kRobotModeButton = 8; // START
     private static final int kEjectPartButton = 5; // LB
     private static final int kCollectPartButton = 6; // RB
+    private static final int kLiftRobotButton = 0;
     private static final int kMoveForwardLifterButton = 0; 
     private static final int kMoveBackwardsLifterButton = 0;
-    private static final int kCloseRearLiftersButton = 0;
-    private static final int kCloseFrontLiftersButton = 0;
+    private static final int kLiftCloseRearButton = 0;
+    private static final int kLiftCloseFrontButton = 0;
     private static final int kElevatorUpAxis = 3; // RT
     private static final int kElevatorDownAxis = 2; // LT
+    private static final int kRobotLiftModeButton = 0;
 
     // Joystick Ports
     private static final int kDriverLeftJoystickPort = 0;
@@ -63,32 +70,44 @@ public class OI
     private SmartJoystick operatorJoy;
 
     private Button modeButton;
-    private Button collectButton;
-    private Button lowButton;
-    private Button middleButton;
-    private Button highButton;
-    private Button liftButton;
-    private Button moveForwardLifterButton;
-    private Button moveBackwardLifterButton;
-    private Button closeRearLiftersButton;
-    private Button closeFrontLiftersButton;
-    private ModeTrigger collectHatchButton;
-    private ModeTrigger collectCargoButton;
-    private ModeTrigger ejectHatchButton;
-    private ModeTrigger ejectCargoButton;
+    private Button prepareLiftButton;
+
+    private ModeTrigger prepareHatchCollectTrigger;
+    private ModeTrigger prepareCargoCollectTrigger;
+    private ModeTrigger prepareHatchLowTrigger;
+    private ModeTrigger prepareCargoLowTrigger;
+    private ModeTrigger prepareHatchMiddleTrigger;
+    private ModeTrigger prepareCargoMiddleTrigger;
+    private ModeTrigger prepareHatchHighTrigger;
+    private ModeTrigger prepareCargoHighTrigger;
+    private ModeTrigger collectHatchTrigger;
+    private ModeTrigger collectCargoTrigger;
+    private ModeTrigger ejectHatchTrigger;
+    private ModeTrigger ejectCargoTrigger;
+    private ModeTrigger liftRobotTrigger;
+    private ModeTrigger liftCloseFrontTrigger;
+    private ModeTrigger liftCloseRearTrigger;
+    private ModeTrigger moveForwardLifterTrigger;
+    private ModeTrigger moveBackwardsLifterTrigger;
+    
     private JoyAxis elevatorDownAxis;
     private JoyAxis elevatorUpAxis;
 
     private TankDrive defaultDrive;
     private AdjustWrist collectHatch;
-    private LaunchHatch ejectHatch;
-    private IntakeCargo collectCargo;
-    private IntakeCargo ejectCargo;
-    private InitCollectMode collectMode;
-    private InitLowMode lowMode;
-    private InitMiddleMode middleMode;
-    private InitHighMode highMode;
+    private EjectHatch ejectHatch;
+    private ActivateIntake collectCargo;
+    private ActivateIntake ejectCargo;
+    private InitHatchCollectMode prepareHatchCollect;
+    private InitHatchLowMode prepareHatchLow;
+    private InitHatchMiddleMode prepareHatchMiddle;
+    private InitHatchHighMode prepareHatchHigh;
+    private InitCargoCollectMode prepareCargoCollect;
+    private InitCargoLowMode prepareCargoLow;
+    private InitCargoMiddleMode prepareCargoMiddle;
+    private InitCargoHighMode prepareCargoHigh;
     private LiftRobot liftRobot;
+    private InitLiftMode prepareLift;
     private MoveLifterWheels moveForwardLifter;
     private MoveLifterWheels moveBackwardLifter;
     private CloseFrontLifters cFront;
@@ -107,22 +126,29 @@ public class OI
         rightJoy = new SmartJoystick(kDriverRightJoystickPort);
         operatorJoy = new SmartJoystick(kOperatorJoystickPort);
 
-        // buttons
-        modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
-        highButton = new JoystickButton(operatorJoy, kHighModeButton);
-        middleButton = new JoystickButton(operatorJoy, kMiddleModeButton);
-        lowButton = new JoystickButton(operatorJoy, kLowModeButton);
-        collectButton = new JoystickButton(operatorJoy, kCollectModeButton);
-        moveBackwardLifterButton = new JoystickButton(operatorJoy, kMoveBackwardsLifterButton);
-        moveForwardLifterButton = new JoystickButton(operatorJoy, kMoveForwardLifterButton);
-        closeFrontLiftersButton = new JoystickButton(operatorJoy, kCloseFrontLiftersButton);
-        closeRearLiftersButton = new JoystickButton(operatorJoy, kCloseRearLiftersButton);
+        // buttons and triggers
+        prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
+        prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
+        prepareHatchMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.HATCH);
+        prepareHatchHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.HATCH);
+        collectHatchTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.HATCH);
+        ejectHatchTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.HATCH);
 
-        // mode buttons
-        collectHatchButton = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.HATCH);
-        collectCargoButton = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.CARGO);
-        ejectHatchButton = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.HATCH);
-        ejectCargoButton = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.CARGO);
+        prepareCargoCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.CARGO);
+        prepareCargoLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.CARGO);
+        prepareCargoMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.CARGO);
+        prepareCargoHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.CARGO);
+        collectCargoTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.CARGO);
+        ejectCargoTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.CARGO);
+
+        liftRobotTrigger = new ModeTrigger(operatorJoy, kLiftRobotButton, RobotMode.CLIMB);
+        liftCloseFrontTrigger = new ModeTrigger(operatorJoy, kLiftCloseFrontButton, RobotMode.CLIMB);
+        liftCloseRearTrigger = new ModeTrigger(operatorJoy, kLiftCloseRearButton, RobotMode.CLIMB);
+        moveBackwardsLifterTrigger = new ModeTrigger(operatorJoy, kMoveBackwardsLifterButton, RobotMode.CLIMB);
+        moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
+
+        modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
+        prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
         
         // axis
         elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, -1, 0, 1);
@@ -130,15 +156,24 @@ public class OI
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
-        collectMode = new InitCollectMode();
-        lowMode = new InitLowMode();
-        middleMode = new InitMiddleMode();
-        highMode = new InitHighMode();
+        
+        prepareHatchCollect = new InitHatchCollectMode();
+        prepareHatchLow = new InitHatchLowMode();
+        prepareHatchMiddle = new InitHatchMiddleMode();
+        prepareHatchHigh = new InitHatchHighMode();
+        collectHatch = new AdjustWrist(WristMode.DOWN);
+        ejectHatch = new EjectHatch(Drivetrain.kEjectDriveBackDistance);
+
+        prepareCargoCollect = new InitCargoCollectMode();
+        prepareCargoLow = new InitCargoLowMode();
+        prepareCargoMiddle = new InitCargoMiddleMode();
+        prepareCargoHigh = new InitCargoHighMode();
         toggleGamepiece = new ToggleGamepieceMode();
-        collectHatch = new AdjustWrist(Wrist.kFloor);
-        ejectHatch = new LaunchHatch();
-        collectCargo = new IntakeCargo(CargoIntake.kIntakeInPower);
-        ejectCargo = new IntakeCargo(CargoIntake.kIntakeOutPower);
+
+        prepareLift = new InitLiftMode();
+
+        collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
+        ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
         liftRobot = new LiftRobot();
         moveForwardLifter = new MoveLifterWheels(Lifter.wheelForwardPower);
         moveBackwardLifter = new MoveLifterWheels(Lifter.wheelReversePower);
@@ -154,26 +189,33 @@ public class OI
 
         elevatorUpAxis.whileActive(elevatorUp);
         elevatorDownAxis.whileActive(elevatorDown);
-
-        collectButton.whenPressed(collectMode);
-        lowButton.whenPressed(lowMode);
-        middleButton.whenPressed(middleMode);
-        highButton.whenPressed(highMode);
         
         modeButton.whenPressed(toggleGamepiece);
-
-        liftButton.whenPressed(liftRobot);
-
-        moveForwardLifterButton.whenPressed(moveForwardLifter);
-        moveBackwardLifterButton.whenPressed(moveBackwardLifter);
         
-        closeFrontLiftersButton.whenPressed(cFront);
-        closeRearLiftersButton.whenPressed(cRear);
+        liftRobotTrigger.whenActive(liftRobot);
 
-        collectHatchButton.whenActive(collectHatch);
-        ejectHatchButton.whenActive(ejectHatch);
+        prepareLiftButton.whenPressed(prepareLift);
 
-        collectCargoButton.whenActive(collectCargo);
-        ejectCargoButton.whenActive(ejectCargo);
+        moveForwardLifterTrigger.whenActive(moveForwardLifter);
+        moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
+        
+        liftCloseFrontTrigger.whenActive(cFront);
+        liftCloseRearTrigger.whenActive(cRear);
+
+        // hatch
+        prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
+        prepareHatchLowTrigger.whenActive(prepareHatchLow);
+        prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
+        prepareHatchHighTrigger.whenActive(prepareHatchHigh);
+        collectHatchTrigger.whenActive(collectHatch);
+        ejectHatchTrigger.whenActive(ejectHatch);
+
+        // cargo
+        prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
+        prepareCargoLowTrigger.whenActive(prepareCargoLow);
+        prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
+        prepareCargoHighTrigger.whenActive(prepareCargoHigh);
+        collectCargoTrigger.whenActive(collectCargo);
+        ejectCargoTrigger.whenActive(ejectCargo);
     }
 }

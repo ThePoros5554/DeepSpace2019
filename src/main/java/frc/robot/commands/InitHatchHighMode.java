@@ -5,15 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.hatch_launcher;
+package frc.robot.commands;
 
-import frc.robot.Robot;
-import poroslib.commands.OpenDoubleSolenoid;
+import edu.wpi.first.wpilibj.command.CommandGroup;
+import frc.robot.commands.elevator.AdjustElevator;
+import frc.robot.commands.wrist.AdjustWrist;
+import frc.robot.subsystems.Elevator.ElevatorMode;
+import frc.robot.subsystems.Wrist.WristMode;
 
-public class LaunchHatch extends OpenDoubleSolenoid
+public class InitHatchHighMode extends CommandGroup
 {
-  public LaunchHatch()
+  /**
+   * Add your docs here.
+   */
+  public InitHatchHighMode()
   {
-    super(Robot.hatchLauncher);
+    addSequential(new AdjustElevator(ElevatorMode.HIGH_HATCH));
+    addParallel(new AdjustWrist(WristMode.UP));
   }
 }
