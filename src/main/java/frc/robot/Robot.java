@@ -11,12 +11,17 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import frc.robot.commands.UpdateRobotState;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
+import poroslib.position.PositionTracker;
+import poroslib.position.VisionTracker;
+import poroslib.systems.Limelight;
+//import sun.jvm.hotspot.runtime.solaris_sparc.SolarisSPARCJavaThreadPDAccess;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -37,6 +42,7 @@ public class Robot extends TimedRobot
   public static CargoIntake cargoIntake;
   public static HatchLauncher hatchLauncher;
   public static Lifter lifter;
+  public static Limelight lime;
 
   private OI oi;
   
@@ -46,6 +52,8 @@ public class Robot extends TimedRobot
   }
 
   public static RobotMode mode = RobotMode.HATCH;
+
+  private UpdateRobotState updateRobotState;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -65,6 +73,9 @@ public class Robot extends TimedRobot
     lifter = new Lifter();
 
     oi = new OI();
+
+    lime = new Limelight();
+    lime.SetCamPosistion(0, 0, 5.5, 0, 0);
   }
 
   /**
@@ -78,6 +89,10 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
+    while (true)
+    {
+      System.out.print(lime.CalculateDistance(197));
+    }
   }
 
   /**
@@ -88,7 +103,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
-
+    updateRobotState.cancel();
   }
 
   @Override
@@ -113,6 +128,13 @@ public class Robot extends TimedRobot
   {
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
+
+    if(updateRobotState == null)
+    {
+      updateRobotState = new UpdateRobotState();
+    }
+
+    updateRobotState.start();
   }
 
   /**
@@ -127,6 +149,12 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
+    if(updateRobotState == null)
+    {
+      updateRobotState = new UpdateRobotState();
+    }
+    
+    updateRobotState.start();
   }
 
   /**

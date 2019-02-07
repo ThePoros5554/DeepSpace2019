@@ -15,7 +15,8 @@ public class Kinematics
 
     /** Append the result of forward kinematics to a previous pose. */
     public static Pose2d integrateForwardKinematics(Pose2d current_pose, double left_wheel_delta,
-            double right_wheel_delta, Rotation2d current_heading) {
+            double right_wheel_delta, Rotation2d current_heading) 
+    {
         Twist2d with_gyro = forwardKinematics(left_wheel_delta, right_wheel_delta,
                 current_pose.getRotation().inverse().rotateBy(current_heading).getRadians());
         return current_pose.transformBy(Pose2d.fromVelocity(with_gyro));
@@ -29,6 +30,18 @@ public class Kinematics
             this.left = left;
             this.right = right;
         }
+    }
+
+    public static DriveVelocity inverseKinematics(Twist2d velocity, double trackWidthMeters, double trackScrubFactor) 
+    {
+        if (Math.abs(velocity.dtheta) < kEpsilon) 
+        {
+            return new DriveVelocity(velocity.dx, velocity.dx);
+        }
+        
+        double delta_v = trackWidthMeters * velocity.dtheta / (2 * trackScrubFactor);
+
+        return new DriveVelocity(velocity.dx - delta_v, velocity.dx + delta_v);
     }
 
 }

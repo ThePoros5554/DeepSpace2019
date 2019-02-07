@@ -25,9 +25,10 @@ public class Limelight
     private double focalLength = this.imgWidth / (2 * Math.tan(this.horizontalFov/2.0));
     
     private double camHeight;
-    private double camHorizontalOffset;
-    private double camVerticalOffset;
+    private double camHorizontalOffPoint;
     private double camHorizontalDegreeOffset;
+    private double camVerticalDegreeOffset;
+    private double camDiagonalOffPoint;
 
     private double lastNTUpdate;
 
@@ -36,7 +37,7 @@ public class Limelight
     {
         limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
         
-        limelightTable.addEntryListener((limelightTable, key, entry, value, flags) -> { setLastUpdateTimeStamp(); }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+        limelightTable.addEntryListener((limelightTable, key, entry, value, flags) -> { updateLastUpdateTimeStamp(); }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
         tHorizontalOffset = limelightTable.getEntry("tx"); 
         tVerticalOffset = limelightTable.getEntry("ty");
@@ -48,11 +49,19 @@ public class Limelight
         tLedMode = limelightTable.getEntry("ledMode");
     }
 
+    /**
+     * Calculates the targets horizontal off set
+     * @return Targets horizontal off set
+     */
     public double getHorizontalOffset()
     {
         return tHorizontalOffset.getDouble(0.0);
     }
 
+    /**
+     * Calculates the targets vertical off set
+     * @return Targets horizontal off set
+     */
     public double getVerticalOffset()
     {
         return tVerticalOffset.getDouble(0.0);
@@ -73,20 +82,6 @@ public class Limelight
         this.camHeight = height;
     }
 
-    public void setHorizontalOffset(double horizontalOffset)
-    {
-        this.camHorizontalOffset = horizontalOffset;
-    }
-
-    public void setVerticalOffset(double verticalOffset)
-    {
-        this.camHorizontalOffset = verticalOffset;
-    }
-
-    public void setHorizontalDegreeOffset(double horizontalDegreeOffset)
-    {
-        this.camHorizontalDegreeOffset = horizontalDegreeOffset;
-    }
 
     public enum LimelightCamMode
     {
@@ -133,15 +128,52 @@ public class Limelight
         tLedMode.setNumber(ledMode.value);
     }
 
-    public void setLastUpdateTimeStamp()
+    public void updateLastUpdateTimeStamp()
     {
         this.lastNTUpdate = Timer.getFPGATimestamp();
     }
 
-    public double calculateDistance(double targerHeight)
+    public double getLastNTUpdateTime()
     {
-        double camDistance = this.focalLength * targerHeight/this.camHeight;
-        double robotHorizontalOffset = this.camHorizontalDegreeOffset - getHorizontalOffset();
-        return Math.sqrt(Math.pow(camDistance*Math.sin(Math.abs(robotHorizontalOffset))+this.camHorizontalOffset, 2) + Math.pow(camDistance * Math.cos(robotHorizontalOffset) + this.camVerticalOffset, 2));
+        return this.lastNTUpdate;
+    }
+
+    /**
+     * Sets the position of the camera
+     * @param diagonalOffPoint Cam diagonal placement error
+     * @param horizontalOffPoint Cam horizontal placement error
+     * @param height The height of the camera
+     * @param horizontalDegreeOffset Cam horizontal degree placement error
+     * @param verticalDegreeOffset Cam vertical degree placement error
+     */
+    public void SetCamPosistion(double diagonalOffPoint, double horizontalOffPoint, double height, double horizontalDegreeOffset, double verticalDegreeOffset)
+    {
+        this.camDiagonalOffPoint = diagonalOffPoint;
+        this.camHorizontalOffPoint = horizontalOffPoint;
+        this.camHeight = height;
+        this.camHorizontalDegreeOffset = horizontalDegreeOffset;
+        this.camVerticalDegreeOffset = verticalDegreeOffset;
+    }
+
+    /**
+     * Finds the vector of the target
+     * @param targetDiagonal The height of the target
+     * @return The vector of the target
+     */
+    public double[] CalculateDistance(double targetDiagonal)
+    {   
+        double camDistance;
+        double xDistance;
+        double zDistance;
+        double robotHorizontalDegreeOfSet;
+        double robotVerticalDegreeOfSet;
+
+        robotHorizontalDegreeOfSet = this.camHorizontalDegreeOffset - this.getHorizontalOffset();
+        robotVerticalDegreeOfSet = this.camVerticalDegreeOffset - this.getVerticalOffset();
+        camDistance = (targetDiagonal - this.camHeight) / Math.tan(robotVerticalDegreeOfSet);
+        xDistance = camDistance * Math.cos(robotHorizontalDegreeOfSet) + this.camHorizontalOffPoint;
+        zDistance = camDistance * Math.sin(robotHorizontalDegreeOfSet) + this.camDiagonalOffPoint;
+        double[] vector = {xDistance,zDistance,Math.atan(zDistance/xDistance)};
+        return vector;
     }
 }

@@ -45,5 +45,10 @@ public class PositionTracker
         return positionReports.getInterpolated(timestamp);
     }
 
+    public void reset()
+    {
+        this.positionReports.clear();
+    }
+
 
 }

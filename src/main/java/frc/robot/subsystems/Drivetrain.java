@@ -194,6 +194,22 @@ public class Drivetrain extends DiffDrivetrain
     return this.masterRight.getSelectedSensorPosition();
   }
 
+  public double getLeftPositionInCm()
+  {
+    return rotationsToCm(getRawLeftPosition());
+  }
+
+  public double getRightPositionInCm()
+  {
+    return rotationsToCm(getRawRightPosition());
+  }
+
+  //TODO fill this convertaion
+  public double rotationsToCm(int rotations)
+  {
+    return 0;
+  }
+
   public void resetRawPosition()
   {
     this.masterLeft.setSelectedSensorPosition(0);

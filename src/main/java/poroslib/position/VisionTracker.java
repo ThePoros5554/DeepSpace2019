@@ -33,4 +33,9 @@ public class VisionTracker
     {
         return visionReports.lastEntry();
     } 
+
+    public void reset()
+    {
+        this.visionReports.clear();
+    }
 }
