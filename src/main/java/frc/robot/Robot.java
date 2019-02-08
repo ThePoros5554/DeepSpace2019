@@ -89,10 +89,8 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    while (true)
-    {
-      System.out.print(lime.CalculateDistance(197));
-    }
+    System.out.print(lime.getHorizontalTargetDisplacement(197).getTranslation().getX());
+    System.out.print(lime.getHorizontalTargetDisplacement(197).getTranslation().getY());
   }
 
   /**

@@ -5,6 +5,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import poroslib.position.geometry.Pose2d;
+import poroslib.position.geometry.Rotation2d;
+import poroslib.position.geometry.Translation2d;
 
 public class Limelight
 {
@@ -157,23 +160,25 @@ public class Limelight
 
     /**
      * Finds the vector of the target
-     * @param targetDiagonal The height of the target
+     * @param targetHeight The height of the target
      * @return The vector of the target
      */
-    public double[] CalculateDistance(double targetDiagonal)
+    public Pose2d getHorizontalTargetDisplacement(double targetHeight)
     {   
         double camDistance;
         double xDistance;
         double zDistance;
         double robotHorizontalDegreeOfSet;
         double robotVerticalDegreeOfSet;
+        Pose2d vector;
 
         robotHorizontalDegreeOfSet = this.camHorizontalDegreeOffset - this.getHorizontalOffset();
         robotVerticalDegreeOfSet = this.camVerticalDegreeOffset - this.getVerticalOffset();
-        camDistance = (targetDiagonal - this.camHeight) / Math.tan(robotVerticalDegreeOfSet);
+        camDistance = (targetHeight - this.camHeight) / Math.tan(robotVerticalDegreeOfSet);
         xDistance = camDistance * Math.cos(robotHorizontalDegreeOfSet) + this.camHorizontalOffPoint;
         zDistance = camDistance * Math.sin(robotHorizontalDegreeOfSet) + this.camDiagonalOffPoint;
-        double[] vector = {xDistance,zDistance,Math.atan(zDistance/xDistance)};
+        vector = new Pose2d(new Translation2d(xDistance, zDistance), new Rotation2d(xDistance, zDistance, true));
+        //{xDistance,zDistance,Math.atan(zDistance/xDistance)};
         return vector;
     }
 }
