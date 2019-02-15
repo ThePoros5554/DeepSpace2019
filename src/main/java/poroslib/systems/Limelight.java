@@ -22,16 +22,10 @@ public class Limelight
     private NetworkTableEntry tCamMode;
     private NetworkTableEntry tPipeline;
     private NetworkTableEntry tLedMode;
-
-    private int imgWidth = 320;
-    private int horizontalFov = 54;
-    private double focalLength = this.imgWidth / (2 * Math.tan(this.horizontalFov/2.0));
     
-    private double camHeight;
-    private double camHorizontalOffPoint;
-    private double camHorizontalDegreeOffset;
-    private double camVerticalDegreeOffset;
-    private double camDiagonalOffPoint;
+    private double hightFromFloor = 2;
+    private double fixedHorizontalOffset = 0;
+    private double fixedVerticalOffset = 0;
 
     private double lastNTUpdate;
 
@@ -58,7 +52,7 @@ public class Limelight
      */
     public double getHorizontalOffset()
     {
-        return tHorizontalOffset.getDouble(0.0);
+        return tHorizontalOffset.getDouble(0.0) + fixedHorizontalOffset;
     }
 
     /**
@@ -67,7 +61,7 @@ public class Limelight
      */
     public double getVerticalOffset()
     {
-        return tVerticalOffset.getDouble(0.0);
+        return tVerticalOffset.getDouble(0.0) + fixedVerticalOffset;
     }
 
     public double getArea()
@@ -79,12 +73,6 @@ public class Limelight
     {
         return tIsTarget.getDouble(0) == 1;
     }
-
-    public void setCamDisplacement(double height)
-    {
-        this.camHeight = height;
-    }
-
 
     public enum LimelightCamMode
     {
@@ -141,44 +129,23 @@ public class Limelight
         return this.lastNTUpdate;
     }
 
-    /**
-     * Sets the position of the camera
-     * @param diagonalOffPoint Cam diagonal placement error
-     * @param horizontalOffPoint Cam horizontal placement error
-     * @param height The height of the camera
-     * @param horizontalDegreeOffset Cam horizontal degree placement error
-     * @param verticalDegreeOffset Cam vertical degree placement error
-     */
-    public void SetCamPosistion(double diagonalOffPoint, double horizontalOffPoint, double height, double horizontalDegreeOffset, double verticalDegreeOffset)
+    public void setFixedHeight(double height)
     {
-        this.camDiagonalOffPoint = diagonalOffPoint;
-        this.camHorizontalOffPoint = horizontalOffPoint;
-        this.camHeight = height;
-        this.camHorizontalDegreeOffset = horizontalDegreeOffset;
-        this.camVerticalDegreeOffset = verticalDegreeOffset;
+        this.hightFromFloor = height;
     }
 
-    /**
-     * Finds the vector of the target
-     * @param targetHeight The height of the target
-     * @return The vector of the target
-     */
-    public Pose2d getHorizontalTargetDisplacement(double targetHeight)
-    {   
-        double camDistance;
-        double xDistance;
-        double zDistance;
-        double robotHorizontalDegreeOfSet;
-        double robotVerticalDegreeOfSet;
-        Pose2d vector;
+    public double getFixedHeight()
+    {
+        return this.hightFromFloor;
+    }
 
-        robotHorizontalDegreeOfSet = this.camHorizontalDegreeOffset - this.getHorizontalOffset();
-        robotVerticalDegreeOfSet = this.camVerticalDegreeOffset - this.getVerticalOffset();
-        camDistance = (targetHeight - this.camHeight) / Math.tan(robotVerticalDegreeOfSet);
-        xDistance = camDistance * Math.cos(robotHorizontalDegreeOfSet) + this.camHorizontalOffPoint;
-        zDistance = camDistance * Math.sin(robotHorizontalDegreeOfSet) + this.camDiagonalOffPoint;
-        vector = new Pose2d(new Translation2d(xDistance, zDistance), new Rotation2d(xDistance, zDistance, true));
-        //{xDistance,zDistance,Math.atan(zDistance/xDistance)};
-        return vector;
+    public void setFixedHorizontalOffset(double horizontalOffset)
+    {
+        this.fixedHorizontalOffset = horizontalOffset;
+    }
+
+    public void setFixedVerticalOffset(double verticalOffset)
+    {
+        this.fixedVerticalOffset = verticalOffset;
     }
 }

@@ -1,7 +1,8 @@
 package poroslib.position;
 
-import frc.robot.Robot;
 import poroslib.position.geometry.Pose2d;
+import poroslib.position.geometry.Rotation2d;
+import poroslib.position.geometry.Translation2d;
 
 public class VisionInfo
 {
@@ -10,24 +11,36 @@ public class VisionInfo
 
     private double camHeight;
     private double targetHeight;
-    private double focalLength;
-
-    private static final double HATCH_HEIGHT = 80.01;//hatch height and ball height are different
     
-    public VisionInfo()
+    public VisionInfo(double horizontalOffset, double verticalOffset, double camHeight, double targetHeight)
     {
-
+        this.horizontalOffset = horizontalOffset;
+        this.verticalOffset = verticalOffset;
+        this.camHeight = camHeight;
+        this.targetHeight = targetHeight;
     }
 
 
     public Pose2d getHorizontalDisplacement()
     {
-        return  Robot.lime.getHorizontalTargetDisplacement(HATCH_HEIGHT);
+        double x;
+        double y;
+    
+        y = (this.targetHeight - this.camHeight) / Math.tan(verticalOffset);
+        x = y * Math.tan(horizontalOffset);
+
+        return new Pose2d(new Translation2d(x, y), new Rotation2d(x, y, true));
     }
 
     public Pose2d getVerticalDisplacement()
     {
-        return  null;
+        double x;
+        double y;
+    
+        y = this.targetHeight - this.camHeight;
+        x = y / Math.tan(verticalOffset);
+
+        return new Pose2d(new Translation2d(x, y), new Rotation2d(x, y, true));
     }
 
 }
