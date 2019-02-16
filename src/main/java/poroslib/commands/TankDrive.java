@@ -36,15 +36,15 @@ public class TankDrive extends Command
     	double leftValue = leftJoy.GetSpeedAxis();
     	double rightValue = rightJoy.GetSpeedAxis();
 
-    	if(this.drivetrain.IsRanged())
+    	if (this.drivetrain.IsRanged())
     	{
-    		this.maxOutput = this.rightJoy.GetSlider();
+            this.maxOutput = this.rightJoy.GetSlider();
     	}
     	else
     	{
     		this.maxOutput = 1;
-    	}
-    	
+        }
+        
     	this.drivetrain.tankDrive(leftValue, rightValue, this.maxOutput);
     }
 

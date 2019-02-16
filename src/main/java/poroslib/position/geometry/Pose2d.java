@@ -45,9 +45,7 @@ public class Pose2d implements Interpolable<Pose2d>
             c = .5 * delta.dtheta;
         } else {
             s = sin_theta / delta.dtheta;
-            System.out.println("s: " + s);
             c = (1.0 - cos_theta) / delta.dtheta;
-            System.out.println("c: " + c);
         }
         return new Pose2d(new Translation2d(delta.dx * s - delta.dy * c, delta.dx * c + delta.dy * s),
                 new Rotation2d(cos_theta, sin_theta, false));

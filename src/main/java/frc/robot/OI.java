@@ -124,97 +124,101 @@ public class OI
         // joysticks
         leftJoy = new SmartJoystick(kDriverLeftJoystickPort);
         rightJoy = new SmartJoystick(kDriverRightJoystickPort);
-        operatorJoy = new SmartJoystick(kOperatorJoystickPort);
+        // operatorJoy = new SmartJoystick(kOperatorJoystickPort);
 
-        // buttons and triggers
-        prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
-        prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
-        prepareHatchMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.HATCH);
-        prepareHatchHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.HATCH);
-        collectHatchTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.HATCH);
-        ejectHatchTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.HATCH);
+        leftJoy.SetSpeedAxis(1);
+        rightJoy.SetSpeedAxis(1);
+        Robot.drivetrain.SetIsRanged(true);
 
-        prepareCargoCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.CARGO);
-        prepareCargoLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.CARGO);
-        prepareCargoMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.CARGO);
-        prepareCargoHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.CARGO);
-        collectCargoTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.CARGO);
-        ejectCargoTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.CARGO);
+        // // buttons and triggers
+        // prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
+        // prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
+        // prepareHatchMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.HATCH);
+        // prepareHatchHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.HATCH);
+        // collectHatchTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.HATCH);
+        // ejectHatchTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.HATCH);
 
-        liftRobotTrigger = new ModeTrigger(operatorJoy, kLiftRobotButton, RobotMode.CLIMB);
-        liftCloseFrontTrigger = new ModeTrigger(operatorJoy, kLiftCloseFrontButton, RobotMode.CLIMB);
-        liftCloseRearTrigger = new ModeTrigger(operatorJoy, kLiftCloseRearButton, RobotMode.CLIMB);
-        moveBackwardsLifterTrigger = new ModeTrigger(operatorJoy, kMoveBackwardsLifterButton, RobotMode.CLIMB);
-        moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
+        // prepareCargoCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.CARGO);
+        // prepareCargoLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.CARGO);
+        // prepareCargoMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.CARGO);
+        // prepareCargoHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.CARGO);
+        // collectCargoTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.CARGO);
+        // ejectCargoTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.CARGO);
 
-        modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
-        prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
+        // liftRobotTrigger = new ModeTrigger(operatorJoy, kLiftRobotButton, RobotMode.CLIMB);
+        // liftCloseFrontTrigger = new ModeTrigger(operatorJoy, kLiftCloseFrontButton, RobotMode.CLIMB);
+        // liftCloseRearTrigger = new ModeTrigger(operatorJoy, kLiftCloseRearButton, RobotMode.CLIMB);
+        // moveBackwardsLifterTrigger = new ModeTrigger(operatorJoy, kMoveBackwardsLifterButton, RobotMode.CLIMB);
+        // moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
+
+        // modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
+        // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
         
-        // axis
-        elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, -1, 0, 1);
-        elevatorUpAxis = new JoyAxis(operatorJoy, kElevatorUpAxis, 0, 1, 0, 1);
+        // // axis
+        // elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, -1, 0, 1);
+        // elevatorUpAxis = new JoyAxis(operatorJoy, kElevatorUpAxis, 0, 1, 0, 1);
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
+
         
-        prepareHatchCollect = new InitHatchCollectMode();
-        prepareHatchLow = new InitHatchLowMode();
-        prepareHatchMiddle = new InitHatchMiddleMode();
-        prepareHatchHigh = new InitHatchHighMode();
-        collectHatch = new AdjustWrist(WristMode.DOWN);
-        ejectHatch = new EjectHatch(Drivetrain.kEjectDriveBackDistance);
+        // prepareHatchCollect = new InitHatchCollectMode();
+        // prepareHatchLow = new InitHatchLowMode();
+        // prepareHatchMiddle = new InitHatchMiddleMode();
+        // prepareHatchHigh = new InitHatchHighMode();
+        // collectHatch = new AdjustWrist(WristMode.DOWN);
+        // ejectHatch = new EjectHatch(Drivetrain.kEjectDriveBackDistance);
 
-        prepareCargoCollect = new InitCargoCollectMode();
-        prepareCargoLow = new InitCargoLowMode();
-        prepareCargoMiddle = new InitCargoMiddleMode();
-        prepareCargoHigh = new InitCargoHighMode();
-        collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
-        ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
+        // prepareCargoCollect = new InitCargoCollectMode();
+        // prepareCargoLow = new InitCargoLowMode();
+        // prepareCargoMiddle = new InitCargoMiddleMode();
+        // prepareCargoHigh = new InitCargoHighMode();
+        // collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
+        // ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
 
-        prepareLift = new InitLiftMode();
-        liftRobot = new LiftRobot();
-        moveForwardLifter = new MoveLifterWheels(Lifter.wheelForwardPower);
-        moveBackwardLifter = new MoveLifterWheels(Lifter.wheelReversePower);
-        closeRearLifters = new CloseRearLifters();
-        closeFrontLifters = new CloseFrontLifters();
+        // prepareLift = new InitLiftMode();
+        // liftRobot = new LiftRobot();
+        // moveForwardLifter = new MoveLifterWheels(Lifter.wheelForwardPower);
+        // moveBackwardLifter = new MoveLifterWheels(Lifter.wheelReversePower);
+        // closeRearLifters = new CloseRearLifters();
+        // closeFrontLifters = new CloseFrontLifters();
 
-        toggleGamepiece = new ToggleGamepieceMode();
-        elevatorDown = new MoveElevator(elevatorDownAxis);
-        elevatorUp = new MoveElevator(elevatorUpAxis);
+        // toggleGamepiece = new ToggleGamepieceMode();
+        // elevatorDown = new MoveElevator(elevatorDownAxis);
+        // elevatorUp = new MoveElevator(elevatorUpAxis);
 
         /****************************************/
 
         Robot.drivetrain.setDefaultCommand(defaultDrive);
-        Robot.drivetrain.SetIsRanged(true);
 
-        modeButton.whenPressed(toggleGamepiece);
+        // modeButton.whenPressed(toggleGamepiece);
         
-        // climb
-        prepareLiftButton.whenPressed(prepareLift);
-        liftRobotTrigger.whenActive(liftRobot);
-        liftCloseFrontTrigger.whenActive(closeFrontLifters);
-        liftCloseRearTrigger.whenActive(closeRearLifters);
-        moveForwardLifterTrigger.whenActive(moveForwardLifter);
-        moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
+        // // climb
+        // prepareLiftButton.whenPressed(prepareLift);
+        // liftRobotTrigger.whenActive(liftRobot);
+        // liftCloseFrontTrigger.whenActive(closeFrontLifters);
+        // liftCloseRearTrigger.whenActive(closeRearLifters);
+        // moveForwardLifterTrigger.whenActive(moveForwardLifter);
+        // moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
 
-        // hatch
-        prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
-        prepareHatchLowTrigger.whenActive(prepareHatchLow);
-        prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
-        prepareHatchHighTrigger.whenActive(prepareHatchHigh);
-        collectHatchTrigger.whenActive(collectHatch);
-        ejectHatchTrigger.whenActive(ejectHatch);
+        // // hatch
+        // prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
+        // prepareHatchLowTrigger.whenActive(prepareHatchLow);
+        // prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
+        // prepareHatchHighTrigger.whenActive(prepareHatchHigh);
+        // collectHatchTrigger.whenActive(collectHatch);
+        // ejectHatchTrigger.whenActive(ejectHatch);
 
-        // cargo
-        prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
-        prepareCargoLowTrigger.whenActive(prepareCargoLow);
-        prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
-        prepareCargoHighTrigger.whenActive(prepareCargoHigh);
-        collectCargoTrigger.whenActive(collectCargo);
-        ejectCargoTrigger.whenActive(ejectCargo);
+        // // cargo
+        // prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
+        // prepareCargoLowTrigger.whenActive(prepareCargoLow);
+        // prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
+        // prepareCargoHighTrigger.whenActive(prepareCargoHigh);
+        // collectCargoTrigger.whenActive(collectCargo);
+        // ejectCargoTrigger.whenActive(ejectCargo);
 
-        // manual
-        elevatorUpAxis.whileActive(elevatorUp);
-        elevatorDownAxis.whileActive(elevatorDown);
+        // // manual
+        // elevatorUpAxis.whileActive(elevatorUp);
+        // elevatorDownAxis.whileActive(elevatorDown);
     }
 }

@@ -10,7 +10,10 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -18,8 +21,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
-import poroslib.position.PositionTracker;
-import poroslib.position.VisionTracker;
 import poroslib.systems.Limelight;
 //import sun.jvm.hotspot.runtime.solaris_sparc.SolarisSPARCJavaThreadPDAccess;
 
@@ -32,7 +33,8 @@ import poroslib.systems.Limelight;
  */
 public class Robot extends TimedRobot
 {
-  
+  private SendableChooser<String> autonomouChooser;
+
   public static Drivetrain drivetrain;
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
@@ -55,6 +57,8 @@ public class Robot extends TimedRobot
 
   private UpdateRobotState updateRobotState;
 
+  private double gameStartTime;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -65,17 +69,37 @@ public class Robot extends TimedRobot
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
+
     
-    elevator = new Elevator();
-    wrist = new Wrist();
-    cargoIntake = new CargoIntake();
-    hatchLauncher = new HatchLauncher();
-    lifter = new Lifter();
+
+    // elevator = new Elevator();
+    // wrist = new Wrist();
+    // cargoIntake = new CargoIntake();
+    // hatchLauncher = new HatchLauncher();
+    // lifter = new Lifter();
 
     oi = new OI();
 
-    lime = new Limelight();
-    lime.SetCamPosistion(0, 0, 5.5, 0, 0);
+    // lime = new Limelight();
+    // lime.SetCamPosistion(0, 0, 5.5, 0, 0);
+
+    autonomouChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);
+    
+    autonomouChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
+    
+    autonomouChooser.addOption("LeftCargoHatch", RobotMap.LEFTSHIPHATCH);
+    
+    autonomouChooser.addOption("RightShipHatch", RobotMap.RIGHTSHIPHATCH);
+    
+    autonomouChooser.addOption("LeftShipCargo", RobotMap.LEFTSHIPCARGO);
+    
+    autonomouChooser.addOption("RightShipCargo", RobotMap.RIGHTSHIPCARGO);
+    
+    autonomouChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
+    
+    autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
+
+    
   }
 
   /**
@@ -89,8 +113,10 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    System.out.print(lime.getHorizontalTargetDisplacement(197).getTranslation().getX());
-    System.out.print(lime.getHorizontalTargetDisplacement(197).getTranslation().getY());
+    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    SmartDashboard.putNumber("pitch", drivetrain.getHeading());
+    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+
   }
 
   /**
@@ -101,7 +127,12 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
-    updateRobotState.cancel();
+    if(updateRobotState != null)
+    {
+      updateRobotState.cancel();
+    }
+
+    drivetrain.resetHeading();
   }
 
   @Override
@@ -147,12 +178,19 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
+    gameStartTime = Timer.getFPGATimestamp();
+
+    drivetrain.resetHeading();
+    drivetrain.resetRawPosition();
+
+
     if(updateRobotState == null)
     {
       updateRobotState = new UpdateRobotState();
     }
     
     updateRobotState.start();
+    RobotMonitor.getRobotMonitor().resetMonitor();
   }
 
   /**
@@ -162,6 +200,15 @@ public class Robot extends TimedRobot
   public void teleopPeriodic()
   {
     Scheduler.getInstance().run();
+    SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
+    SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
+    SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
+
+    SmartDashboard.putNumber("rawLeft: " , drivetrain.getRawLeftPosition());
+    SmartDashboard.putNumber("rawRight: ", drivetrain.getRawRightPosition());
+
+    double currenttime = Timer.getFPGATimestamp() - gameStartTime;
+
   }
 
   /**

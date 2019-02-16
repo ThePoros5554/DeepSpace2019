@@ -36,7 +36,7 @@ public class Drivetrain extends DiffDrivetrain
   //
 
   private static final boolean kInvertEncLeft = false;
-  private static final boolean kInvertEncRight = false;
+  private static final boolean kInvertEncRight = true;
 
   private static final double kVoltage = 12;
 
@@ -44,9 +44,9 @@ public class Drivetrain extends DiffDrivetrain
   private static final double kI = 0;
   private static final double kD = 0;
   public static final double kEjectDriveBackDistance = 14.3;
-  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
+  private static final NeutralMode kNeutralMode = NeutralMode.Coast;
   private static final int kTargetThreshold = 0;
-  private static final double kRamp = 0.4;
+  private static final double kRamp = 0;
   /*****/
 
   private WPI_TalonSRX masterLeft;
@@ -78,8 +78,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.follow(this.masterRight);
 
     // invertion
-    this.masterLeft.setInverted(InvertType.None);
-    this.masterRight.setInverted(InvertType.None);
+    this.masterLeft.setInverted(InvertType.InvertMotorOutput);
+    this.masterRight.setInverted(InvertType.InvertMotorOutput);
     this.middleLeft.setInverted(InvertType.FollowMaster);
     this.middleRight.setInverted(InvertType.FollowMaster);
     this.rearLeft.setInverted(InvertType.FollowMaster);
@@ -98,7 +98,9 @@ public class Drivetrain extends DiffDrivetrain
     this.setNeutralMode(kNeutralMode);
 
     // voltage compensation
-    this.configVoltageCompSaturation(kVoltage, true);
+    this.configVoltageCompSaturation(kVoltage, false);
+
+    configRamp(0.3);
 
     this.controlMode = ControlMode.PercentOutput;
     this.set(0, 0);
@@ -131,12 +133,12 @@ public class Drivetrain extends DiffDrivetrain
 
   public void configRamp(double rampRate)
   {
-    this.masterLeft.configClosedloopRamp(rampRate);
-    this.masterRight.configClosedloopRamp(rampRate);
-    this.middleLeft.configClosedloopRamp(rampRate);
-    this.middleRight.configClosedloopRamp(rampRate);
-    this.rearLeft.configClosedloopRamp(rampRate);
-    this.rearRight.configClosedloopRamp(rampRate);
+    // this.masterLeft.configClosedloopRamp(rampRate);
+    // this.masterRight.configClosedloopRamp(rampRate);
+    // this.middleLeft.configClosedloopRamp(rampRate);
+    // this.middleRight.configClosedloopRamp(rampRate);
+    // this.rearLeft.configClosedloopRamp(rampRate);
+    // this.rearRight.configClosedloopRamp(rampRate);
 
     this.masterLeft.configOpenloopRamp(rampRate);
     this.masterRight.configOpenloopRamp(rampRate);
@@ -182,6 +184,8 @@ public class Drivetrain extends DiffDrivetrain
     this.navx.reset();
   }
 
+
+
   @Override
   public int getRawLeftPosition()
   {
@@ -192,6 +196,7 @@ public class Drivetrain extends DiffDrivetrain
   public int getRawRightPosition()
   {
     return this.masterRight.getSelectedSensorPosition();
+
   }
 
   public double getLeftPositionInCm()
@@ -207,7 +212,7 @@ public class Drivetrain extends DiffDrivetrain
   //TODO fill this convertaion
   public double rotationsToCm(int rotations)
   {
-    return 0;
+    return rotations * (10.16 * Math.PI) / 4096 ;
   }
 
   public void resetRawPosition()

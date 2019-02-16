@@ -2,6 +2,7 @@ package poroslib.position;
 
 import java.util.Map.Entry;
 
+import edu.wpi.first.wpilibj.Timer;
 import poroslib.position.geometry.Kinematics;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Rotation2d;
@@ -37,6 +38,10 @@ public class PositionTracker
 
     public Entry<InterpolatingDouble, Pose2d> getLastReport()
     {
+        if(positionReports.lastEntry() == null)
+        {
+            positionReports.put(new InterpolatingDouble(Timer.getFPGATimestamp()), new Pose2d());
+        }
         return positionReports.lastEntry();
     }
 

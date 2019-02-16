@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMonitor;
 
@@ -29,6 +30,7 @@ public class UpdateRobotState extends Command
     @Override
     protected void execute()
     {
+      
         double leftPositionInCm = Robot.drivetrain.getLeftPositionInCm();
         double rightPositionInCm = Robot.drivetrain.getRightPositionInCm();
 
@@ -38,10 +40,13 @@ public class UpdateRobotState extends Command
         prevLastLeftEncCountCm = leftPositionInCm;
         prevLastRightEncCountCm = rightPositionInCm;
 
-        if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
-        {
-            robotMonitor.addVisionReport(Robot.lime.getLastNTUpdateTime());
-        }
+        SmartDashboard.putNumber("Distance left: ", leftPositionInCm);
+        SmartDashboard.putNumber("Distance right: ", rightPositionInCm);
+
+        // if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
+        // {
+        //     robotMonitor.addVisionReport(Robot.lime.getLastNTUpdateTime());
+        // }
     }
   
     // Make this return true when this Command no longer needs to run execute()
