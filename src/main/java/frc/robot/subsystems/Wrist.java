@@ -69,8 +69,8 @@ public class Wrist extends Subsystem {
     //limitswitches
 
     //softlimits (if needed)
-    this.configForwardSoftLimitThreshold(kMaxTilt, true);
-    this.configReverseSoftLimitThreshold(kMinTilt, true);
+    this.configForwardSoftLimitThreshold(kMaxTilt, false);
+    this.configReverseSoftLimitThreshold(kMinTilt, false);
 
     //voltage
     this.configVoltageCompSaturation(kVoltage, false);
@@ -92,10 +92,9 @@ public class Wrist extends Subsystem {
     master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
     this.configProfileSlot(0, 2.3, 0, 01, 30); // up
     this.configProfileSlot(1, 2.3, 0, 01, 30); // TODO: check for down
-    
-		master.configSelectedFeedbackSensor(FeedbackDevice.Analog);
-
-    //set neutral mode
+    master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+    this.configProfileSlot(0, 2.3, 0, 01, 30);
+    master.configMotionCruiseVelocity(105, 0);
     this.setNeutralMode(kNeutralMode);
 
     //this.master.configOpenloopRamp(kRamp);
