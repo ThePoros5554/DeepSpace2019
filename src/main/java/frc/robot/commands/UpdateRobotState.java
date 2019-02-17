@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMonitor;
 
@@ -39,9 +38,6 @@ public class UpdateRobotState extends Command
 
         prevLastLeftEncCountCm = leftPositionInCm;
         prevLastRightEncCountCm = rightPositionInCm;
-
-        SmartDashboard.putNumber("Distance left: ", leftPositionInCm);
-        SmartDashboard.putNumber("Distance right: ", rightPositionInCm);
 
         // if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
         // {

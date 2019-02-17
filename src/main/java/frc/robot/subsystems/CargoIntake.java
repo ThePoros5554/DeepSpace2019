@@ -15,12 +15,12 @@ import poroslib.subsystems.MechSys;
  */
 public class CargoIntake extends MechSys {
  
+  // manual values
   public static final double kIntakeInPower = 0.8;
-  public static final double kIntakeOutPower = -0.8;
+  public static final double kIntakeOutPower = -1;
 
-  //
-  private static final int kIntakePort = 2;
-  //
+  // ports
+  private static final int kIntakePort = 0;
 
   public CargoIntake()
   {
@@ -28,8 +28,7 @@ public class CargoIntake extends MechSys {
   }
 
   @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
+  public void initDefaultCommand()
+  {
   }
 }

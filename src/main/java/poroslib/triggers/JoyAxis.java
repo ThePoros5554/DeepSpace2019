@@ -6,14 +6,14 @@ import poroslib.util.MathHelper;
 
 public class JoyAxis extends Trigger
 {
-	private int axisNumber;
-	private GenericHID joy;
+	protected int axisNumber;
+	protected GenericHID joy;
 	
-	private double newMinValue;
-	private double newMaxValue;
+	protected double newMinValue;
+	protected double newMaxValue;
 	
-	private double oldMinValue;
-	private double oldMaxValue;
+	protected double oldMinValue;
+	protected double oldMaxValue;
 
 	public JoyAxis(GenericHID joystick, int axisNumber, double newMinValue, double newMaxValue, double oldMinValue, double oldMaxValue) 
 	{

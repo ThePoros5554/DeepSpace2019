@@ -5,9 +5,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
-import poroslib.position.geometry.Pose2d;
-import poroslib.position.geometry.Rotation2d;
-import poroslib.position.geometry.Translation2d;
 
 public class Limelight
 {

@@ -18,36 +18,34 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import poroslib.subsystems.DiffDrivetrain;
 
-/**
- * Add your docs here.
- */
 public class Drivetrain extends DiffDrivetrain
 {
-  /**** constants: ****/
-  //
+  // ports
   public static final int kFrontLeftPort = 0;
   public static final int kFrontRightPort = 1;
-
   private static final int kMiddleRightPort = 2;
   private static final int kRearRightPort = 3;
-  
   private static final int kMiddleLeftPort = 0;
   private static final int kRearLeftPort = 1;
-  //
 
-  private static final boolean kInvertEncLeft = false;
-  private static final boolean kInvertEncRight = true;
-
-  private static final double kVoltage = 12;
-
+  // motion gains
   private static final double kP = 0;
   private static final double kI = 0;
   private static final double kD = 0;
+  private static final double kF = 0;
+
+  // config constants
+  private static final double kVoltage = 12;
+  private static final double kWheelDiameter = 10.16 * Math.PI;
+  private static final double kEncoderTicks = 4096;
+  private static final boolean kInvertEncLeft = true;
+  private static final boolean kInvertEncRight = false;
+  private static final double kRamp = 0.3;
   public static final double kEjectDriveBackDistance = 14.3;
-  private static final NeutralMode kNeutralMode = NeutralMode.Coast;
+  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
   private static final int kTargetThreshold = 0;
-  private static final double kRamp = 0;
-  /*****/
+
+  //
 
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
@@ -78,8 +76,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.follow(this.masterRight);
 
     // invertion
-    this.masterLeft.setInverted(InvertType.InvertMotorOutput);
-    this.masterRight.setInverted(InvertType.InvertMotorOutput);
+    this.masterLeft.setInverted(InvertType.None);
+    this.masterRight.setInverted(InvertType.None);
     this.middleLeft.setInverted(InvertType.FollowMaster);
     this.middleRight.setInverted(InvertType.FollowMaster);
     this.rearLeft.setInverted(InvertType.FollowMaster);
@@ -100,7 +98,15 @@ public class Drivetrain extends DiffDrivetrain
     // voltage compensation
     this.configVoltageCompSaturation(kVoltage, false);
 
-    configRamp(0.3);
+    this.masterLeft.configNominalOutputForward(0);
+		this.masterLeft.configNominalOutputReverse(0);
+		this.masterLeft.configPeakOutputForward(1);
+    this.masterLeft.configPeakOutputReverse(-1);
+
+    this.masterRight.configNominalOutputForward(0);
+		this.masterRight.configNominalOutputReverse(0);
+		this.masterRight.configPeakOutputForward(1);
+    this.masterRight.configPeakOutputReverse(-1);
 
     this.controlMode = ControlMode.PercentOutput;
     this.set(0, 0);
@@ -133,13 +139,6 @@ public class Drivetrain extends DiffDrivetrain
 
   public void configRamp(double rampRate)
   {
-    // this.masterLeft.configClosedloopRamp(rampRate);
-    // this.masterRight.configClosedloopRamp(rampRate);
-    // this.middleLeft.configClosedloopRamp(rampRate);
-    // this.middleRight.configClosedloopRamp(rampRate);
-    // this.rearLeft.configClosedloopRamp(rampRate);
-    // this.rearRight.configClosedloopRamp(rampRate);
-
     this.masterLeft.configOpenloopRamp(rampRate);
     this.masterRight.configOpenloopRamp(rampRate);
     this.middleLeft.configOpenloopRamp(rampRate);
@@ -184,8 +183,6 @@ public class Drivetrain extends DiffDrivetrain
     this.navx.reset();
   }
 
-
-
   @Override
   public int getRawLeftPosition()
   {
@@ -209,10 +206,9 @@ public class Drivetrain extends DiffDrivetrain
     return rotationsToCm(getRawRightPosition());
   }
 
-  //TODO fill this convertaion
   public double rotationsToCm(int rotations)
   {
-    return rotations * (10.16 * Math.PI) / 4096 ;
+    return rotations * kWheelDiameter / kEncoderTicks;
   }
 
   public void resetRawPosition()
@@ -221,8 +217,6 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.setSelectedSensorPosition(0);
   }
 
-  //TODO check if profile configs of followers is necessary (since they should follow the master output anyways)
-
   public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
   {
     this.masterLeft.config_kP(profileSlot, kP);
@@ -230,71 +224,35 @@ public class Drivetrain extends DiffDrivetrain
     this.masterLeft.config_kD(profileSlot, kD);
     this.masterLeft.config_kF(profileSlot, kF);
 
-/*  this.middleLeft.config_kP(profileSlot, kP);
-    this.middleLeft.config_kI(profileSlot, kI);
-    this.middleLeft.config_kD(profileSlot, kD);
-    this.middleLeft.config_kF(profileSlot, kF);
-    
-    this.rearLeft.config_kP(profileSlot, kP);
-    this.rearLeft.config_kI(profileSlot, kI);
-    this.rearLeft.config_kD(profileSlot, kD);
-    this.rearLeft.config_kF(profileSlot, kF); */
-
     this.masterRight.config_kP(profileSlot, kP);
     this.masterRight.config_kI(profileSlot, kI);
     this.masterRight.config_kD(profileSlot, kD);
     this.masterRight.config_kF(profileSlot, kF);
-
-/*  this.middleRight.config_kP(profileSlot, kP);
-    this.middleRight.config_kI(profileSlot, kI);
-    this.middleRight.config_kD(profileSlot, kD);
-    this.middleRight.config_kF(profileSlot, kF);
-    
-    this.rearRight.config_kP(profileSlot, kP);
-    this.rearRight.config_kI(profileSlot, kI);
-    this.rearRight.config_kD(profileSlot, kD);
-    this.rearRight.config_kF(profileSlot, kF); */
   }
 
   public void configMotionValues(int sensorUnitsPer100msPerSec, int sensorUnitsPer100ms)
   {
     this.masterLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
     this.masterLeft.configMotionCruiseVelocity(sensorUnitsPer100ms);
-    
-/*  this.middleLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
-    this.middleLeft.configMotionCruiseVelocity(sensorUnitsPer100ms);
-    
-    this.rearLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
-    this.rearLeft.configMotionCruiseVelocity(sensorUnitsPer100ms); */
 
     this.masterRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
     this.masterRight.configMotionCruiseVelocity(sensorUnitsPer100ms);
-    
-/*  this.middleRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
-    this.middleRight.configMotionCruiseVelocity(sensorUnitsPer100ms);
-    
-    this.rearRight.configMotionAcceleration(sensorUnitsPer100msPerSec);
-    this.rearRight.configMotionCruiseVelocity(sensorUnitsPer100ms); */
   }
 
   public void selectProfileSlot(int profileSlot)
   {
     this.masterLeft.selectProfileSlot(profileSlot, 0);
-/*  this.middleLeft.selectProfileSlot(profileSlot, 0);
-    this.rearLeft.selectProfileSlot(profileSlot, 0); */
-
     this.masterRight.selectProfileSlot(profileSlot, 0);
-/*  this.middleRight.selectProfileSlot(profileSlot, 0);
-    this.rearRight.selectProfileSlot(profileSlot, 0); */
   }
 
   public boolean isInTarget(double rightTarget, double leftTarget)
   {
     int rightpos = getRawRightPosition();
     int leftpos = getRawLeftPosition();
+    boolean isInTargetRight = rightTarget >= (rightpos - kTargetThreshold) && rightTarget <= (rightpos + kTargetThreshold);
+    boolean isInTargetLeft = leftTarget >= (leftpos - kTargetThreshold) && leftTarget <= (leftpos + kTargetThreshold);
 
-    return (rightTarget >= (rightpos - kTargetThreshold) && rightTarget <= (rightpos + kTargetThreshold)) &&
-    (leftTarget >= (leftpos - kTargetThreshold) && leftTarget <= (leftpos + kTargetThreshold));
+    return isInTargetLeft && isInTargetRight;
   }
 
   @Override

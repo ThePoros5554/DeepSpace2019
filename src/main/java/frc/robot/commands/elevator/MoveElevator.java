@@ -34,6 +34,7 @@ public class MoveElevator extends Command {
   @Override
   protected void execute()
   {
+    System.out.println(this.axis.GetAxisValue());
     Robot.elevator.set(this.axis.GetAxisValue());
   }
 

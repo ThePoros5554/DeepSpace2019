@@ -1,7 +1,5 @@
 package poroslib.util;
 
-import java.util.TreeMap;
-
 /**
  * Interpolating Tree Maps are used to get values at points that are not defined
  * by making a guess from points that are defined. This uses linear

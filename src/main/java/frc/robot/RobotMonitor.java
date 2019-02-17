@@ -38,9 +38,8 @@ public class RobotMonitor
 
     public void addPositionObservation(double timestamp, double left_encoder_delta_distance, double right_encoder_delta_distance, double currentGyroAngle)
     {
-
         positions.addReportFromSensors(new InterpolatingDouble(timestamp), left_encoder_delta_distance, right_encoder_delta_distance, 
-                Rotation2d.fromDegrees(currentGyroAngle));
+        Rotation2d.fromDegrees(currentGyroAngle));
     }
 
     public Pose2d getPositionAtTime(double timestamp)
@@ -58,6 +57,7 @@ public class RobotMonitor
         visionTargets.addReportFromTarget(timestamp, Robot.lime.getHorizontalOffset(), Robot.lime.getVerticalOffset(), Robot.lime.getFixedHeight(), targetFixedHeight);
     }
 
+    
     public Entry<Double, VisionInfo> getLastVisionReport()
     {
         return visionTargets.getLastReport();

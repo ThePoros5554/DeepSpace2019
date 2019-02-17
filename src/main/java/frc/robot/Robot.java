@@ -72,9 +72,9 @@ public class Robot extends TimedRobot
 
     
 
-    // elevator = new Elevator();
-    // wrist = new Wrist();
-    // cargoIntake = new CargoIntake();
+    elevator = new Elevator();
+    wrist = new Wrist();
+    cargoIntake = new CargoIntake();
     // hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
@@ -83,23 +83,17 @@ public class Robot extends TimedRobot
     // lime = new Limelight();
     // lime.SetCamPosistion(0, 0, 5.5, 0, 0);
 
-    autonomouChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);
-    
+    autonomouChooser = new SendableChooser<String>();
+    autonomouChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
     autonomouChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
-    
     autonomouChooser.addOption("LeftCargoHatch", RobotMap.LEFTSHIPHATCH);
-    
     autonomouChooser.addOption("RightShipHatch", RobotMap.RIGHTSHIPHATCH);
-    
     autonomouChooser.addOption("LeftShipCargo", RobotMap.LEFTSHIPCARGO);
-    
     autonomouChooser.addOption("RightShipCargo", RobotMap.RIGHTSHIPCARGO);
-    
     autonomouChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
-    
     autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
 
-    
+    elevator.setSensorPosition(0);
   }
 
   /**
@@ -114,9 +108,25 @@ public class Robot extends TimedRobot
   public void robotPeriodic()
   {
     SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
-    SmartDashboard.putNumber("pitch", drivetrain.getHeading());
-    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
+    SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
+    SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
+    SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+
+    SmartDashboard.putString("RobotMode", mode.toString());
+
+    SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
+    SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
+    SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
+
+    SmartDashboard.putNumber("Elevator Position", elevator.getSensorPosition());
+
+    SmartDashboard.putNumber("Wrist Position", wrist.getSensorPosition());
+
+    SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
+
+    SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
   }
 
   /**
@@ -200,14 +210,10 @@ public class Robot extends TimedRobot
   public void teleopPeriodic()
   {
     Scheduler.getInstance().run();
-    SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
-    SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
-    SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("rawLeft: " , drivetrain.getRawLeftPosition());
-    SmartDashboard.putNumber("rawRight: ", drivetrain.getRawRightPosition());
 
     double currenttime = Timer.getFPGATimestamp() - gameStartTime;
+
 
   }
 

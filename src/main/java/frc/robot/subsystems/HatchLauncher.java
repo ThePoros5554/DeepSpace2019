@@ -14,6 +14,7 @@ import poroslib.subsystems.DoubleSolenoidSys;
  */
 public class HatchLauncher extends DoubleSolenoidSys {
 
+  // ports
   public static final int kSolenoidForwardPort = 0;
   public static final int kSolenoidReversePort = 1;
 
@@ -28,7 +29,7 @@ public class HatchLauncher extends DoubleSolenoidSys {
   {
     super(kSolenoidForwardPort, kSolenoidReversePort);
 
-    this.currentMode = LauncherPistonsMode.OPENED;
+    this.currentMode = LauncherPistonsMode.CLOSED;
   }
 
   public LauncherPistonsMode getCurrentMode()
@@ -37,8 +38,7 @@ public class HatchLauncher extends DoubleSolenoidSys {
   }
 
   @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
+  public void initDefaultCommand()
+  {
   }
 }

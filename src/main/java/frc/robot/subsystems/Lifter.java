@@ -17,16 +17,18 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Lifter extends Subsystem {
 
+  // manual values
   public static final double wheelForwardPower = 0.8;
   public static final double wheelReversePower = -0.8;
   
+  // ports
   private static final int kFrontSolenoidForwardPort = 0;
   private static final int kFrontSolenoidReversePort = 0;
   private static final int kRearSolenoidForwardPort = 0;
   private static final int kRearSolenoidReversePort = 0;
-  //
   private static final int kRearLeftMotorPort = 0;
   private static final int kRearRightMotorPort = 1;
+  
   //
 
   private DoubleSolenoid frontPistons;
