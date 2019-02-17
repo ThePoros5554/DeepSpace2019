@@ -51,11 +51,12 @@ public class RobotMonitor
         return positions.getLastReport();
     }
 
-    public void addVisionReport(double timeStamp)
+    public void addVisionReport(double timestamp, double horizontalOffset, double verticalOffset, double camHeight, double targetHight)
     {
-        visionTrgets.addReportFromTarget(timeStamp);
+        visionTrgets.addReportFromTarget(timestamp, horizontalOffset, verticalOffset, camHeight, targetHight);
     }
 
+    
     public Entry<Double, VisionInfo> getLastVisionReport()
     {
         return visionTrgets.getLastReport();

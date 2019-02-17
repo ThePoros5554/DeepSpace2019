@@ -40,9 +40,6 @@ public class UpdateRobotState extends Command
         prevLastLeftEncCountCm = leftPositionInCm;
         prevLastRightEncCountCm = rightPositionInCm;
 
-        SmartDashboard.putNumber("Distance left: ", leftPositionInCm);
-        SmartDashboard.putNumber("Distance right: ", rightPositionInCm);
-
         // if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
         // {
         //     robotMonitor.addVisionReport(Robot.lime.getLastNTUpdateTime());

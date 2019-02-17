@@ -16,10 +16,10 @@ import poroslib.subsystems.MechSys;
 public class CargoIntake extends MechSys {
  
   public static final double kIntakeInPower = 0.8;
-  public static final double kIntakeOutPower = -0.8;
+  public static final double kIntakeOutPower = -1;
 
   //
-  private static final int kIntakePort = 2;
+  private static final int kIntakePort = 0;
   //
 
   public CargoIntake()

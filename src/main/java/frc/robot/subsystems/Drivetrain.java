@@ -35,8 +35,8 @@ public class Drivetrain extends DiffDrivetrain
   private static final int kRearLeftPort = 1;
   //
 
-  private static final boolean kInvertEncLeft = false;
-  private static final boolean kInvertEncRight = true;
+  private static final boolean kInvertEncLeft = true;
+  private static final boolean kInvertEncRight = false;
 
   private static final double kVoltage = 12;
 
@@ -78,8 +78,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.follow(this.masterRight);
 
     // invertion
-    this.masterLeft.setInverted(InvertType.InvertMotorOutput);
-    this.masterRight.setInverted(InvertType.InvertMotorOutput);
+    this.masterLeft.setInverted(InvertType.None);
+    this.masterRight.setInverted(InvertType.None);
     this.middleLeft.setInverted(InvertType.FollowMaster);
     this.middleRight.setInverted(InvertType.FollowMaster);
     this.rearLeft.setInverted(InvertType.FollowMaster);

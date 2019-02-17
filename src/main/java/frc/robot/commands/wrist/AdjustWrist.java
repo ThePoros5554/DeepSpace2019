@@ -28,30 +28,31 @@ public class AdjustWrist extends Command
   protected void initialize()
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
-    Robot.wrist.set(this.targetMode);
+    Robot.wrist.selectProfileSlot(0);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
+    Robot.wrist.set(this.targetMode);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished()
   {
-    return Robot.wrist.isInMode(this.targetMode);
+    return false;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
-    if (isFinished())
-    {
-      Robot.wrist.setWristMode(this.targetMode);
-    }
+    // if (isFinished())
+    // {
+    //   Robot.wrist.setWristMode(this.targetMode);
+    // }
 
     Robot.wrist.setControlMode(ControlMode.PercentOutput);
     Robot.wrist.set(0);
@@ -62,6 +63,6 @@ public class AdjustWrist extends Command
   @Override
   protected void interrupted()
   {
-    end();
+//    end();
   }
 }

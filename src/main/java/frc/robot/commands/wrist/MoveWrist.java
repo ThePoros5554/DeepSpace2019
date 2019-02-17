@@ -11,10 +11,14 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import poroslib.triggers.JoyAxis;
 
 public class MoveWrist extends Command
 {
   private double power;
+  private JoyAxis powerAxis;
+
+  private double velocity;
 
   public MoveWrist(double power)
   {
@@ -22,18 +26,38 @@ public class MoveWrist extends Command
     this.power = power;
   }
 
+  public MoveWrist(JoyAxis powerAxis)
+  {
+    requires(Robot.wrist);
+    this.powerAxis = powerAxis;
+  }
+
   // Called just before this Command runs the first time
   @Override
   protected void initialize()
   {
     Robot.wrist.setControlMode(ControlMode.PercentOutput);
-    Robot.wrist.set(this.power);
+    this.velocity = 0;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() 
   {
+    if(powerAxis == null)
+    {
+      double currentVelocity = Robot.wrist.getSensorPosition(); 
+
+      if(currentVelocity > velocity)
+      {
+        velocity = currentVelocity;
+      }
+      Robot.wrist.set(power);
+    }
+    else
+    {
+      Robot.wrist.set(this.powerAxis.GetAxisValue());
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()

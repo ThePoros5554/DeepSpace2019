@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -26,19 +27,23 @@ public class Wrist extends Subsystem {
   // ports:
   private static final int kWristPort = 3;
 
-  // positions:
-  private static final int kDownPosition = 0;
-  private static final int kInsidePosition = 1;
-  private static final int kUpPosition = 2;
-  private static final int kCargoHighPosition = 2;
+  // positions for practice robot:
+  private static final int kDownPosition = 312;
+  private static final int kInsidePosition = 518;
+  private static final int kUpPosition = 435;
+  private static final int kCargoHighPosition = 365;
+
+  //gains
+  public static final double motionMagicUpSlot = 0;
+  public static final double motionKF = 1.93018867;//1024/530;//530 rawUnits/100ms
 
   // config constants:
-  private static final int kMaxTilt = 0;
-  private static final int kMinTilt = 1;
+  private static final int kMaxTilt = 530;
+  private static final int kMinTilt = 312;
   private static final double kVoltage = 10;
   private static final int kMaxAcceleration = 3;
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final boolean kInvertPot = false;
+  private static final boolean kInvertPot = true;
   private static final int kMaxVelocity = 5;
   private static final double kRamp = 0.2;
   private static final int kTargetThreshold = 2;
@@ -51,7 +56,7 @@ public class Wrist extends Subsystem {
     UP, DOWN, INSIDE, HIGH_CARGO
   }
 
-  private WristMode currentMode;
+  private WristMode currentMode = WristMode.INSIDE;
 
   public Wrist()
   {
@@ -62,27 +67,38 @@ public class Wrist extends Subsystem {
     //limitswitches
 
     //softlimits (if needed)
-    this.configForwardSoftLimitThreshold(kMaxTilt, true);
-    this.configReverseSoftLimitThreshold(kMinTilt, true);
+    this.configForwardSoftLimitThreshold(kMaxTilt, false);
+    this.configReverseSoftLimitThreshold(kMinTilt, false);
 
     //voltage
-    this.configVoltageCompSaturation(kVoltage, true);
+    this.configVoltageCompSaturation(kVoltage, false);
 
     //config motion magic
     this.configMotionValues(kMaxAcceleration, kMaxVelocity);
     
     //config (if needed) pid loops
 
-    //followers + slaves
-
+		master.configNominalOutputForward(0);
+		master.configNominalOutputReverse(0);
+		master.configPeakOutputForward(1);
+    master.configPeakOutputReverse(-1);
+        
     //Config direction of master and slaves
     master.setSensorPhase(kInvertPot);
-    master.setInverted(InvertType.None);
+    master.setInverted(InvertType.InvertMotorOutput);
+    
+    //motion parameters
+    master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+    this.configProfileSlot(0, 2.3, 0, 01, 30);
+    master.configMotionCruiseVelocity(105, 0);
+    master.configMotionAcceleration(50, 0);
+    
+		master.configSelectedFeedbackSensor(FeedbackDevice.Analog);
 
     //set neutral mode
     this.setNeutralMode(kNeutralMode);
 
-    this.master.configOpenloopRamp(kRamp);
+//  this.master.configOpenloopRamp(kRamp);
 
     controlMode = ControlMode.PercentOutput;
     set(0);
@@ -143,7 +159,8 @@ public class Wrist extends Subsystem {
   {
     if (this.controlMode == ControlMode.MotionMagic || this.controlMode == ControlMode.Position)
     {
-      switch (this.currentMode)
+      System.out.println("passed if");
+      switch (mode)
       {
         case DOWN:
         set(kDownPosition);
@@ -151,6 +168,7 @@ public class Wrist extends Subsystem {
 
         case UP:
         set(kUpPosition);
+        System.out.println("Set wrist up");
         break;
 
         case INSIDE:
@@ -197,10 +215,10 @@ public class Wrist extends Subsystem {
 
   public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
   {
-    master.config_kP(profileSlot, kP);
-    master.config_kI(profileSlot, kI);
-    master.config_kD(profileSlot, kD);
-    master.config_kF(profileSlot, kF);
+    master.config_kP(profileSlot, kP, 10);
+    master.config_kI(profileSlot, kI, 10);
+    master.config_kD(profileSlot, kD, 10);
+    master.config_kF(profileSlot, kF, 10);
   }
 
   public void configMotionValues(int sensorUnitsPer100msPerSec, int sensorUnitsPer100ms)
@@ -222,6 +240,11 @@ public class Wrist extends Subsystem {
   public int getSensorPosition()
   {
       return master.getSelectedSensorPosition();
+  }
+
+  public int getWristVelocity()
+  {
+      return master.getSelectedSensorVelocity();
   }
 
   public void setWristMode(WristMode mode)
