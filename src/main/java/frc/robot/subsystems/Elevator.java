@@ -16,13 +16,14 @@ public class Elevator extends Subsystem
     private static final int kElevatorMasterPort = 2;
 
     // positions for practice robot:
-    public static final int kFloorPosition = 0;
-    public static final int kHatchLowPosition = 10;
-    public static final int kHatchMiddlePosition = 200;
-    public static final int kHatchHighPosition = 480;
-    public static final int kCargoLowPosition = 50;
-    public static final int kCargoMiddlePosition = 245;
-    public static final int kCargoHighPosition = 500;
+    private static final int kFloorPosition = 0;
+    private static final int kHatchLowPosition = 10;
+    private static final int kHatchMiddlePosition = 200;
+    private static final int kHatchHighPosition = 480;
+    private static final int kCargoLowPosition = 50;
+    private static final int kCargoMiddlePosition = 245;
+    private static final int kCargoHighPosition = 500;
+    public static final int kTopOfFirstLevel = 9000;
     
     // motion gains
     private static final int kMaxAcceleration = 2;

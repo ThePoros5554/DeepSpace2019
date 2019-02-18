@@ -7,8 +7,6 @@
 
 package frc.robot.commands.wrist;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.Wrist.WristMode;
@@ -27,35 +25,27 @@ public class AdjustWrist extends Command
   @Override
   protected void initialize()
   {
-    Robot.wrist.setControlMode(ControlMode.MotionMagic);
-    Robot.wrist.selectProfileSlot(0);
+    Robot.wrist.setTargetPosition(this.targetMode);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
-    Robot.wrist.set(this.targetMode);
+    Robot.wrist.motionMagicControl();
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished()
   {
-    return false;
+    return Robot.wrist.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
-    // if (isFinished())
-    // {
-    //   Robot.wrist.setWristMode(this.targetMode);
-    // }
-
-    Robot.wrist.setControlMode(ControlMode.PercentOutput);
-    Robot.wrist.set(0);
   }
 
   // Called when another command which requires one or more of the same
@@ -63,6 +53,5 @@ public class AdjustWrist extends Command
   @Override
   protected void interrupted()
   {
-//    end();
   }
 }

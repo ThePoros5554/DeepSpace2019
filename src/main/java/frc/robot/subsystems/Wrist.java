@@ -17,6 +17,8 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.robot.Robot;
+import frc.robot.subsystems.Elevator.ElevatorMode;
 
 public class Wrist extends Subsystem {
 
@@ -52,6 +54,8 @@ public class Wrist extends Subsystem {
   private WPI_TalonSRX master;
 
   private ControlMode controlMode;
+  private int maxPositionLimit = kMaxTilt;
+  private int minPositionLimit = kMinTilt;
 
   public enum WristMode
   {
@@ -59,6 +63,7 @@ public class Wrist extends Subsystem {
   }
 
   private WristMode currentMode = WristMode.INSIDE;
+  private int targetPosition;
 
   public Wrist()
   {
@@ -151,60 +156,32 @@ public class Wrist extends Subsystem {
     master.set(controlMode, value);
   }
 
-  public void set(WristMode mode)
+  public boolean isInPosition(int targetPosition)
   {
-    if (this.controlMode == ControlMode.MotionMagic || this.controlMode == ControlMode.Position)
-    {
-      switch (mode)
-      {
-        case DOWN:
-        set(kDownPosition);
-        break;
-
-        case UP:
-        set(kUpPosition);
-        break;
-
-        case INSIDE:
-        set(kInsidePosition);
-        break;
-
-        case HIGH_CARGO:
-        set(kCargoHighPosition);
-        break;
-      }
-    }
-  }
+		int positionError = Math.abs(this.getSensorPosition() - targetPosition);
+    
+    return positionError < kTargetThreshold;
+	}
 
   public boolean isInMode(WristMode mode)
   {
-    if (mode == this.currentMode)
-      return true;
-
     switch (mode)
     {
       case DOWN:
-      return isInTarget(kDownPosition);
+      return isInPosition(kDownPosition);
 
       case UP:
-      return isInTarget(kUpPosition);
+      return isInPosition(kUpPosition);
 
       case INSIDE:
-      return isInTarget(kInsidePosition);
+      return isInPosition(kInsidePosition);
 
       case HIGH_CARGO:
-      return isInTarget(kCargoHighPosition);
+      return isInPosition(kCargoHighPosition);
 
       default:
       return false;
     }
-  }
-
-  public boolean isInTarget(int target)
-  {
-    int sensorpos = getSensorPosition();
-
-    return (target >= (sensorpos - kTargetThreshold) && target <= (sensorpos + kTargetThreshold));
   }
 
   public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
@@ -250,6 +227,144 @@ public class Wrist extends Subsystem {
   {
     return this.currentMode;
   }
+
+  public void motionMagicControl()
+  {
+		manageMotion(targetPosition);
+		master.set(ControlMode.MotionMagic, targetPosition);
+	}
+
+	/*
+	 * controls the position of the collector between upPositionLimit and
+	 * downPositionLimit based on the scalar input between -1 and 1.
+	 */
+  public void motionMagicPositionControl(double positionScalar)
+  {
+		double encoderPosition = 0;
+
+    if (positionScalar > 0)
+    {
+			encoderPosition = positionScalar * this.maxPositionLimit;
+    }
+    else
+    {
+			encoderPosition = -positionScalar * this.minPositionLimit;
+		}
+    
+    master.set(ControlMode.MotionMagic, encoderPosition);
+	}
+
+	/*
+	 * choose which set of gains to use based on direction of travel.
+	 */
+  public void manageMotion(double targetPosition)
+  {  
+    double currentPosition = getSensorPosition();
+  
+    manageLimits();
+
+    if (currentPosition < kUpPosition) // inside robot
+    {
+      if (currentPosition > targetPosition) // moving down
+      {
+				selectProfileSlot(0);
+      }
+      else // moving up
+      {
+				selectProfileSlot(1);
+			}
+    }
+    else // outside robot
+    {
+      if (currentPosition < targetPosition) // moving down
+      {
+				selectProfileSlot(0);
+      }
+      else // moving up
+      {
+				selectProfileSlot(1);
+			}
+		}
+		
+		this.master.configForwardSoftLimitThreshold(kMaxTilt);
+		this.master.configReverseSoftLimitThreshold(kMinTilt);
+	}
+
+	//Prevents wrist from moving behind the home position whilst elevator is not above first stage
+  private void manageLimits()
+  {
+    if (Robot.elevator.getSensorPosition() < Elevator.kTopOfFirstLevel)
+    {
+			this.maxPositionLimit = kMaxTilt;
+    }
+    else
+    {
+			this.maxPositionLimit = kUpPosition;
+      
+      if (this.targetPosition < kUpPosition)
+      {
+				this.targetPosition = kUpPosition;
+			}
+		}
+	}
+
+  public int getTargetPosition()
+  {
+		return this.targetPosition;
+	}
+	
+	//if valid position is inverted return false else, return true
+  public void setTargetPosition(int position)
+  {
+		manageLimits();
+    
+    if (isValidPosition(position))
+    {
+      this.targetPosition = position;
+    }
+  }
+  
+  public void setTargetPosition(WristMode position)
+  {
+    switch (position)
+    {
+      case DOWN:
+      setTargetPosition(kDownPosition);
+      break;
+
+      case UP:
+      setTargetPosition(kUpPosition);
+      break;
+
+      case INSIDE:
+      setTargetPosition(kInsidePosition);
+      break;
+
+      case HIGH_CARGO:
+      setTargetPosition(kCargoHighPosition);
+      break;
+    }
+	}	
+	
+  public void incrementTargetPosition(int increment)
+  {
+		int newTargetPosition = this.targetPosition + increment;
+    
+    if (isValidPosition(newTargetPosition))
+    {
+			this.targetPosition = newTargetPosition;
+		}
+	}
+	
+  public void stopWristInPlace()
+  {
+		this.master.set(ControlMode.MotionMagic, this.getSensorPosition());
+	}
+	
+  public boolean isValidPosition(int position)
+  {
+		return (position >= this.minPositionLimit && position <= this.maxPositionLimit);
+	}
 
   @Override
   public void initDefaultCommand()
