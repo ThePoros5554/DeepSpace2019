@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.robot.commands.elevator.ElevatorHold;
 
 public class Elevator extends Subsystem
 {
@@ -17,13 +18,14 @@ public class Elevator extends Subsystem
     private static final int kElevatorMasterPort = 2;
 
     // positions for practice robot:
-    public static final int kFloorPosition = 0;
-    public static final int kHatchLowPosition = 10;
-    public static final int kHatchMiddlePosition = 1000;
-    public static final int kHatchHighPosition = 480;
-    public static final int kCargoLowPosition = 50;
-    public static final int kCargoMiddlePosition = 245;
-    public static final int kCargoHighPosition = 500;
+    private static final int kFloorPosition = 0;
+    private static final int kHatchLowPosition = 10;
+    private static final int kHatchMiddlePosition = 200;
+    private static final int kHatchHighPosition = 480;
+    private static final int kCargoLowPosition = 50;
+    private static final int kCargoMiddlePosition = 245;
+    private static final int kCargoHighPosition = 500;
+    public static final int kTopOfFirstLevel = 8000;
     
     // motion gains
     private static final int kMaxAcceleration = 20;
@@ -90,6 +92,7 @@ public class Elevator extends Subsystem
 
         master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
         this.configProfileSlot(0, 0, 0, 0, 5); // up
+        configProfileSlot(1, 5.3, 0, 0.3, 0);
 
         this.master.configOpenloopRamp(kRamp);
 
@@ -198,6 +201,11 @@ public class Elevator extends Subsystem
         }
       }
     }
+
+    public void holdInPlace()
+    {
+        master.set(ControlMode.MotionMagic, getCurrentPosition());
+    }
   
     public boolean isInMode(ElevatorMode mode)
     {
@@ -234,7 +242,7 @@ public class Elevator extends Subsystem
 
     public boolean isInTarget(int target)
     {
-      int sensorpos = getSensorPosition();
+      int sensorpos = getCurrentPosition();
   
       return (target >= (sensorpos - targetThreshold) && target <= (sensorpos + targetThreshold));
     }
@@ -262,8 +270,13 @@ public class Elevator extends Subsystem
     {
         master.setSelectedSensorPosition(position);
     }
+    
+    public void stopInPlace()
+    {
+        this.master.set(ControlMode.MotionMagic, this.getCurrentPosition());
+    }
 
-    public int getSensorPosition()
+    public int getCurrentPosition()
     {
         return master.getSelectedSensorPosition();
     }
@@ -281,5 +294,6 @@ public class Elevator extends Subsystem
     @Override
     protected void initDefaultCommand()
     {
+        setDefaultCommand(new ElevatorHold());
     }
 }

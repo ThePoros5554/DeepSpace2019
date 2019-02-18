@@ -22,6 +22,7 @@ import frc.robot.commands.InitCargoHighMode;
 import frc.robot.commands.ToggleGamepieceMode;
 import frc.robot.commands.cargo_intake.ActivateIntake;
 import frc.robot.commands.elevator.AdjustElevator;
+import frc.robot.commands.elevator.ElevatorHold;
 import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.EjectHatch;
 import frc.robot.commands.lifter.CloseFrontLifters;
@@ -166,13 +167,14 @@ public class OI
 
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
-        
+        Robot.elevator.setDefaultCommand(new ElevatorHold());
+
         // // axis
         elevatorUpAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, 1, -1, 0);
         elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorUpAxis, 0, -1, -1, 0);
         wristUpAxis = new JoyAxisPart(operatorJoy, kWristAxis, -0.65, 0.65, -1, 1, -1, -0.15);
         wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, 0.5, -0.5, 1, -1, 0.01, 1);
-        wristMotion = new AdjustWrist(WristMode.UP);
+        wristMotion = new AdjustWrist(WristMode.INSIDE);
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
@@ -235,7 +237,7 @@ public class OI
         // prepareCargoHighTrigger.whenActive(prepareCargoHigh);
         collectCargoTrigger.whileActive(collectCargo);
         ejectCargoTrigger.whileActive(ejectCargo);
-        prepareHatchCollectTrigger.whileActive(elevatorAdjust);
+        prepareHatchCollectTrigger.whileActive(wristMotion);
 
         // manual
         elevatorUpAxis.whileActive(elevatorUp);

@@ -120,9 +120,9 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
     SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("Elevator Position", elevator.getSensorPosition());
+    SmartDashboard.putNumber("Elevator Position", elevator.getCurrentPosition());
 
-    SmartDashboard.putNumber("Wrist Position", wrist.getSensorPosition());
+    SmartDashboard.putNumber("Wrist Position", wrist.getCurrentPosition());
 
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
 

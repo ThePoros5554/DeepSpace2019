@@ -44,9 +44,9 @@ public class MoveWrist extends Command
   @Override
   protected void execute() 
   {
-    if(powerAxis == null)
+    if (powerAxis == null)
     {
-      double currentVelocity = Robot.wrist.getSensorPosition(); 
+      double currentVelocity = Robot.wrist.getCurrentPosition(); 
 
       if(currentVelocity > velocity)
       {
