@@ -28,20 +28,23 @@ public class AdjustElevator extends Command
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    Robot.elevator.set(this.targetMode);
+    Robot.elevator.selectProfileSlot(0);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
+    System.out.println(Robot.elevator.getControlMode());
+    Robot.elevator.set(this.targetMode);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished()
   {
-    return Robot.elevator.isInMode(this.targetMode);
+    return false;
+    //return Robot.elevator.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true

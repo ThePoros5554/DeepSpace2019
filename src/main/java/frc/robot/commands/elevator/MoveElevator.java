@@ -15,12 +15,22 @@ import poroslib.triggers.JoyAxis;
 
 public class MoveElevator extends Command {
 
-  private JoyAxis axis;
+  private double power;
+  private JoyAxis powerAxis;
+
+  private double velocity;
+
 
   public MoveElevator(JoyAxis moveAxis)
   {
     requires(Robot.elevator);
-    this.axis = moveAxis;
+    this.powerAxis = moveAxis;
+  }
+
+  public MoveElevator(double power)
+  {
+    requires(Robot.elevator);
+    this.power = power;
   }
 
   // Called just before this Command runs the first time
@@ -28,14 +38,27 @@ public class MoveElevator extends Command {
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.PercentOutput);
+    this.velocity = 0;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
-    System.out.println(this.axis.GetAxisValue());
-    Robot.elevator.set(this.axis.GetAxisValue());
+    if(powerAxis == null)
+    {
+      double currentVelocity = Robot.wrist.getSensorPosition(); 
+
+      if(currentVelocity > velocity)
+      {
+        velocity = currentVelocity;
+      }
+      Robot.elevator.set(power);
+    }
+    else
+    {
+      Robot.elevator.set(this.powerAxis.GetAxisValue());
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()

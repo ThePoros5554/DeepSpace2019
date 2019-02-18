@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -18,27 +19,27 @@ public class Elevator extends Subsystem
     // positions for practice robot:
     public static final int kFloorPosition = 0;
     public static final int kHatchLowPosition = 10;
-    public static final int kHatchMiddlePosition = 200;
+    public static final int kHatchMiddlePosition = 1000;
     public static final int kHatchHighPosition = 480;
     public static final int kCargoLowPosition = 50;
     public static final int kCargoMiddlePosition = 245;
     public static final int kCargoHighPosition = 500;
     
     // motion gains
-    private static final int kMaxAcceleration = 2;
-    private static final int kMaxVelocity = 6;
+    private static final int kMaxAcceleration = 20;
+    private static final int kMaxVelocity = 50;
     private static final double kP = 0;
     private static final double kI = 0;
     private static final double kD = 0;
 
     // config constants
     private static final double kVoltage = 10;
-    private static final boolean kInvertEnc = false;
+    private static final boolean kInvertEnc = true;
     private static final NeutralMode kNeutralMode = NeutralMode.Brake;
     private static final double kRamp = 0.4;
-    private static final int kMaxHeight = 500;
+    private static final int kMaxHeight = 48470;
     private static final int kMinHeight = 0;
-    private static final int targetThreshold = 2;
+    private static final int targetThreshold = 0;
 
     private WPI_TalonSRX master;
     
@@ -60,11 +61,11 @@ public class Elevator extends Subsystem
         //limitswitches
 
         //softlimits (if needed)
-        this.configForwardSoftLimitThreshold(kMaxHeight, false);
-        this.configReverseSoftLimitThreshold(kMinHeight, false);
+        this.configForwardSoftLimitThreshold(kMaxHeight, true);
+        this.configReverseSoftLimitThreshold(kMinHeight, true);
 
         //voltage
-        this.configVoltageCompSaturation(kVoltage, true);
+        //this.configVoltageCompSaturation(kVoltage, false);
 
         //config motion magic
         this.configMotionValues(kMaxAcceleration, kMaxVelocity);
@@ -82,10 +83,13 @@ public class Elevator extends Subsystem
 
         //Config direction of master and slaves
         master.setSensorPhase(kInvertEnc);
-        master.setInverted(InvertType.None);
+        master.setInverted(InvertType.InvertMotorOutput);
 
         //set neutral mode
         this.setNeutralMode(kNeutralMode);
+
+        master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
+        this.configProfileSlot(0, 0, 0, 0, 5); // up
 
         this.master.configOpenloopRamp(kRamp);
 
@@ -151,14 +155,21 @@ public class Elevator extends Subsystem
         master.set(controlMode, output);
     }
 
+    public ControlMode getControlMode()
+    {
+        return this.controlMode;
+    }
+
     public void set(ElevatorMode mode)
     {
       if (this.controlMode == ControlMode.MotionMagic || this.controlMode == ControlMode.Position)
       {
+        System.out.println("ee");
         switch (mode)
         {
           case FLOOR:
           set(kFloorPosition);
+          System.out.println("set");
           break;
   
           case LOW_HATCH:

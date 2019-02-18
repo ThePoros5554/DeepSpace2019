@@ -42,17 +42,17 @@ public class AdjustWrist extends Command
   @Override
   protected boolean isFinished()
   {
-    return false;
+    return Robot.wrist.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
-    // if (isFinished())
-    // {
-    //   Robot.wrist.setWristMode(this.targetMode);
-    // }
+    if (isFinished())
+    {
+      Robot.wrist.setWristMode(this.targetMode);
+    }
 
     Robot.wrist.setControlMode(ControlMode.PercentOutput);
     Robot.wrist.set(0);
@@ -63,6 +63,6 @@ public class AdjustWrist extends Command
   @Override
   protected void interrupted()
   {
-//    end();
+    end();
   }
 }

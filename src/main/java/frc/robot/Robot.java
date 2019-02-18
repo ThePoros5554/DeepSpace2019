@@ -190,6 +190,7 @@ public class Robot extends TimedRobot
   {
     gameStartTime = Timer.getFPGATimestamp();
 
+    elevator.setSensorPosition(0);
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
 
