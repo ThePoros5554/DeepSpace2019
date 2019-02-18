@@ -71,9 +71,9 @@ public class Robot extends TimedRobot
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
 
     
-
     elevator = new Elevator();
     wrist = new Wrist();
+    elevator.enableLimitSwitches(true);
     cargoIntake = new CargoIntake();
     // hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
@@ -127,6 +127,10 @@ public class Robot extends TimedRobot
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
 
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
+
+
+    SmartDashboard.putBoolean("Ele Fwd", Robot.wrist.getIsFwdLimitSwitchClosed());
+    SmartDashboard.putBoolean("Ele Rev", Robot.wrist.getIsRevLimitSwitchClosed());
   }
 
   /**

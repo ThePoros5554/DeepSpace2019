@@ -6,10 +6,12 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.commands.elevator.ElevatorHold;
 
 public class Elevator extends Subsystem
@@ -295,5 +297,22 @@ public class Elevator extends Subsystem
     protected void initDefaultCommand()
     {
         setDefaultCommand(new ElevatorHold());
+    }
+
+    public void enableLimitSwitches(boolean isEnabled)
+    {
+        master.configForwardLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyOpen, Robot.wrist.getWristDeviceId(), 10);
+        master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyOpen, Robot.wrist.getWristDeviceId(), 10);
+        master.overrideLimitSwitchesEnable(isEnabled);
+    }
+
+    public boolean getIsFwdLimitSwitchClosed()
+    {
+      return master.getSensorCollection().isFwdLimitSwitchClosed();
+    }
+  
+    public boolean getIsRevLimitSwitchClosed()
+    {
+      return master.getSensorCollection().isRevLimitSwitchClosed();
     }
 }

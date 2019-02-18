@@ -72,10 +72,11 @@ public class Wrist extends Subsystem {
     master.configSelectedFeedbackSensor(FeedbackDevice.Analog);
 
     //limitswitches
+    master.overrideLimitSwitchesEnable(false);
 
     //softlimits (if needed)
-    this.configForwardSoftLimitThreshold(kMaxTilt, true);
-    this.configReverseSoftLimitThreshold(kMinTilt, true);
+    this.configForwardSoftLimitThreshold(kMaxTilt, false);
+    this.configReverseSoftLimitThreshold(kMinTilt, false);
 
     //voltage
     this.configVoltageCompSaturation(kVoltage, false);
@@ -379,5 +380,20 @@ public class Wrist extends Subsystem {
 
     this.master.configForwardSoftLimitThreshold(this.maxPositionLimit);
     this.master.configReverseSoftLimitThreshold(this.minPositionLimit);
+  }
+
+  public int getWristDeviceId()
+  {
+    return master.getDeviceID();
+  }
+
+  public boolean getIsFwdLimitSwitchClosed()
+  {
+    return master.getSensorCollection().isFwdLimitSwitchClosed();
+  }
+
+  public boolean getIsRevLimitSwitchClosed()
+  {
+    return master.getSensorCollection().isRevLimitSwitchClosed();
   }
 }

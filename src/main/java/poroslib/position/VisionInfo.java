@@ -29,7 +29,7 @@ public class VisionInfo
         y = (this.targetHeight - this.camHeight) / Math.tan(verticalOffset);
         x = y * Math.tan(horizontalOffset);
 
-        return new Pose2d(new Translation2d(x, y), new Rotation2d(x, y, true));
+        return new Pose2d(new Translation2d(x, y), Rotation2d.fromDegrees(horizontalOffset));
     }
 
     public Pose2d getVerticalDisplacement()
@@ -40,7 +40,7 @@ public class VisionInfo
         y = this.targetHeight - this.camHeight;
         x = y / Math.tan(verticalOffset);
 
-        return new Pose2d(new Translation2d(x, y), new Rotation2d(x, y, true));
+        return new Pose2d(new Translation2d(x, y), Rotation2d.fromDegrees(verticalOffset));
     }
 
 }
