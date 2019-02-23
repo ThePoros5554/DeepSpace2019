@@ -7,6 +7,11 @@
 
 package frc.robot.subsystems;
 
+//robot width 85
+//robot length 66.5
+//robot max speed 7750 native/100ms
+
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -21,12 +26,12 @@ import poroslib.subsystems.DiffDrivetrain;
 public class Drivetrain extends DiffDrivetrain
 {
   // ports
-  public static final int kFrontLeftPort = 0;
-  public static final int kFrontRightPort = 1;
-  private static final int kMiddleRightPort = 2;
-  private static final int kRearRightPort = 3;
-  private static final int kMiddleLeftPort = 0;
-  private static final int kRearLeftPort = 1;
+  public static final int kFrontLeftPort = 1;
+  public static final int kFrontRightPort = 0;
+  private static final int kMiddleRightPort = 1;
+  private static final int kRearRightPort = 0;
+  private static final int kMiddleLeftPort = 2;
+  private static final int kRearLeftPort = 3;
 
   // motion gains
   private static final double kP = 0;
@@ -39,9 +44,10 @@ public class Drivetrain extends DiffDrivetrain
   private static final double kWheelDiameter = 10.16 * Math.PI;
   private static final double kEncoderTicks = 4096;
   private static final boolean kInvertEncLeft = true;
-  private static final boolean kInvertEncRight = false;
-  private static final double kRamp = 0.3;
+  private static final boolean kInvertEncRight = true;
+  private static final double kRamp = 0;
   public static final double kEjectDriveBackDistance = 14.3;
+  public static final double TRACKWIDTH = 72.5;
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
   private static final int kTargetThreshold = 0;
 
@@ -76,8 +82,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.follow(this.masterRight);
 
     // invertion
-    this.masterLeft.setInverted(InvertType.None);
-    this.masterRight.setInverted(InvertType.None);
+    this.masterLeft.setInverted(InvertType.InvertMotorOutput);
+    this.masterRight.setInverted(InvertType.InvertMotorOutput);
     this.middleLeft.setInverted(InvertType.FollowMaster);
     this.middleRight.setInverted(InvertType.FollowMaster);
     this.rearLeft.setInverted(InvertType.FollowMaster);
@@ -91,6 +97,11 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     this.masterLeft.setSensorPhase(kInvertEncLeft);
     this.masterRight.setSensorPhase(kInvertEncRight);
+
+    // motion magic
+    this.configMotionValues(2000, 1500);
+    this.configProfileSlot(0, 0, 0, 0.00, 0.132); //kf = 1023/7750
+    this.selectProfileSlot(0);
 
     // neutral mode
     this.setNeutralMode(kNeutralMode);
@@ -186,7 +197,7 @@ public class Drivetrain extends DiffDrivetrain
   @Override
   public int getRawLeftPosition()
   {
-    return this.masterLeft.getSelectedSensorPosition();
+    return -this.masterLeft.getSelectedSensorPosition();
   }
 
   @Override
@@ -209,6 +220,11 @@ public class Drivetrain extends DiffDrivetrain
   public double rotationsToCm(int rotations)
   {
     return rotations * kWheelDiameter / kEncoderTicks;
+  }
+
+  public static int cmToRotations(double cm)
+  {
+    return (int)(kEncoderTicks * cm / kWheelDiameter);
   }
 
   public void resetRawPosition()
@@ -254,6 +270,12 @@ public class Drivetrain extends DiffDrivetrain
 
     return isInTargetLeft && isInTargetRight;
   }
+
+  public int getDriveTrainVelocity()
+  {
+    return (this.masterLeft.getSelectedSensorVelocity() + this.masterRight.getSelectedSensorVelocity()) / 2;
+  }
+
 
   @Override
   public void initDefaultCommand()

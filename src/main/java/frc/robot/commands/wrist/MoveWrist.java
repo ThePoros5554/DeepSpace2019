@@ -56,6 +56,13 @@ public class MoveWrist extends Command
     }
     else
     {
+      double currentVelocity = Robot.wrist.getWristVelocity(); 
+
+      if(currentVelocity > velocity)
+      {
+        velocity = currentVelocity;
+      }
+
       Robot.wrist.set(this.powerAxis.GetAxisValue());
     }
   }

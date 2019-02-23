@@ -32,7 +32,6 @@ public class RobotMonitor
     
     private PositionTracker positions;
     private VisionTracker visionTargets;
-    private Pose2d cameraVerticalDisplacement;
 
     public static final double targetFixedHeight = 80.01; // Hatch target height at the HIGHEST POINT
 
@@ -60,18 +59,21 @@ public class RobotMonitor
     
     public Entry<Double, VisionInfo> getLastVisionReport()
     {
-        return visionTargets.getLastReport();
+        Entry<Double, VisionInfo> lastReport = visionTargets.getLastReport();
+        
+        if(lastReport == null)
+        {
+            visionTargets.add(-1, new VisionInfo(0, 0, 0, 0));
+            return visionTargets.getLastReport();
+        }
+        else
+        {
+            return lastReport;
+        }
+
     }
 
-    public void setCameraVerticalDisplacement(Pose2d cameraVerticalDisplacement)
-    {
-        this.cameraVerticalDisplacement = cameraVerticalDisplacement;
-    }
 
-    public Pose2d getCameraVerticalDisplacement()
-    {
-        return cameraVerticalDisplacement;
-    }
 
     public void resetMonitor()
     {

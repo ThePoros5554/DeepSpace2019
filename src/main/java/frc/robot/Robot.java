@@ -8,21 +8,33 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.kauailabs.navx.IMUProtocol.GyroUpdate;
 
+import edu.wpi.first.wpilibj.GyroBase;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
+//import frc.robot.subsystems.SendableForShuffleBoard;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
 import poroslib.systems.Limelight;
+import poroslib.systems.Limelight.LimelightCamMode;
 //import sun.jvm.hotspot.runtime.solaris_sparc.SolarisSPARCJavaThreadPDAccess;
+import poroslib.systems.Limelight.LimelightLedMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -70,18 +82,16 @@ public class Robot extends TimedRobot
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
 
-    
     elevator = new Elevator();
     wrist = new Wrist();
-    elevator.enableLimitSwitches(true);
+    elevator.enableLimitSwitches(false);
     cargoIntake = new CargoIntake();
     // hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
     oi = new OI();
 
-    // lime = new Limelight();
-    // lime.SetCamPosistion(0, 0, 5.5, 0, 0);
+    lime = new Limelight();
 
     autonomouChooser = new SendableChooser<String>();
     autonomouChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
@@ -94,6 +104,7 @@ public class Robot extends TimedRobot
     autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
 
     elevator.setSensorPosition(0);
+    //Shuffleboard.getTab("gyros").add("gyro", drivetrain.getHeading()).withWidget(BuiltInWidgets.kGyro);
   }
 
   /**
@@ -107,6 +118,9 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
+    //
+    lime.setPipeline(7);
+    lime.setCamMode(LimelightCamMode.VisionProcessor);
     SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
     SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
@@ -114,11 +128,14 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
     SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
 
-    SmartDashboard.putString("RobotMode", mode.toString());
-
     SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
     SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
+
+
+    SmartDashboard.putNumber("target x: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getX());
+    SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
+    SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
     SmartDashboard.putNumber("Elevator Position", elevator.getCurrentPosition());
 
@@ -127,9 +144,8 @@ public class Robot extends TimedRobot
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
 
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
+    //Shuffleboard.getTab("SmartDashboard").add("Gyro", SmartDashboard.putData(drivetrain.getHeading()).withWidget(BuiltInWidgets.kGyro);
 
-
-    SmartDashboard.putBoolean("Ele Fwd", Robot.wrist.getIsFwdLimitSwitchClosed());
     SmartDashboard.putBoolean("Ele Rev", Robot.wrist.getIsRevLimitSwitchClosed());
   }
 
@@ -169,6 +185,8 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+    lime.setLedMode(LimelightLedMode.ForceOn);
+
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
 
@@ -192,6 +210,8 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
+    lime.setLedMode(LimelightLedMode.ForceOn);
+
     gameStartTime = Timer.getFPGATimestamp();
 
     elevator.setSensorPosition(0);
@@ -214,6 +234,7 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
+
     Scheduler.getInstance().run();
 
 

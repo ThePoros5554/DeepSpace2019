@@ -54,10 +54,29 @@ public class MoveElevator extends Command {
         velocity = currentVelocity;
       }
       Robot.elevator.set(power);
+
+      System.out.println("as;diasdfhasdfjkfuh");
+      System.out.println("as;diasdfhasdfjkfuh");
+      System.out.println("as;diasdfhasdfjkfuh");
+      System.out.println("as;diasdfhasdfjkfuh");
+      System.out.println("as;diasdfhasdfjkfuh");
+      System.out.println("as;diasdfhasdfjkfuh");
+
     }
     else
     {
+      double currentVelocity = Robot.elevator.getSelectedSensorVelocity(); 
+
+      if(currentVelocity > velocity)
+      {
+        velocity = currentVelocity;
+      }
+
       Robot.elevator.set(this.powerAxis.GetAxisValue());
+      System.out.println(velocity);
+
+      //System.out.println("power: " + this.powerAxis.GetAxisValue());
+
     }
   }
 

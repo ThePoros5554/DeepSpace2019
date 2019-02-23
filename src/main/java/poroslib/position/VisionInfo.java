@@ -25,9 +25,12 @@ public class VisionInfo
     {
         double x;
         double y;
+
+        double verticalOffsetRad = Math.toRadians(verticalOffset);
+        double horizontalOffsetRad = Math.toRadians(horizontalOffset);
     
-        y = (this.targetHeight - this.camHeight) / Math.tan(verticalOffset);
-        x = y * Math.tan(horizontalOffset);
+        y = (this.targetHeight - this.camHeight) / Math.tan(verticalOffsetRad);
+        x = y * Math.sin(horizontalOffsetRad);
 
         return new Pose2d(new Translation2d(x, y), Rotation2d.fromDegrees(horizontalOffset));
     }

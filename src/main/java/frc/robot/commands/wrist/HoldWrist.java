@@ -7,53 +7,43 @@
 
 package frc.robot.commands.wrist;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.Wrist.WristMode;
 
-public class AdjustWrist extends Command
+public class HoldWrist extends Command
 {
-  private WristMode targetMode;
-
-  public AdjustWrist(WristMode mode)
+  public HoldWrist()
   {
     requires(Robot.wrist);
-    this.targetMode = mode;
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize()
-  {
-    Robot.wrist.setControlMode(ControlMode.MotionMagic);
-    Robot.wrist.setTargetPosition(this.targetMode);
+  protected void initialize(){
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
-  protected void execute()
-  {
+  protected void execute() {
+    Robot.wrist.stopInPlace();
+
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished()
-  {
-    return true;
+  protected boolean isFinished() {
+    return false;
   }
 
   // Called once after isFinished returns true
   @Override
-  protected void end()
-  {
+  protected void end() {
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
-  protected void interrupted()
-  {
+  protected void interrupted() {
+    end();
   }
 }

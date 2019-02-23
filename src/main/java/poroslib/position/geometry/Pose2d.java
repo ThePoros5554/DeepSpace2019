@@ -47,7 +47,7 @@ public class Pose2d implements Interpolable<Pose2d>
             s = sin_theta / delta.dtheta;
             c = (1.0 - cos_theta) / delta.dtheta;
         }
-        return new Pose2d(new Translation2d(delta.dx * s - delta.dy * c, delta.dx * c + delta.dy * s),
+        return new Pose2d(new Translation2d(delta.dx * c + delta.dy * s, delta.dx * s - delta.dy * c),
                 new Rotation2d(cos_theta, sin_theta, false));
     }
 

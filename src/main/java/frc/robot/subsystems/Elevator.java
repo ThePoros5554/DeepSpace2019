@@ -22,7 +22,7 @@ public class Elevator extends Subsystem
     // positions for practice robot:
     private static final int kFloorPosition = 0;
     private static final int kHatchLowPosition = 10;
-    private static final int kHatchMiddlePosition = 200;
+    private static final int kHatchMiddlePosition = 15000;
     private static final int kHatchHighPosition = 480;
     private static final int kCargoLowPosition = 50;
     private static final int kCargoMiddlePosition = 245;
@@ -30,17 +30,17 @@ public class Elevator extends Subsystem
     public static final int kTopOfFirstLevel = 8000;
     
     // motion gains
-    private static final int kMaxAcceleration = 20;
-    private static final int kMaxVelocity = 50;
+    private static final int kMaxAcceleration = (int)(3126 * 0.8);
+    private static final int kMaxVelocity = (int)(3126 * 0.8);
     private static final double kP = 0;
     private static final double kI = 0;
     private static final double kD = 0;
 
     // config constants
     private static final double kVoltage = 10;
-    private static final boolean kInvertEnc = true;
+    private static final boolean kInvertEnc = false;
     private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-    private static final double kRamp = 0.4;
+    private static final double kRamp = 0;
     private static final int kMaxHeight = 48470;
     private static final int kMinHeight = 0;
     private static final int targetThreshold = 0;
@@ -65,8 +65,8 @@ public class Elevator extends Subsystem
         //limitswitches
 
         //softlimits (if needed)
-        this.configForwardSoftLimitThreshold(kMaxHeight, true);
-        this.configReverseSoftLimitThreshold(kMinHeight, true);
+        this.configForwardSoftLimitThreshold(kMaxHeight, false);
+        this.configReverseSoftLimitThreshold(0, false);
 
         //voltage
         //this.configVoltageCompSaturation(kVoltage, false);
@@ -93,7 +93,7 @@ public class Elevator extends Subsystem
         this.setNeutralMode(kNeutralMode);
 
         master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
-        this.configProfileSlot(0, 0, 0, 0, 5); // up
+        this.configProfileSlot(0, 1, 0, 0, 0.6); // up
         configProfileSlot(1, 5.3, 0, 0.3, 0);
 
         this.master.configOpenloopRamp(kRamp);
@@ -132,6 +132,11 @@ public class Elevator extends Subsystem
     {
         master.configForwardSoftLimitThreshold(forwardSensorLimit);
         master.configForwardSoftLimitEnable(enableForwardLimit);
+    }
+
+    public int getSelectedSensorVelocity()
+    {
+        return master.getSelectedSensorVelocity();
     }
 
     public void configReverseSoftLimitThreshold(int reverseSensorLimit, boolean enableReverseLimit)
@@ -296,14 +301,14 @@ public class Elevator extends Subsystem
     @Override
     protected void initDefaultCommand()
     {
-        setDefaultCommand(new ElevatorHold());
+        //setDefaultCommand(new ElevatorHold());
     }
 
     public void enableLimitSwitches(boolean isEnabled)
     {
-        master.configForwardLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyOpen, Robot.wrist.getWristDeviceId(), 10);
-        master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyOpen, Robot.wrist.getWristDeviceId(), 10);
-        master.overrideLimitSwitchesEnable(isEnabled);
+        // master.configForwardLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.Disabled, Robot.wrist.getWristDeviceId(), 10);
+        // master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.Disabled, Robot.wrist.getWristDeviceId(), 10);
+        // master.overrideLimitSwitchesEnable(isEnabled);
     }
 
     public boolean getIsFwdLimitSwitchClosed()
@@ -314,5 +319,14 @@ public class Elevator extends Subsystem
     public boolean getIsRevLimitSwitchClosed()
     {
       return master.getSensorCollection().isRevLimitSwitchClosed();
+    }
+
+    @Override
+    public void periodic()
+    {
+        if (!getIsRevLimitSwitchClosed())
+        {
+            //this.setSensorPosition(0);
+        }
     }
 }

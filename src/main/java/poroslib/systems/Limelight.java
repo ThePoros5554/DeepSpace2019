@@ -5,6 +5,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import poroslib.position.geometry.Pose2d;
+import poroslib.position.geometry.Rotation2d;
+import poroslib.position.geometry.Translation2d;
 
 public class Limelight
 {
@@ -20,9 +23,10 @@ public class Limelight
     private NetworkTableEntry tPipeline;
     private NetworkTableEntry tLedMode;
     
-    private double hightFromFloor = 2;
+    private double hightFromFloor = 109;
     private double fixedHorizontalOffset = 0;
-    private double fixedVerticalOffset = 0;
+    private double fixedVerticalOffset = -12.5;
+    private Pose2d cameraHorizontalDisplacementFromRobot = new Pose2d(new Translation2d(0,50), Rotation2d.fromDegrees(0));
 
     private double lastNTUpdate;
 
@@ -144,5 +148,15 @@ public class Limelight
     public void setFixedVerticalOffset(double verticalOffset)
     {
         this.fixedVerticalOffset = verticalOffset;
+    }
+
+    public void setCameraVerticalDisplacement(Pose2d cameraHorizontalDisplacementFromRobot)
+    {
+        this.cameraHorizontalDisplacementFromRobot = cameraHorizontalDisplacementFromRobot;
+    }
+
+    public Pose2d getCameraHorizontalDisplacementFromRobot()
+    {
+        return cameraHorizontalDisplacementFromRobot;
     }
 }

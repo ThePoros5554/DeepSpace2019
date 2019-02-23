@@ -51,7 +51,7 @@ public class MagicDrive extends Command
   @Override
   protected boolean isFinished()
   {
-    return Robot.drivetrain.isInTarget(this.rightTarget, this.leftTarget);
+    return false;
   }
 
   // Called once after isFinished returns true

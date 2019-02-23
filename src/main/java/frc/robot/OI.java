@@ -20,7 +20,9 @@ import frc.robot.commands.InitCargoMiddleMode;
 import frc.robot.commands.InitHatchHighMode;
 import frc.robot.commands.InitCargoHighMode;
 import frc.robot.commands.ToggleGamepieceMode;
+import frc.robot.commands.VisionAllignment;
 import frc.robot.commands.cargo_intake.ActivateIntake;
+import frc.robot.commands.drive.MagicDrive;
 import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.elevator.ElevatorHold;
 import frc.robot.commands.elevator.MoveElevator;
@@ -30,6 +32,7 @@ import frc.robot.commands.lifter.CloseRearLifters;
 import frc.robot.commands.lifter.LiftRobot;
 import frc.robot.commands.lifter.MoveLifterWheels;
 import frc.robot.commands.wrist.AdjustWrist;
+import frc.robot.commands.wrist.HoldWrist;
 import frc.robot.commands.wrist.MoveWrist;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -65,6 +68,7 @@ public class OI
     private static final int kElevatorDownAxis = 2; // LT
     private static final int kRobotLiftModeButton = 0;
     private static final int kWristAxis = 1; // L 
+    private static final int kMoveToVisionTargetButton = 7;
 
     // Joystick Ports
     private static final int kDriverLeftJoystickPort = 0;
@@ -77,6 +81,7 @@ public class OI
 
     private Button modeButton;
     private Button prepareLiftButton;
+    private Button moveToVisionTarget;
 
     private ModeTrigger prepareHatchCollectTrigger;
     private ModeTrigger prepareCargoCollectTrigger;
@@ -129,6 +134,9 @@ public class OI
 
     private AdjustElevator elevatorAdjust;
 
+    private VisionAllignment visionAllignment;
+    private MagicDrive md;
+
     private ToggleGamepieceMode toggleGamepiece;
 
     public OI()
@@ -144,6 +152,7 @@ public class OI
         rightJoy.SetSpeedAxis(1);
         Robot.drivetrain.SetIsRanged(true);
 
+        
         // // buttons and triggers
          prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
         // prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
@@ -166,19 +175,19 @@ public class OI
         // moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
 
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
+        moveToVisionTarget = new JoystickButton(operatorJoy, kMoveToVisionTargetButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
-        Robot.elevator.setDefaultCommand(new ElevatorHold());
+        //Robot.elevator.setDefaultCommand(new ElevatorHold());
 
         // // axis
         elevatorUpAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, 1, -1, 0);
         elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorUpAxis, 0, -1, -1, 0);
-        wristUpAxis = new JoyAxisPart(operatorJoy, kWristAxis, -0.65, 0.65, -1, 1, -1, -0.15);
-        wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, 0.5, -0.5, 1, -1, 0.01, 1);
-        wristMotion = new AdjustWrist(WristMode.INSIDE);
+        wristUpAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, 0.1, 1);
+        wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, -1, -0.1);
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
-
+        wristMotion = new AdjustWrist(WristMode.UP);
         
         // prepareHatchCollect = new InitHatchCollectMode();
         // prepareHatchLow = new InitHatchLowMode();
@@ -193,7 +202,7 @@ public class OI
         // prepareCargoHigh = new InitCargoHighMode();
         collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
         ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
-        elevatorAdjust = new AdjustElevator(ElevatorMode.MIDDLE_HATCH);
+        //elevatorAdjust = new AdjustElevator(ElevatorMode.MIDDLE_HATCH);
 
         // prepareLift = new InitLiftMode();
         // liftRobot = new LiftRobot();
@@ -208,10 +217,13 @@ public class OI
         wristDown = new MoveWrist(wristDownAxis);
         wristUp = new MoveWrist(wristUpAxis);
 
+        visionAllignment = new VisionAllignment();
+        md = new MagicDrive(20000, -20000, false);
         /****************************************/
 
-        Robot.drivetrain.setDefaultCommand(defaultDrive);
+        
 
+        Robot.drivetrain.setDefaultCommand(defaultDrive);
         modeButton.whenPressed(toggleGamepiece);
         
         // // climb
@@ -235,14 +247,16 @@ public class OI
         // prepareCargoLowTrigger.whenActive(prepareCargoLow);
         // prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
         // prepareCargoHighTrigger.whenActive(prepareCargoHigh);
-        collectCargoTrigger.whileActive(collectCargo);
-        ejectCargoTrigger.whileActive(ejectCargo);
-        prepareHatchCollectTrigger.whileActive(wristMotion);
+         collectCargoTrigger.whileActive(collectCargo);
+         ejectCargoTrigger.whileActive(ejectCargo);
+        //prepareHatchCollectTrigger.whileActive(wristMotion);
 
         // manual
         elevatorUpAxis.whileActive(elevatorUp);
         elevatorDownAxis.whileActive(elevatorDown);
         wristDownAxis.whileActive(wristDown);
         wristUpAxis.whileActive(wristUp);
+
+        moveToVisionTarget.whileActive(visionAllignment);
     }
 }

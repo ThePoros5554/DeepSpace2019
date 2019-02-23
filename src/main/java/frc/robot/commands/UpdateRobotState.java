@@ -39,10 +39,10 @@ public class UpdateRobotState extends Command
         prevLastLeftEncCountCm = leftPositionInCm;
         prevLastRightEncCountCm = rightPositionInCm;
 
-        // if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
-        // {
-        //     robotMonitor.addVisionReport(Robot.lime.getLastNTUpdateTime());
-        // }
+        if(robotMonitor.getLastVisionReport().getKey() != Robot.lime.getLastNTUpdateTime())
+        {
+            robotMonitor.addVisionReport(Robot.lime.getLastNTUpdateTime());
+        }
     }
   
     // Make this return true when this Command no longer needs to run execute()

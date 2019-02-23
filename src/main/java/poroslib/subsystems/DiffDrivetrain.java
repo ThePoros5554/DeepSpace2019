@@ -46,9 +46,9 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     {
     	this.driver.setMaxOutput(maxOutput);
     	
-    	if (Math.abs(leftSpeed - rightSpeed) < rotateDeadband)
+    	if (Math.abs(Math.abs(leftSpeed) - Math.abs(rightSpeed)) < rotateDeadband && Math.signum(leftSpeed) + Math.signum(rightSpeed) != 0)
     	{
-    		double speed = (leftSpeed + rightSpeed)/2;
+    		double speed = Math.signum(leftSpeed)*(Math.abs(leftSpeed) + Math.abs(rightSpeed)) / 2;
     		leftSpeed = speed;
     		rightSpeed = speed;
     	}

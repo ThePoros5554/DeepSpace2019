@@ -1,6 +1,7 @@
 package poroslib.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+import frc.robot.Robot;
 import poroslib.subsystems.DiffDrivetrain;
 import poroslib.triggers.SmartJoystick;
 
@@ -14,7 +15,9 @@ public class TankDrive extends Command
 	private SmartJoystick leftJoy;
 	private SmartJoystick rightJoy;
 	
-	private double maxOutput = 1;
+    private double maxOutput = 1;
+    
+    private double maxSpeed = 0;
 	
     public TankDrive(DiffDrivetrain drivetrain, SmartJoystick leftJoy, SmartJoystick rightJoy)
     {
@@ -45,7 +48,13 @@ public class TankDrive extends Command
     		this.maxOutput = 1;
         }
         
-    	this.drivetrain.tankDrive(leftValue, rightValue, this.maxOutput);
+        this.drivetrain.tankDrive(leftValue, rightValue, this.maxOutput);
+        
+        int velocity = Robot.drivetrain.getDriveTrainVelocity();
+        if(this.maxSpeed < velocity)
+        {
+            maxSpeed = velocity;
+        }
     }
 
     protected boolean isFinished()

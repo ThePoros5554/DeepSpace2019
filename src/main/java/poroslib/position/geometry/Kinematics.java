@@ -38,10 +38,11 @@ public class Kinematics
         {
             return new DriveVelocity(velocity.dx, velocity.dx);
         }
-        
+
         double delta_v = trackWidthMeters * velocity.dtheta / (2 * trackScrubFactor);
 
-        return new DriveVelocity(velocity.dx - delta_v, velocity.dx + delta_v);
+        System.out.println((velocity.dx + delta_v) > velocity.dx - delta_v);
+        return new DriveVelocity(velocity.dx + delta_v , velocity.dx - delta_v);
     }
 
 }
