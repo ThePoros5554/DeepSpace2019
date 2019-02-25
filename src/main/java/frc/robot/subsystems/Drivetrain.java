@@ -53,8 +53,8 @@ public class Drivetrain extends DiffDrivetrain
 
   //
 
-  private WPI_TalonSRX masterLeft;
-  private WPI_TalonSRX masterRight;
+  public WPI_TalonSRX masterLeft;
+  public WPI_TalonSRX masterRight;
   private WPI_VictorSPX middleLeft;
   private WPI_VictorSPX middleRight;
   private WPI_VictorSPX rearLeft;
@@ -100,8 +100,12 @@ public class Drivetrain extends DiffDrivetrain
 
     // motion magic
     this.configMotionValues(2000, 1500);
-    this.configProfileSlot(0, 0, 0, 0.00, 0.132); //kf = 1023/7750
-    this.selectProfileSlot(0);
+    this.configProfileSlot(0, 0.005, 0, 0.00, 0.132); //kf = 1023/7750
+
+    //position control
+    this.configProfileSlot(1, 0.015, 0.0000015, 0.005, 0);
+    this.masterLeft.configMaxIntegralAccumulator(1, 60000);
+    this.masterRight.configMaxIntegralAccumulator(1, 60000);
 
     // neutral mode
     this.setNeutralMode(kNeutralMode);

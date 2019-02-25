@@ -41,7 +41,6 @@ public class Kinematics
 
         double delta_v = trackWidthMeters * velocity.dtheta / (2 * trackScrubFactor);
 
-        System.out.println((velocity.dx + delta_v) > velocity.dx - delta_v);
         return new DriveVelocity(velocity.dx + delta_v , velocity.dx - delta_v);
     }
 

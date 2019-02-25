@@ -18,8 +18,8 @@ public class RobotMonitor
 		if(instance == null)
 		{
             instance = new RobotMonitor();
-            instance.positions = new PositionTracker(500);
-            instance.visionTargets = new VisionTracker(500);
+            instance.positions = new PositionTracker(1000);
+            instance.visionTargets = new VisionTracker(1000);
 		}
 		
 		return instance;
@@ -53,7 +53,8 @@ public class RobotMonitor
 
     public void addVisionReport(double timestamp)
     {
-        visionTargets.addReportFromTarget(timestamp, Robot.lime.getHorizontalOffset(), Robot.lime.getVerticalOffset(), Robot.lime.getFixedHeight(), targetFixedHeight);
+        visionTargets.addReportFromTarget(timestamp, Robot.lime.getHorizontalOffset(), Robot.lime.getVerticalOffset(), Robot.lime.getFixedHeight(), targetFixedHeight,
+            Robot.lime.getHorizontalSideLength(), Robot.lime.getVerticalSideLength(), Robot.lime.getIsTarget());
     }
 
     
@@ -63,7 +64,7 @@ public class RobotMonitor
         
         if(lastReport == null)
         {
-            visionTargets.add(-1, new VisionInfo(0, 0, 0, 0));
+            visionTargets.add(-1, new VisionInfo(0, 0, 0, 0, 0, 0, false));
             return visionTargets.getLastReport();
         }
         else

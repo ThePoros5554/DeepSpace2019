@@ -16,6 +16,8 @@ public class Limelight
 
     private NetworkTableEntry tHorizontalOffset;
     private NetworkTableEntry tVerticalOffset;
+    private NetworkTableEntry tHor;
+    private NetworkTableEntry tVer;
     private NetworkTableEntry tArea;
     private NetworkTableEntry tIsTarget;
     
@@ -26,7 +28,8 @@ public class Limelight
     private double hightFromFloor = 109;
     private double fixedHorizontalOffset = 0;
     private double fixedVerticalOffset = -12.5;
-    private Pose2d cameraHorizontalDisplacementFromRobot = new Pose2d(new Translation2d(0,50), Rotation2d.fromDegrees(0));
+    private Pose2d cameraHorizontalDisplacementFromRobot = new Pose2d(new Translation2d(0, -50
+    ), Rotation2d.fromDegrees(0));
 
     private double lastNTUpdate;
 
@@ -39,6 +42,8 @@ public class Limelight
 
         tHorizontalOffset = limelightTable.getEntry("tx"); 
         tVerticalOffset = limelightTable.getEntry("ty");
+        tHor = limelightTable.getEntry("thor"); 
+        tVer = limelightTable.getEntry("tvert");
         tArea = limelightTable.getEntry("ta");
         tIsTarget = limelightTable.getEntry("tv");
 
@@ -63,6 +68,16 @@ public class Limelight
     public double getVerticalOffset()
     {
         return tVerticalOffset.getDouble(0.0) + fixedVerticalOffset;
+    }
+
+    public double getVerticalSideLength()
+    {
+        return tVer.getDouble(0.0);
+    }
+
+    public double getHorizontalSideLength()
+    {
+        return tHor.getDouble(0.0);
     }
 
     public double getArea()
