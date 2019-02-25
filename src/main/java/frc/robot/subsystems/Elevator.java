@@ -56,6 +56,8 @@ public class Elevator extends Subsystem
         FLOOR, LOW_HATCH, LOW_CARGO, MIDDLE_HATCH, MIDDLE_CARGO, HIGH_HATCH, HIGH_CARGO
     }
 
+    private int targetPosition;
+
     public Elevator()
     {
         master = new WPI_TalonSRX(kElevatorMasterPort);
@@ -65,7 +67,7 @@ public class Elevator extends Subsystem
         //limitswitches
 
         //softlimits (if needed)
-        this.configForwardSoftLimitThreshold(kMaxHeight, false);
+        this.configForwardSoftLimitThreshold(kMaxHeight, true);
 
         //voltage
         //this.configVoltageCompSaturation(kVoltage, false);
@@ -207,11 +209,6 @@ public class Elevator extends Subsystem
         }
       }
     }
-
-    public void holdInPlace()
-    {
-        master.set(ControlMode.MotionMagic, getCurrentPosition());
-    }
   
     public boolean isInMode(ElevatorMode mode)
     {
@@ -276,11 +273,6 @@ public class Elevator extends Subsystem
     {
         master.setSelectedSensorPosition(position);
     }
-    
-    public void stopInPlace()
-    {
-        this.master.set(ControlMode.MotionMagic, this.getCurrentPosition());
-    }
 
     public int getCurrentPosition()
     {
@@ -295,6 +287,17 @@ public class Elevator extends Subsystem
     public ElevatorMode getElevatorMode()
     {
         return this.currentMode;
+    }
+
+    public int getTargetPosition()
+    {
+          return this.targetPosition;
+      }
+      
+      //if valid position is inverted return false else, return true
+    public void setTargetPosition(int position)
+    {    
+        this.targetPosition = position;
     }
 
     @Override
@@ -315,6 +318,12 @@ public class Elevator extends Subsystem
         if (Robot.drivetrain.getIsElevatorLimit())
         {
             this.setSensorPosition(0);
+        }
+
+        if (this.controlMode == ControlMode.MotionMagic)
+        {
+          master.set(ControlMode.MotionMagic, this.targetPosition);
+
         }
     }
 }

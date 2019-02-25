@@ -52,18 +52,7 @@ public class MoveElevator extends Command
     }
     else
     {
-      // double currentVelocity = Robot.elevator.getSelectedSensorVelocity(); 
-
-      // if (currentVelocity > velocity)
-      // {
-      //   velocity = currentVelocity;
-      // }
-
        Robot.elevator.set(this.powerAxis.GetAxisValue());
-      
-       // System.out.println(velocity);
-      // System.out.println("power: " + this.powerAxis.GetAxisValue());
-
     }
   }
 
@@ -78,8 +67,8 @@ public class MoveElevator extends Command
   @Override
   protected void end()
   {
-    Robot.elevator.setControlMode(ControlMode.PercentOutput);
-    Robot.elevator.set(0);
+    Robot.elevator.setControlMode(ControlMode.MotionMagic);
+    Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition());
   }
 
   // Called when another command which requires one or more of the same

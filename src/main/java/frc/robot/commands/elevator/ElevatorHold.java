@@ -31,7 +31,7 @@ public class ElevatorHold extends Command {
   @Override
   protected void execute()
   {
-    Robot.elevator.holdInPlace();
+    // Robot.elevator.holdInPlace();
   }
 
   // Make this return true when this Command no longer needs to run execute()

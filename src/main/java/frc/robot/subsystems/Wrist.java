@@ -20,7 +20,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Robot;
 
-public class Wrist extends Subsystem
+public class 
+Wrist extends Subsystem
 {
 
   // manual values
@@ -46,8 +47,11 @@ public class Wrist extends Subsystem
   private static final int kMinTilt = 1000;
   private static final double kVoltage = 10;
 
-  private static final int kMaxAcceleration = (int)0.7*400;
-  private static final int kMaxVelocity = (int)0.7*400;
+  private int maxPositionLimit = kMaxTilt;
+  private int minPositionLimit = kMinTilt;
+
+  // private static final int kMaxAcceleration = (int)0.7*400;
+  // private static final int kMaxVelocity = (int)0.7*400;
 
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
   private static final boolean kInvertPot = true;
@@ -57,8 +61,6 @@ public class Wrist extends Subsystem
   private WPI_TalonSRX master;
 
   private ControlMode controlMode;
-  private int maxPositionLimit = kMaxTilt;
-  private int minPositionLimit = kMinTilt;
 
   public enum WristMode
   {
@@ -66,6 +68,7 @@ public class Wrist extends Subsystem
   }
 
   private WristMode currentMode = WristMode.INSIDE;
+
   private int targetPosition;
 
   public Wrist()

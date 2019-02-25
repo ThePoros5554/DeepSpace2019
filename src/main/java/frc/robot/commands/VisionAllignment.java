@@ -10,10 +10,8 @@ import frc.robot.subsystems.Drivetrain;
 import poroslib.position.VisionInfo;
 import poroslib.position.geometry.Kinematics;
 import poroslib.position.geometry.Pose2d;
-import poroslib.position.geometry.Translation2d;
 import poroslib.position.geometry.Twist2d;
 import poroslib.position.geometry.Kinematics.DriveVelocity;
-import poroslib.position.geometry.Rotation2d;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class VisionAllignment extends Command

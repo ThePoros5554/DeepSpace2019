@@ -51,8 +51,15 @@ public class MoveWrist extends Command
         velocity = currentVelocity;
       }
 
+      if(this.powerAxis != null)
+      {
       Robot.wrist.set(this.powerAxis.GetAxisValue());
-      //System.out.println(velocity);
+      }
+      else
+      {
+        Robot.wrist.set(this.power);
+      }
+      System.out.println(velocity);
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -66,7 +73,8 @@ public class MoveWrist extends Command
   @Override
   protected void end()
   {
-    Robot.wrist.set(0);
+    Robot.wrist.setControlMode(ControlMode.MotionMagic);
+    Robot.wrist.setTargetPosition(Robot.wrist.getCurrentPosition());
   }
 
   // Called when another command which requires one or more of the same

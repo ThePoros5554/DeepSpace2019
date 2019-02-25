@@ -137,9 +137,9 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
     SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
-    // SmartDashboard.putNumber("Elevator Position", elevator.getCurrentPosition());
+    SmartDashboard.putNumber("Elevator Position", elevator.getCurrentPosition());
 
-    // SmartDashboard.putNumber("Wrist Position", wrist.getCurrentPosition());
+    SmartDashboard.putNumber("Wrist Position", wrist.getCurrentPosition());
 
     // SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
 

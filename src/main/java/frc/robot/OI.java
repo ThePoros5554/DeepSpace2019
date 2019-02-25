@@ -149,10 +149,8 @@ public class OI
         leftJoy = new SmartJoystick(kDriverLeftJoystickPort);
         rightJoy = new SmartJoystick(kDriverRightJoystickPort);
         operatorJoy = new SmartJoystick(kOperatorJoystickPort);
-        operatorJoy.SetSpeedAxis(1);
-        operatorJoy.SetRotateAxis(0);
-        // leftJoy.SetSpeedAxis(1);
-        // rightJoy.SetSpeedAxis(1);
+        leftJoy.SetSpeedAxis(1);
+        rightJoy.SetSpeedAxis(1);
         Robot.drivetrain.SetIsRanged(true);
 
         // // buttons and triggers
@@ -177,15 +175,15 @@ public class OI
         // moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
 
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
-        moveToVisionTarget = new JoystickButton(operatorJoy, kMoveToVisionTargetButton);
+        moveToVisionTarget = new JoystickButton(rightJoy, kMoveToVisionTargetButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
         //Robot.elevator.setDefaultCommand(new ElevatorHold());
 
         // // axis
         elevatorUpAxis = new JoyAxis(operatorJoy, kElevatorDownAxis, 0, 1, -1, 0);
         elevatorDownAxis = new JoyAxis(operatorJoy, kElevatorUpAxis, 0, -1, -1, 0);
-        wristUpAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, 0.1, 1);
-        wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, -1, -0.1);
+        wristUpAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, 0.2, 1);
+        wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, -1, -0.2);
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
@@ -253,12 +251,12 @@ public class OI
         ejectCargoTrigger.whileActive(ejectCargo);
         prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
-        // // manual
-        // elevatorUpAxis.whileActive(elevatorUp);
-        // elevatorDownAxis.whileActive(elevatorDown);
-        // wristDownAxis.whileActive(wristDown);
-        // wristUpAxis.whileActive(wristUp);
+        // manual
+        elevatorUpAxis.whileActive(elevatorUp);
+        elevatorDownAxis.whileActive(elevatorDown);
+        wristDownAxis.whileActive(wristDown);
+        wristUpAxis.whileActive(wristUp);
 
-        //moveToVisionTarget.whileActive(visionAllignment);
+        moveToVisionTarget.whileActive(visionAllignment);
     }
 }
