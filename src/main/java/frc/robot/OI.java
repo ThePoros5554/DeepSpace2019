@@ -175,7 +175,7 @@ public class OI
         // moveForwardLifterTrigger = new ModeTrigger(operatorJoy, kMoveForwardLifterButton, RobotMode.CLIMB);
 
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
-        moveToVisionTarget = new JoystickButton(rightJoy, kMoveToVisionTargetButton);
+        // moveToVisionTarget = new JoystickButton(rightJoy, kMoveToVisionTargetButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
         //Robot.elevator.setDefaultCommand(new ElevatorHold());
 
@@ -251,12 +251,13 @@ public class OI
         ejectCargoTrigger.whileActive(ejectCargo);
         prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
+
         // manual
         elevatorUpAxis.whileActive(elevatorUp);
         elevatorDownAxis.whileActive(elevatorDown);
         wristDownAxis.whileActive(wristDown);
         wristUpAxis.whileActive(wristUp);
 
-        moveToVisionTarget.whileActive(visionAllignment);
+
     }
 }

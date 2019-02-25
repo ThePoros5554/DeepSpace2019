@@ -64,10 +64,20 @@ Wrist extends Subsystem
 
   public enum WristMode
   {
-    UP, DOWN, INSIDE, HIGH_CARGO
-  }
+    UP(1830), DOWN(2895), INSIDE(1000), HIGH_CARGO(2000);
+    
+    private final int position;
 
-  private WristMode currentMode = WristMode.INSIDE;
+    private WristMode(int position)
+    {
+        this.position = position;
+    }
+
+    public int getPosition()
+    {
+      return position;
+    }
+  }
 
   private int targetPosition;
 
@@ -164,32 +174,11 @@ Wrist extends Subsystem
     master.set(controlMode, value);
   }
 
-  public boolean isInPosition(int targetPosition)
-  {
-		int positionError = Math.abs(this.getCurrentPosition() - targetPosition);
-    
-    return positionError < kTargetThreshold;
-	}
-
   public boolean isInMode(WristMode mode)
   {
-    switch (mode)
-    {
-      case DOWN:
-      return isInPosition(kDownPosition);
-
-      case UP:
-      return isInPosition(kUpPosition);
-
-      case INSIDE:
-      return isInPosition(kInsidePosition);
-
-      case HIGH_CARGO:
-      return isInPosition(kCargoHighPosition);
-
-      default:
-      return false;
-    }
+		int positionError = Math.abs(this.getCurrentPosition() - mode.position);
+    
+    return positionError < kTargetThreshold;
   }
 
   public void configProfileSlot(int profileSlot, double kP, double kI, double kD, double kF)
@@ -220,21 +209,6 @@ Wrist extends Subsystem
   {
       return master.getSelectedSensorVelocity();
   }
-
-  // public void setWristMode(WristMode mode)
-  // {
-  //   this.currentMode = mode; 
-  // }
-
-  public WristMode getWristMode()
-  {
-    return this.currentMode;
-  }
-
-  public void motionMagicControl()
-  {
-		master.set(ControlMode.MotionMagic, targetPosition);
-	}
 
 	/*
 	 * controls the position of the collector between upPositionLimit and
@@ -384,11 +358,15 @@ Wrist extends Subsystem
     if (this.controlMode == ControlMode.MotionMagic)
     {
       manageMotion();
-      master.set(ControlMode.MotionMagic, this.targetPosition);
-      // System.out.println(master.getClosedLoopError());
-      // System.out.println(master.getClosedLoopTarget());
+      master.set(ControlMode.MotionMagic, targetPosition);
+
     }
 
+  }
+
+  public void neutralOutput()
+  {
+    master.neutralOutput();
   }
 
   public int getWristDeviceId()

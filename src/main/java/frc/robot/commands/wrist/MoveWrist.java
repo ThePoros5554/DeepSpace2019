@@ -59,7 +59,9 @@ public class MoveWrist extends Command
       {
         Robot.wrist.set(this.power);
       }
-      System.out.println(velocity);
+
+      Robot.wrist.setTargetPosition(Robot.wrist.getCurrentPosition());
+
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -74,7 +76,6 @@ public class MoveWrist extends Command
   protected void end()
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
-    Robot.wrist.setTargetPosition(Robot.wrist.getCurrentPosition());
   }
 
   // Called when another command which requires one or more of the same

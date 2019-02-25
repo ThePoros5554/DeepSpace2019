@@ -50,13 +50,6 @@ public class AdjustElevator extends Command
   @Override
   protected void end()
   {
-    if (isFinished())
-    {
-      Robot.elevator.setElevatorMode(this.targetMode);
-    }
-
-    //Robot.elevator.setControlMode(ControlMode.PercentOutput);
-    Robot.elevator.set(0);
   }
 
   // Called when another command which requires one or more of the same

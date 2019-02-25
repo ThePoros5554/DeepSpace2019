@@ -54,6 +54,8 @@ public class MoveElevator extends Command
     {
        Robot.elevator.set(this.powerAxis.GetAxisValue());
     }
+
+    Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition());
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -67,8 +69,8 @@ public class MoveElevator extends Command
   @Override
   protected void end()
   {
+    System.out.println("end");
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition());
   }
 
   // Called when another command which requires one or more of the same

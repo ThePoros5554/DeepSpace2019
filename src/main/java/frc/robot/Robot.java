@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.IMUProtocol.GyroUpdate;
 
@@ -103,7 +104,6 @@ public class Robot extends TimedRobot
     autonomouChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
     autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
 
-    elevator.setSensorPosition(0);
   }
 
   /**
@@ -141,6 +141,10 @@ public class Robot extends TimedRobot
 
     SmartDashboard.putNumber("Wrist Position", wrist.getCurrentPosition());
 
+    SmartDashboard.putNumber("Ele sp", elevator.getTargetPosition());
+    SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
+
+
     // SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
 
     // SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
@@ -165,6 +169,9 @@ public class Robot extends TimedRobot
     }
 
     drivetrain.resetHeading();
+
+    elevator.neutralOutput();
+
   }
 
   @Override
@@ -197,7 +204,15 @@ public class Robot extends TimedRobot
       updateRobotState = new UpdateRobotState();
     }
 
+    elevator.setControlMode(ControlMode.PercentOutput);
+    wrist.setTargetPosition(wrist.getCurrentPosition());
+
     updateRobotState.start();
+
+    elevator.neutralOutput();
+    wrist.neutralOutput();
+    
+
   }
 
   /**
@@ -216,7 +231,6 @@ public class Robot extends TimedRobot
 
     gameStartTime = Timer.getFPGATimestamp();
 
-    elevator.setSensorPosition(0);
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
 
@@ -228,6 +242,11 @@ public class Robot extends TimedRobot
     
     updateRobotState.start();
     RobotMonitor.getRobotMonitor().resetMonitor();
+
+    elevator.neutralOutput();
+    wrist.neutralOutput();
+    elevator.setControlMode(ControlMode.PercentOutput);
+    wrist.setControlMode(ControlMode.PercentOutput);
   }
 
   /**

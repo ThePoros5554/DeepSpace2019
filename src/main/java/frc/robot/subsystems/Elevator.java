@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Robot;
 import frc.robot.commands.elevator.ElevatorHold;
+import frc.robot.subsystems.Wrist.WristMode;
 
 public class Elevator extends Subsystem
 {
@@ -41,19 +42,36 @@ public class Elevator extends Subsystem
     private static final boolean kInvertEnc = false;
     private static final NeutralMode kNeutralMode = NeutralMode.Brake;
     private static final double kRamp = 0;
-    private static final int kMaxHeight = 48470;
+
+    private static final int kMaxHeight = 47500;
     private static final int kMinHeight = 0;
     private static final int targetThreshold = 0;
 
     private WPI_TalonSRX master;
     
     private ControlMode controlMode;
-    
-    private ElevatorMode currentMode;
 
     public enum ElevatorMode
     {
-        FLOOR, LOW_HATCH, LOW_CARGO, MIDDLE_HATCH, MIDDLE_CARGO, HIGH_HATCH, HIGH_CARGO
+        FLOOR(0),
+        LOW_HATCH(12000),
+        LOW_CARGO(13000),
+        MIDDLE_HATCH(22000),
+        MIDDLE_CARGO(23000),
+        HIGH_HATCH(30000),
+        HIGH_CARGO(31000);
+
+        private final int position;
+
+        private ElevatorMode(int position)
+        {
+            this.position = position;
+        }
+
+        public int getPosition()
+        {
+            return position;
+        }
     }
 
     private int targetPosition;
@@ -94,12 +112,12 @@ public class Elevator extends Subsystem
         this.setNeutralMode(kNeutralMode);
 
         master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
-        this.configProfileSlot(0, 1, 0, 0, 0.6); // up
+        this.configProfileSlot(0, 0.5, 0, 0, 0.6); // up
         //configProfileSlot(1, 5.3, 0, 0.3, 0);
 
         this.master.configOpenloopRamp(kRamp);
 
-        currentMode = ElevatorMode.FLOOR;
+        this.targetPosition = ElevatorMode.FLOOR.position;
 
         controlMode = ControlMode.PercentOutput;
         set(0);
@@ -175,72 +193,13 @@ public class Elevator extends Subsystem
     {
       if (this.controlMode == ControlMode.MotionMagic || this.controlMode == ControlMode.Position)
       {
-        System.out.println("ee");
-        switch (mode)
-        {
-          case FLOOR:
-          set(kFloorPosition);
-          System.out.println("set");
-          break;
-  
-          case LOW_HATCH:
-          set(kHatchLowPosition);
-          break;
-  
-          case LOW_CARGO:
-          set(kCargoLowPosition);
-          break;
-  
-          case MIDDLE_HATCH:
-          set(kHatchMiddlePosition);
-          break;
-  
-          case MIDDLE_CARGO:
-          set(kCargoMiddlePosition);
-          break;
-
-          case HIGH_HATCH:
-          set(kHatchHighPosition);
-          break;
-  
-          case HIGH_CARGO:
-          set(kCargoHighPosition);
-          break;
-        }
+          this.set(mode.position);
       }
     }
   
     public boolean isInMode(ElevatorMode mode)
     {
-      if (mode == this.currentMode)
-        return true;
-  
-        switch (mode)
-        {
-          case FLOOR:
-          return isInTarget(kFloorPosition);
-  
-          case LOW_HATCH:
-          return isInTarget(kHatchLowPosition);
-  
-          case LOW_CARGO:
-          return isInTarget(kCargoLowPosition);
-  
-          case MIDDLE_HATCH:
-          return isInTarget(kHatchMiddlePosition);
-  
-          case MIDDLE_CARGO:
-          return isInTarget(kCargoMiddlePosition);
-
-          case HIGH_HATCH:
-          return isInTarget(kHatchHighPosition);
-  
-          case HIGH_CARGO:
-          return isInTarget(kCargoHighPosition);
-
-          default:
-          return false;
-        }
+        return this.isInTarget(mode.position);
     }
 
     public boolean isInTarget(int target)
@@ -279,20 +238,10 @@ public class Elevator extends Subsystem
         return master.getSelectedSensorPosition();
     }
 
-    public void setElevatorMode(ElevatorMode currentLevel)
-    {
-        this.currentMode = currentLevel;
-    }
-
-    public ElevatorMode getElevatorMode()
-    {
-        return this.currentMode;
-    }
-
     public int getTargetPosition()
     {
-          return this.targetPosition;
-      }
+        return this.targetPosition;
+    }
       
       //if valid position is inverted return false else, return true
     public void setTargetPosition(int position)
@@ -300,16 +249,28 @@ public class Elevator extends Subsystem
         this.targetPosition = position;
     }
 
+    public void setTargetMode(ElevatorMode mode)
+    {    
+        this.targetPosition = mode.position;
+    }
+
     @Override
     protected void initDefaultCommand()
     {
-        //setDefaultCommand(new ElevatorHold());
     }
 
     public void enableLimitSwitch(boolean isEnabled)
     {
         master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyClosed, Robot.drivetrain.GetSwitchDeviceId(), 10);
         master.overrideLimitSwitchesEnable(isEnabled);
+    }
+
+    public void manageLimits()
+    {
+        if (Robot.wrist.getCurrentPosition() < WristMode.UP.getPosition())
+        {
+            configForwardSoftLimitThreshold(0, true);
+        }
     }
 
     @Override
@@ -322,8 +283,12 @@ public class Elevator extends Subsystem
 
         if (this.controlMode == ControlMode.MotionMagic)
         {
-          master.set(ControlMode.MotionMagic, this.targetPosition);
-
+          master.set(ControlMode.MotionMagic, targetPosition);
         }
+    }
+
+    public void neutralOutput()
+    {
+        master.neutralOutput();
     }
 }
