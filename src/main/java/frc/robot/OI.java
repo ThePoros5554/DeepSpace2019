@@ -40,6 +40,7 @@ import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Elevator.ElevatorMode;
 import frc.robot.subsystems.Wrist.WristMode;
 import frc.robot.triggers.ModeTrigger;
+import poroslib.commands.ArcadeDrive;
 import poroslib.commands.TankDrive;
 import poroslib.triggers.JoyAxis;
 import poroslib.triggers.JoyAxisPart;
@@ -67,8 +68,9 @@ public class OI
     private static final int kElevatorUpAxis = 3; // RT
     private static final int kElevatorDownAxis = 2; // LT
     private static final int kRobotLiftModeButton = 0;
+
     private static final int kWristAxis = 1; // L 
-    private static final int kMoveToVisionTargetButton = 7;
+    private static final int kMoveToVisionTargetButton = 1;
 
     // Joystick Ports
     private static final int kDriverLeftJoystickPort = 0;
@@ -147,12 +149,12 @@ public class OI
         leftJoy = new SmartJoystick(kDriverLeftJoystickPort);
         rightJoy = new SmartJoystick(kDriverRightJoystickPort);
         operatorJoy = new SmartJoystick(kOperatorJoystickPort);
-
-        leftJoy.SetSpeedAxis(1);
-        rightJoy.SetSpeedAxis(1);
+        operatorJoy.SetSpeedAxis(1);
+        operatorJoy.SetRotateAxis(0);
+        // leftJoy.SetSpeedAxis(1);
+        // rightJoy.SetSpeedAxis(1);
         Robot.drivetrain.SetIsRanged(true);
 
-        
         // // buttons and triggers
          prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
         // prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
@@ -218,7 +220,7 @@ public class OI
         wristUp = new MoveWrist(wristUpAxis);
 
         visionAllignment = new VisionAllignment();
-        md = new MagicDrive(20000, -20000, false);
+        md = new MagicDrive(20000, -30000, false);
         /****************************************/
 
         
@@ -251,11 +253,11 @@ public class OI
         ejectCargoTrigger.whileActive(ejectCargo);
         prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
-        // manual
-        elevatorUpAxis.whileActive(elevatorUp);
-        elevatorDownAxis.whileActive(elevatorDown);
-        wristDownAxis.whileActive(wristDown);
-        wristUpAxis.whileActive(wristUp);
+        // // manual
+        // elevatorUpAxis.whileActive(elevatorUp);
+        // elevatorDownAxis.whileActive(elevatorDown);
+        // wristDownAxis.whileActive(wristDown);
+        // wristUpAxis.whileActive(wristUp);
 
         //moveToVisionTarget.whileActive(visionAllignment);
     }

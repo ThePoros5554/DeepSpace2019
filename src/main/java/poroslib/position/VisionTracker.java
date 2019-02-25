@@ -18,9 +18,10 @@ public class VisionTracker
         visionReports.put(timestamp, cameraError);
     }
 
-    public void addReportFromTarget(double timestamp, double horizontalOffset, double verticalOffset, double camHeight, double targetHight)
+    public void addReportFromTarget(double timestamp, double horizontalOffset, double verticalOffset, double camHeight, double targetHight,
+            double horSideLength , double verSideLength, boolean isTarget)
     {
-        VisionInfo report = new VisionInfo(horizontalOffset, verticalOffset, camHeight, targetHight);
+        VisionInfo report = new VisionInfo(horizontalOffset, verticalOffset, camHeight, targetHight, horSideLength, verSideLength, isTarget);
         visionReports.put(timestamp, report);
     }
 

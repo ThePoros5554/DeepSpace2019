@@ -12,6 +12,7 @@ import poroslib.position.geometry.Kinematics;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Translation2d;
 import poroslib.position.geometry.Twist2d;
+import poroslib.position.geometry.Kinematics.DriveVelocity;
 import poroslib.position.geometry.Rotation2d;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -21,6 +22,11 @@ public class VisionAllignment extends Command
     private RobotMonitor monitor;
 
     private Pose2d bufferedTarget;
+    private VisionInfo bufferedVisionTarget;
+
+    private DriveVelocity lastDriveSignal;
+
+    private final double maxDriveVelocity = 200;
 
     public VisionAllignment()
     {
@@ -34,6 +40,8 @@ public class VisionAllignment extends Command
     protected void initialize()
     {
         bufferedTarget = null;
+        driveTrain.setControlMode(ControlMode.Position);
+        driveTrain.selectProfileSlot(1);
     }
 
     @Override
@@ -41,51 +49,83 @@ public class VisionAllignment extends Command
     {
         if(monitor.getLastVisionReport() != null)
         {
+            Pose2d out = new Pose2d();
             Entry<Double, VisionInfo> visionData = monitor.getLastVisionReport();
 
             double proccesTimeStamp = visionData.getKey();
 
-            Pose2d cameraToTargetAtProccesTime = visionData.getValue().getHorizontalDisplacement();
-            Pose2d robotAtProccesTime = monitor.getPositionAtTime(proccesTimeStamp);
-            Pose2d cameraDisplacementFromRobot = Robot.lime.getCameraHorizontalDisplacementFromRobot();
-
-            //this vector represents the position of the target
-            Pose2d target = (robotAtProccesTime.transformBy(cameraDisplacementFromRobot)).transformBy(cameraToTargetAtProccesTime);
-            //Pose2d target = new Pose2d(new Translation2d(42,113), Rotation2d.fromDegrees(-41));
-
-            if(target.getTranslation().getY() >= 40)
+            if(this.validateVisionTarget(visionData.getValue()))
             {
-                bufferedTarget = target;
+                bufferedVisionTarget = visionData.getValue();
             }
 
-            Pose2d robotNow = monitor.getLastPositionReport().getValue();
-            // System.out.println("robot now, x: " + robotNow.getTranslation().getX() 
-            //     + ", y: "+ robotNow.getTranslation().getY() + ", deg: " + robotNow.getRotation().getDegrees());
-            Pose2d cameraNow = robotNow.transformBy(cameraDisplacementFromRobot);
+            if(bufferedVisionTarget != null)
+            {
+                Pose2d cameraToTargetAtProccesTime = bufferedVisionTarget.getHorizontalDisplacement();
+                Pose2d robotAtProccesTime = monitor.getPositionAtTime(proccesTimeStamp);
+                Pose2d cameraDisplacementFromRobot = Robot.lime.getCameraHorizontalDisplacementFromRobot();
 
-            //this vector represents the current position of the camera
-            Pose2d cameraToTargetNow = bufferedTarget.transformBy(cameraNow.inverse());
-            // System.out.println("robot now, x: " + cameraToTargetNow.getTranslation().getX() 
-            // + ", y: "+ cameraToTargetNow.getTranslation().getY() + ", deg: " + cameraToTargetNow.getRotation().getDegrees());
+                //this vector represents the position of the target
+                Pose2d target = (robotAtProccesTime.transformBy(cameraDisplacementFromRobot)).transformBy(cameraToTargetAtProccesTime);
 
-            Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getRadians());
-            Kinematics.DriveVelocity velocity = Kinematics.inverseKinematics(cameraToTargetDelta, Drivetrain.TRACKWIDTH, 1);
+                if(target.getTranslation().getY() >= 30 || bufferedTarget == null)
+                {
+                    bufferedTarget = target;
+                }
 
-            SmartDashboard.putNumber("go left: ", velocity.left);
-            SmartDashboard.putNumber("go right: ",  velocity.right);
+                Pose2d robotNow = monitor.getLastPositionReport().getValue();
+                Pose2d cameraNow = robotNow.transformBy(cameraDisplacementFromRobot);
 
-            System.out.println("deg: " + Math.toDegrees(cameraToTargetDelta.dtheta));
+                //this vector represents the current position of the camera
 
-            driveTrain.setControlMode(ControlMode.MotionMagic);
+                Pose2d cameraToTargetNow = bufferedTarget.transformBy(cameraNow.inverse());
 
-            // Robot.drivetrain.set(-(velocity.left * 0.001), (velocity.right * 0.001));
-            int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
-            int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
+                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getRadians());
+                DriveVelocity velocity = Kinematics.inverseKinematics(cameraToTargetDelta, 250, 1);
 
-            // System.out.println((driveTrain.getRawLeftPosition() + leftTicksToGo));
+                double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
+                if(forwardSpeed > this.maxDriveVelocity)
+                {
+                    if(lastDriveSignal != null)
+                    {
+                        velocity = lastDriveSignal;
+                    } 
+                    else
+                    {
+                        double diffrence = forwardSpeed / maxDriveVelocity;
+                        velocity = new DriveVelocity((velocity.left / diffrence), (velocity.right / diffrence));
+                    }
+                }
 
-            driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
+                SmartDashboard.putNumber("go left: ", velocity.left);
+                SmartDashboard.putNumber("go right: ",  velocity.right);
+
+
+                int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
+                int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
+
+                driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
+
+                lastDriveSignal = velocity;
+            }
         }
+    }
+
+    private boolean validateVisionTarget(VisionInfo value) 
+    {
+        boolean isValid = true;
+
+        if(value.getIsTarget() == false)
+        {
+            isValid = false;
+        }
+
+        if(value.getHorizontalSideLength() < value.getVerticalSideLength())
+        {
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     @Override
