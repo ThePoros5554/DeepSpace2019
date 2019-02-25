@@ -26,12 +26,12 @@ import poroslib.subsystems.DiffDrivetrain;
 public class Drivetrain extends DiffDrivetrain
 {
   // ports
-  public static final int kFrontLeftPort = 1;
-  public static final int kFrontRightPort = 0;
-  private static final int kMiddleRightPort = 1;
-  private static final int kRearRightPort = 0;
-  private static final int kMiddleLeftPort = 2;
-  private static final int kRearLeftPort = 3;
+  public static final int kFrontLeftPort = 0;
+  public static final int kFrontRightPort = 1;
+  private static final int kMiddleRightPort = 6; // 2
+  private static final int kRearRightPort = 3;
+  private static final int kMiddleLeftPort = 5; // 1
+  private static final int kRearLeftPort = 1;
 
   // motion gains
   private static final double kP = 0;
@@ -55,8 +55,8 @@ public class Drivetrain extends DiffDrivetrain
 
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
-  private WPI_VictorSPX middleLeft;
-  private WPI_VictorSPX middleRight;
+  private WPI_TalonSRX middleLeft;
+  private WPI_TalonSRX middleRight;
   private WPI_VictorSPX rearLeft;
   private WPI_VictorSPX rearRight;
 
@@ -70,8 +70,8 @@ public class Drivetrain extends DiffDrivetrain
 
     this.masterLeft = masterLeft;
     this.masterRight = masterRight;
-    this.middleLeft = new WPI_VictorSPX(kMiddleLeftPort);
-    this.middleRight = new WPI_VictorSPX(kMiddleRightPort);
+    this.middleLeft = new WPI_TalonSRX(kMiddleLeftPort);
+    this.middleRight = new WPI_TalonSRX(kMiddleRightPort);
     this.rearLeft = new WPI_VictorSPX(kRearLeftPort);
     this.rearRight = new WPI_VictorSPX(kRearRightPort);
     
@@ -274,6 +274,16 @@ public class Drivetrain extends DiffDrivetrain
   public int getDriveTrainVelocity()
   {
     return (this.masterLeft.getSelectedSensorVelocity() + this.masterRight.getSelectedSensorVelocity()) / 2;
+  }
+
+  public int GetSwitchDeviceId()
+  {
+    return middleLeft.getDeviceID();
+  }
+
+  public boolean getIsElevatorLimit()
+  {
+    return  !middleLeft.getSensorCollection().isRevLimitSwitchClosed();
   }
 
 

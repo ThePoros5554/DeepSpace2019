@@ -22,7 +22,7 @@ public class Elevator extends Subsystem
     // positions for practice robot:
     private static final int kFloorPosition = 0;
     private static final int kHatchLowPosition = 10;
-    private static final int kHatchMiddlePosition = 15000;
+    private static final int kHatchMiddlePosition = 22000;
     private static final int kHatchHighPosition = 480;
     private static final int kCargoLowPosition = 50;
     private static final int kCargoMiddlePosition = 245;
@@ -66,7 +66,6 @@ public class Elevator extends Subsystem
 
         //softlimits (if needed)
         this.configForwardSoftLimitThreshold(kMaxHeight, false);
-        this.configReverseSoftLimitThreshold(0, false);
 
         //voltage
         //this.configVoltageCompSaturation(kVoltage, false);
@@ -94,7 +93,7 @@ public class Elevator extends Subsystem
 
         master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
         this.configProfileSlot(0, 1, 0, 0, 0.6); // up
-        configProfileSlot(1, 5.3, 0, 0.3, 0);
+        //configProfileSlot(1, 5.3, 0, 0.3, 0);
 
         this.master.configOpenloopRamp(kRamp);
 
@@ -293,7 +292,7 @@ public class Elevator extends Subsystem
         this.currentMode = currentLevel;
     }
 
-    public ElevatorMode getsetElevatorMode()
+    public ElevatorMode getElevatorMode()
     {
         return this.currentMode;
     }
@@ -304,29 +303,18 @@ public class Elevator extends Subsystem
         //setDefaultCommand(new ElevatorHold());
     }
 
-    public void enableLimitSwitches(boolean isEnabled)
+    public void enableLimitSwitch(boolean isEnabled)
     {
-        // master.configForwardLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.Disabled, Robot.wrist.getWristDeviceId(), 10);
-        // master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.Disabled, Robot.wrist.getWristDeviceId(), 10);
-        // master.overrideLimitSwitchesEnable(isEnabled);
-    }
-
-    public boolean getIsFwdLimitSwitchClosed()
-    {
-      return master.getSensorCollection().isFwdLimitSwitchClosed();
-    }
-  
-    public boolean getIsRevLimitSwitchClosed()
-    {
-      return master.getSensorCollection().isRevLimitSwitchClosed();
+        master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyClosed, Robot.drivetrain.GetSwitchDeviceId(), 10);
+        master.overrideLimitSwitchesEnable(isEnabled);
     }
 
     @Override
     public void periodic()
     {
-        if (!getIsRevLimitSwitchClosed())
+        if (Robot.drivetrain.getIsElevatorLimit())
         {
-            //this.setSensorPosition(0);
+            this.setSensorPosition(0);
         }
     }
 }

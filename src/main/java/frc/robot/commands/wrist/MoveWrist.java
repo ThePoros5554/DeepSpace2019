@@ -44,18 +44,6 @@ public class MoveWrist extends Command
   @Override
   protected void execute() 
   {
-    if (powerAxis == null)
-    {
-      double currentVelocity = Robot.wrist.getCurrentPosition(); 
-
-      if(currentVelocity > velocity)
-      {
-        velocity = currentVelocity;
-      }
-      Robot.wrist.set(power);
-    }
-    else
-    {
       double currentVelocity = Robot.wrist.getWristVelocity(); 
 
       if(currentVelocity > velocity)
@@ -64,7 +52,7 @@ public class MoveWrist extends Command
       }
 
       Robot.wrist.set(this.powerAxis.GetAxisValue());
-    }
+      //System.out.println(velocity);
   }
 
   // Make this return true when this Command no longer needs to run execute()

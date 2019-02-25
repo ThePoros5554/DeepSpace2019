@@ -191,7 +191,7 @@ public class OI
         
         // prepareHatchCollect = new InitHatchCollectMode();
         // prepareHatchLow = new InitHatchLowMode();
-        // prepareHatchMiddle = new InitHatchMiddleMode();
+         prepareHatchMiddle = new InitHatchMiddleMode();
         // prepareHatchHigh = new InitHatchHighMode();
         // collectHatch = new AdjustWrist(WristMode.DOWN);
         // ejectHatch = new EjectHatch(Drivetrain.kEjectDriveBackDistance);
@@ -247,9 +247,9 @@ public class OI
         // prepareCargoLowTrigger.whenActive(prepareCargoLow);
         // prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
         // prepareCargoHighTrigger.whenActive(prepareCargoHigh);
-         collectCargoTrigger.whileActive(collectCargo);
-         ejectCargoTrigger.whileActive(ejectCargo);
-        //prepareHatchCollectTrigger.whileActive(wristMotion);
+        collectCargoTrigger.whileActive(collectCargo);
+        ejectCargoTrigger.whileActive(ejectCargo);
+        prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
         // manual
         elevatorUpAxis.whileActive(elevatorUp);
@@ -257,6 +257,6 @@ public class OI
         wristDownAxis.whileActive(wristDown);
         wristUpAxis.whileActive(wristUp);
 
-        moveToVisionTarget.whileActive(visionAllignment);
+        //moveToVisionTarget.whileActive(visionAllignment);
     }
 }

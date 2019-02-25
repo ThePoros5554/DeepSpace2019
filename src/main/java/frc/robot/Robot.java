@@ -84,7 +84,7 @@ public class Robot extends TimedRobot
 
     elevator = new Elevator();
     wrist = new Wrist();
-    elevator.enableLimitSwitches(false);
+    elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
     // hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
@@ -104,7 +104,6 @@ public class Robot extends TimedRobot
     autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
 
     elevator.setSensorPosition(0);
-    //Shuffleboard.getTab("gyros").add("gyro", drivetrain.getHeading()).withWidget(BuiltInWidgets.kGyro);
   }
 
   /**
@@ -121,16 +120,17 @@ public class Robot extends TimedRobot
     //
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
-    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
-    SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
-    SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
+    lime.setLedMode(LimelightLedMode.ForceOff);
+    // SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
+    // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
-    SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
-    SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+    // SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
+    // SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
 
-    SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
-    SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
-    SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
+    // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
+    // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
+    // SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
 
 
     SmartDashboard.putNumber("target x: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getX());
@@ -146,7 +146,9 @@ public class Robot extends TimedRobot
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
     //Shuffleboard.getTab("SmartDashboard").add("Gyro", SmartDashboard.putData(drivetrain.getHeading()).withWidget(BuiltInWidgets.kGyro);
 
-    SmartDashboard.putBoolean("Ele Rev", Robot.wrist.getIsRevLimitSwitchClosed());
+    SmartDashboard.putBoolean("ElevatorLimit", Robot.drivetrain.getIsElevatorLimit());
+
+
   }
 
   /**

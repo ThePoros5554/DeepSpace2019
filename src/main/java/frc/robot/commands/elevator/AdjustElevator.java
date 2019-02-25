@@ -43,8 +43,7 @@ public class AdjustElevator extends Command
   @Override
   protected boolean isFinished()
   {
-    return false;
-    //return Robot.elevator.isInMode(this.targetMode);
+    return Robot.elevator.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true
@@ -56,7 +55,7 @@ public class AdjustElevator extends Command
       Robot.elevator.setElevatorMode(this.targetMode);
     }
 
-    Robot.elevator.setControlMode(ControlMode.PercentOutput);
+    //Robot.elevator.setControlMode(ControlMode.PercentOutput);
     Robot.elevator.set(0);
   }
 

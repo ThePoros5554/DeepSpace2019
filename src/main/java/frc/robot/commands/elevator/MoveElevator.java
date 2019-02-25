@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import poroslib.triggers.JoyAxis;
 
-public class MoveElevator extends Command {
+public class MoveElevator extends Command
+{
 
   private double power;
   private JoyAxis powerAxis;
@@ -45,37 +46,23 @@ public class MoveElevator extends Command {
   @Override
   protected void execute()
   {
-    if(powerAxis == null)
+    if (powerAxis == null)
     {
-      double currentVelocity = Robot.elevator.getCurrentPosition(); 
-
-      if(currentVelocity > velocity)
-      {
-        velocity = currentVelocity;
-      }
       Robot.elevator.set(power);
-
-      System.out.println("as;diasdfhasdfjkfuh");
-      System.out.println("as;diasdfhasdfjkfuh");
-      System.out.println("as;diasdfhasdfjkfuh");
-      System.out.println("as;diasdfhasdfjkfuh");
-      System.out.println("as;diasdfhasdfjkfuh");
-      System.out.println("as;diasdfhasdfjkfuh");
-
     }
     else
     {
-      double currentVelocity = Robot.elevator.getSelectedSensorVelocity(); 
+      // double currentVelocity = Robot.elevator.getSelectedSensorVelocity(); 
 
-      if(currentVelocity > velocity)
-      {
-        velocity = currentVelocity;
-      }
+      // if (currentVelocity > velocity)
+      // {
+      //   velocity = currentVelocity;
+      // }
 
-      Robot.elevator.set(this.powerAxis.GetAxisValue());
-      System.out.println(velocity);
-
-      //System.out.println("power: " + this.powerAxis.GetAxisValue());
+       Robot.elevator.set(this.powerAxis.GetAxisValue());
+      
+       // System.out.println(velocity);
+      // System.out.println("power: " + this.powerAxis.GetAxisValue());
 
     }
   }
@@ -91,6 +78,7 @@ public class MoveElevator extends Command {
   @Override
   protected void end()
   {
+    Robot.elevator.setControlMode(ControlMode.PercentOutput);
     Robot.elevator.set(0);
   }
 

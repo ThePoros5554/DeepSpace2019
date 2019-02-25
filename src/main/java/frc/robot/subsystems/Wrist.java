@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -30,26 +31,26 @@ public class Wrist extends Subsystem
   private static final int kWristPort = 3;
 
   // positions for practice robot:
-  private static final int kDownPosition = 490;
-  private static final int kInsidePosition = 282;
-  private static final int kUpPosition = 369;
-  private static final int kCargoHighPosition = 635;
+  private static final int kDownPosition = 2895;
+  private static final int kInsidePosition = 1000;
+  private static final int kUpPosition = 1830;
+  private static final int kCargoHighPosition = 2000;
 
   // motion gains
   public static final double kMotionMagicUpSlot = 0;
   public static final double kMotionMagicDownSlot = 1;
-  public static final double kF = 1.93018867; // 1024/530 result, 530 rawUnits/100ms
+  public static final double kF = 1023/0.3*280; // 0.3*1023/280 result, 280 rawUnits/100ms
 
   // config constants
-  private static final int kMaxTilt = 489;
-  private static final int kMinTilt = 281;
+  private static final int kMaxTilt = 2885;
+  private static final int kMinTilt = 1000;
   private static final double kVoltage = 10;
 
-  private static final int kMaxAcceleration = 25;
-  private static final int kMaxVelocity = 25;
+  private static final int kMaxAcceleration = (int)0.7*400;
+  private static final int kMaxVelocity = (int)0.7*400;
 
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final boolean kInvertPot = false;
+  private static final boolean kInvertPot = true;
   private static final double kRamp = 0.2;
   private static final int kTargetThreshold = 2;
 
@@ -71,20 +72,20 @@ public class Wrist extends Subsystem
   {
     master = new WPI_TalonSRX(kWristPort);
 
-    master.configSelectedFeedbackSensor(FeedbackDevice.Analog);
+    master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
 
     //limitswitches
     master.overrideLimitSwitchesEnable(false);
 
     //softlimits (if needed)
-    this.configForwardSoftLimitThreshold(kMaxTilt, false);
-    this.configReverseSoftLimitThreshold(kMinTilt, false);
+    this.configForwardSoftLimitThreshold(kMaxTilt, true);
+    this.configReverseSoftLimitThreshold(kMinTilt, true);
 
     //voltage
     // this.configVoltageCompSaturation(kVoltage, false);
 
     //config motion magic
-    this.configMotionValues(kMaxAcceleration, kMaxVelocity);
+    this.configMotionValues(500, 500);
     
     //config (if needed) pid loops
 		master.configNominalOutputForward(0);
@@ -98,8 +99,8 @@ public class Wrist extends Subsystem
     
     //motion parameters
     master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
-    this.configProfileSlot(0,6, 0, 0, 40); // up 2.3
-    this.configProfileSlot(1,  2.3, 0, 0.3, 30); // TODO: check for down
+    this.configProfileSlot(0, 1, 0, 0.1,2.046); // up
+    this.configProfileSlot(1, 0, 0, 0, 1); // TODO: check for down
     this.setNeutralMode(kNeutralMode);
 
     //this.master.configOpenloopRamp(kRamp);
@@ -380,7 +381,9 @@ public class Wrist extends Subsystem
     if (this.controlMode == ControlMode.MotionMagic)
     {
       manageMotion();
-      this.master.set(this.targetPosition);
+      master.set(ControlMode.MotionMagic, this.targetPosition);
+      // System.out.println(master.getClosedLoopError());
+      // System.out.println(master.getClosedLoopTarget());
     }
 
   }
@@ -388,15 +391,5 @@ public class Wrist extends Subsystem
   public int getWristDeviceId()
   {
     return master.getDeviceID();
-  }
-
-  // public boolean getIsFwdLimitSwitchClosed()
-  // {
-  //   return master.getSensorCollection().isFwdLimitSwitchClosed();
-  // }
-
-  public boolean getIsRevLimitSwitchClosed()
-  {
-    return master.getSensorCollection().isRevLimitSwitchClosed();
   }
 }

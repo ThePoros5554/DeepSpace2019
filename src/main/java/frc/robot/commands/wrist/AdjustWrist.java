@@ -29,6 +29,7 @@ public class AdjustWrist extends Command
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
     Robot.wrist.setTargetPosition(this.targetMode);
+    //System.out.println(Robot.wrist.getTargetPosition());
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -41,13 +42,14 @@ public class AdjustWrist extends Command
   @Override
   protected boolean isFinished()
   {
-    return true;
+    return false;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
+
   }
 
   // Called when another command which requires one or more of the same
