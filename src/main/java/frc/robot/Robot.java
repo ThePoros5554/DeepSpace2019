@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.IMUProtocol.GyroUpdate;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Sendable;
@@ -82,12 +83,12 @@ public class Robot extends TimedRobot
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
-
+    
     elevator = new Elevator();
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
-    // hatchLauncher = new HatchLauncher();
+    //hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
     oi = new OI();
@@ -211,7 +212,7 @@ public class Robot extends TimedRobot
 
     elevator.neutralOutput();
     wrist.neutralOutput();
-    
+
 
   }
 

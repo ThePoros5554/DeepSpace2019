@@ -26,6 +26,8 @@ import frc.robot.commands.drive.MagicDrive;
 import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.elevator.ElevatorHold;
 import frc.robot.commands.elevator.MoveElevator;
+import frc.robot.commands.hatch_launcher.ActivateLauncher;
+import frc.robot.commands.hatch_launcher.RetractLauncher;
 import frc.robot.commands.EjectHatch;
 import frc.robot.commands.lifter.CloseFrontLifters;
 import frc.robot.commands.lifter.CloseRearLifters;
@@ -187,7 +189,7 @@ public class OI
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
-        wristMotion = new AdjustWrist(WristMode.UP);
+        // wristMotion = new AdjustWrist(WristMode.UP);
         
         // prepareHatchCollect = new InitHatchCollectMode();
         // prepareHatchLow = new InitHatchLowMode();
@@ -239,8 +241,8 @@ public class OI
         // prepareHatchLowTrigger.whenActive(prepareHatchLow);
         // prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
         // prepareHatchHighTrigger.whenActive(prepareHatchHigh);
-        // collectHatchTrigger.whenActive(collectHatch);
-        // ejectHatchTrigger.whenActive(ejectHatch);
+         //collectHatchTrigger.whileActive(retract);
+         //ejectHatchTrigger.whileActive(activate);
 
         // // cargo
         // prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
