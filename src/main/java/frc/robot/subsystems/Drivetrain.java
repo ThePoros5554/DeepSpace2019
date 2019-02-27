@@ -37,7 +37,7 @@ public class Drivetrain extends DiffDrivetrain
   private static final double kP = 0;
   private static final double kI = 0;
   private static final double kD = 0;
-  private static final double kF = 0;
+  public static final double kF = 0.132;
 
   // config constants
   private static final double kVoltage = 12;
@@ -74,6 +74,9 @@ public class Drivetrain extends DiffDrivetrain
     this.middleRight = new WPI_TalonSRX(kMiddleRightPort);
     this.rearLeft = new WPI_VictorSPX(kRearLeftPort);
     this.rearRight = new WPI_VictorSPX(kRearRightPort);
+
+    this.masterLeft.configFactoryDefault();
+    this.masterRight.configFactoryDefault();
     
     // followers
     this.middleLeft.follow(this.masterLeft);
@@ -103,9 +106,12 @@ public class Drivetrain extends DiffDrivetrain
     this.configProfileSlot(0, 0.005, 0, 0.00, 0.132); //kf = 1023/7750
 
     //position control
-    this.configProfileSlot(1, 0.015, 0.0000015, 0.005, 0);
-    this.masterLeft.configMaxIntegralAccumulator(1, 60000);
-    this.masterRight.configMaxIntegralAccumulator(1, 60000);
+    this.configProfileSlot(1, 0.03, 0.000002, 0.1, 0);
+    this.masterLeft.config_IntegralZone(1, 30000);
+    this.masterRight.config_IntegralZone(1, 30000);
+
+
+  
 
     // neutral mode
     this.setNeutralMode(kNeutralMode);
@@ -250,6 +256,12 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.config_kF(profileSlot, kF);
   }
 
+  public void configFeedForward(int profileSlot, double kF)
+  {
+    this.masterLeft.config_kF(profileSlot, kF);
+    this.masterRight.config_kF(profileSlot, kF);
+  }
+
   public void configMotionValues(int sensorUnitsPer100msPerSec, int sensorUnitsPer100ms)
   {
     this.masterLeft.configMotionAcceleration(sensorUnitsPer100msPerSec);
@@ -294,5 +306,11 @@ public class Drivetrain extends DiffDrivetrain
   @Override
   public void initDefaultCommand()
   {
+  }
+
+  @Override
+  public void periodic()
+  {
+    System.out.println(masterLeft.getClosedLoopError());
   }
 }

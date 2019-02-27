@@ -12,6 +12,8 @@ import poroslib.position.geometry.Kinematics;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Twist2d;
 import poroslib.position.geometry.Kinematics.DriveVelocity;
+import poroslib.triggers.SmartJoystick;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class VisionAllignment extends Command
@@ -24,12 +26,20 @@ public class VisionAllignment extends Command
 
     private DriveVelocity lastDriveSignal;
 
-    private final double maxDriveVelocity = 200;
+    private final double maxDriveVelocity = 1000;
+    private final double headingGain = 4;
+    private final double distanceGain = 0.5;
 
-    public VisionAllignment()
+    private SmartJoystick leftJoy;
+    private boolean isDriverControl;
+
+
+    public VisionAllignment(SmartJoystick leftJoy, boolean isDriverControl)
     {
         driveTrain = Robot.drivetrain;
         monitor = RobotMonitor.getRobotMonitor();
+        this.leftJoy = leftJoy;
+        this.isDriverControl = isDriverControl;
 
         requires(driveTrain);
     }
@@ -78,22 +88,35 @@ public class VisionAllignment extends Command
 
                 Pose2d cameraToTargetNow = bufferedTarget.transformBy(cameraNow.inverse());
 
-                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getRadians());
-                DriveVelocity velocity = Kinematics.inverseKinematics(cameraToTargetDelta, 250, 1);
+                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getDegrees());
 
-                double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
-                if(forwardSpeed > this.maxDriveVelocity)
+                //angle portion for the position loop
+                double delta_v = headingGain * cameraToTargetDelta.dtheta;
+                
+                double forwardValue;
+                if(isDriverControl)
                 {
-                    if(lastDriveSignal != null)
-                    {
-                        velocity = lastDriveSignal;
-                    } 
-                    else
-                    {
-                        double diffrence = forwardSpeed / maxDriveVelocity;
-                        velocity = new DriveVelocity((velocity.left / diffrence), (velocity.right / diffrence));
-                    }
+                    forwardValue = distanceGain * (leftJoy.GetSpeedAxis() * -250);
                 }
+                else
+                {
+                    forwardValue = distanceGain * cameraToTargetDelta.dx;
+                }
+                DriveVelocity velocity = new DriveVelocity(forwardValue + delta_v, forwardValue -delta_v);
+
+                // double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
+                // if(forwardSpeed > this.maxDriveVelocity)
+                // {
+                //     if(lastDriveSignal != null)
+                //     {
+                //         velocity = lastDriveSignal;
+                //     } 
+                //     else
+                //     {
+                //         double diffrence = forwardSpeed / maxDriveVelocity;
+                //         velocity = new DriveVelocity((velocity.left / diffrence), (velocity.right / diffrence));
+                //     }
+                // }
 
                 SmartDashboard.putNumber("go left: ", velocity.left);
                 SmartDashboard.putNumber("go right: ",  velocity.right);
@@ -102,6 +125,7 @@ public class VisionAllignment extends Command
                 int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
                 int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
 
+                driveTrain.selectProfileSlot(1);
                 driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
 
                 lastDriveSignal = velocity;
