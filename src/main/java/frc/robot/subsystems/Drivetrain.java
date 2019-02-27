@@ -307,10 +307,4 @@ public class Drivetrain extends DiffDrivetrain
   public void initDefaultCommand()
   {
   }
-
-  @Override
-  public void periodic()
-  {
-    System.out.println(masterLeft.getClosedLoopError());
-  }
 }
