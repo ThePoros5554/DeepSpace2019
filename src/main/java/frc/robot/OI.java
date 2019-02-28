@@ -24,6 +24,8 @@ import frc.robot.commands.ToggleGamepieceMode;
 import frc.robot.commands.VisionAlignment;
 import frc.robot.commands.cargo_intake.ActivateIntake;
 import frc.robot.commands.elevator.MoveElevator;
+import frc.robot.commands.hatch_launcher.ActivateLauncher;
+import frc.robot.commands.hatch_launcher.RetractLauncher;
 import frc.robot.commands.EjectHatch;
 import frc.robot.commands.lifter.CloseFrontLifters;
 import frc.robot.commands.lifter.CloseRearLifters;
@@ -171,6 +173,7 @@ public class OI
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
+        // wristMotion = new AdjustWrist(WristMode.UP);
         
         prepareHatchCollect = new InitHatchCollectMode();
         prepareHatchLow = new InitHatchLowMode();
@@ -199,7 +202,7 @@ public class OI
         wristUp = new MoveWrist(wristUpAxis);
 
         toggleGamepiece = new ToggleGamepieceMode();
-        visionAllignment = new VisionAlignment();
+        visionAllignment = new VisionAlignment(leftJoy, true);
 
         /****************************************/
 

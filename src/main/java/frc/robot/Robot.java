@@ -27,14 +27,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
-//import frc.robot.subsystems.SendableForShuffleBoard;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
 import poroslib.systems.Limelight;
 import poroslib.systems.Limelight.LimelightCamMode;
-//import sun.jvm.hotspot.runtime.solaris_sparc.SolarisSPARCJavaThreadPDAccess;
 import poroslib.systems.Limelight.LimelightLedMode;
 
 /**
@@ -82,12 +80,12 @@ public class Robot extends TimedRobot
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
-
+    
     elevator = new Elevator();
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
-    // hatchLauncher = new HatchLauncher();
+    //hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
     oi = new OI();
@@ -205,7 +203,7 @@ public class Robot extends TimedRobot
 
     elevator.neutralOutput();
     wrist.neutralOutput();
-    
+
 
   }
 

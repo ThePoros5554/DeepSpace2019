@@ -20,8 +20,7 @@ public class EjectHatch extends CommandGroup {
   public EjectHatch(double backDistance)
   {
     addParallel(new ActivateLauncher());
-    addParallel(new MagicDrive(backDistance, backDistance, true));
-    addSequential(new Timeout(0.5));
-    addParallel(new RetractLauncher());
+    //addSequential(new MagicDrive(backDistance, backDistance, true));
+    //addParallel(new RetractLauncher());
   }
 }

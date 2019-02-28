@@ -44,10 +44,10 @@ public class Drivetrain extends DiffDrivetrain
   
   // position
   private static final int kPositionSlot = 1; 
-  private static final double kPositionP = 0.015; 
-  private static final double kPositionI = 0.0000015;
-  private static final int kPositionIMaxAccum = 60000;
-  private static final double kPositionD = 0.005;
+  private static final double kPositionP = 0.03; 
+  private static final double kPositionI = 0.000002;
+  private static final int kPositionIZone = 30000;
+  private static final double kPositionD = 0.1;
   private static final double kPositionF = 0;
 
   // config constants
@@ -85,6 +85,9 @@ public class Drivetrain extends DiffDrivetrain
     this.middleRight = new WPI_TalonSRX(kMiddleRightPort);
     this.rearLeft = new WPI_VictorSPX(kRearLeftPort);
     this.rearRight = new WPI_VictorSPX(kRearRightPort);
+
+    this.masterLeft.configFactoryDefault();
+    this.masterRight.configFactoryDefault();
     
     // followers
     this.middleLeft.follow(this.masterLeft);
@@ -115,8 +118,8 @@ public class Drivetrain extends DiffDrivetrain
 
     // position control
     this.configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF);
-    this.masterLeft.configMaxIntegralAccumulator(kPositionSlot, kPositionIMaxAccum);
-    this.masterRight.configMaxIntegralAccumulator(kPositionSlot, kPositionIMaxAccum);
+    this.masterLeft.config_IntegralZone(kPositionSlot, kPositionIZone);
+    this.masterRight.config_IntegralZone(kPositionSlot, kPositionIZone);
 
     // neutral mode
     this.setNeutralMode(kNeutralMode);
@@ -257,6 +260,12 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.config_kP(profileSlot, kP);
     this.masterRight.config_kI(profileSlot, kI);
     this.masterRight.config_kD(profileSlot, kD);
+    this.masterRight.config_kF(profileSlot, kF);
+  }
+
+  public void configFeedForward(int profileSlot, double kF)
+  {
+    this.masterLeft.config_kF(profileSlot, kF);
     this.masterRight.config_kF(profileSlot, kF);
   }
 
