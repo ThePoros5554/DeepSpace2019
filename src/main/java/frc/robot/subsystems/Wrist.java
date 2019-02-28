@@ -7,12 +7,9 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -20,27 +17,30 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Robot;
 
-public class 
-Wrist extends Subsystem
+public class Wrist extends Subsystem
 {
-
-  // manual values
-  // public static final double kManualPowerUp = 1;
-  // public static final double kManualPowerDown = -1;
-
   // ports
   private static final int kWristPort = 3;
 
-  // positions for practice robot:
+  // positions
   private static final int kDownPosition = 2895;
   private static final int kInsidePosition = 1000;
   private static final int kUpPosition = 1830;
   private static final int kCargoHighPosition = 2000;
+  private static final int kDownExtendedPosition = 3100;
 
   // motion gains
-  public static final double kMotionMagicUpSlot = 0;
-  public static final double kMotionMagicDownSlot = 1;
-  public static final double kF = 1023/0.3*280; // 0.3*1023/280 result, 280 rawUnits/100ms
+  public static final int kMagicUpSlot = 0;
+  public static final int kMagicDownSlot = 1;
+  public static final double kUpP = 1;
+  public static final double kUpI = 0;
+  public static final double kUpD = 0.1;
+  public static final double kUpF = 2.046;
+  public static final double kDownP = 1;
+  public static final double kDownI = 0;
+  public static final double kDownD = 0.1;
+  public static final double kDownF = 2.046;
+  
 
   // config constants
   private static final int kMaxTilt = 2885;
@@ -50,11 +50,11 @@ Wrist extends Subsystem
   private int maxPositionLimit = kMaxTilt;
   private int minPositionLimit = kMinTilt;
 
-  // private static final int kMaxAcceleration = (int)0.7*400;
-  // private static final int kMaxVelocity = (int)0.7*400;
+  private static final int kMaxAcceleration = 500;
+  private static final int kMaxVelocity = 500;
 
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final boolean kInvertPot = true;
+  private static final boolean kInvertEnc = true;
   private static final double kRamp = 0.2;
   private static final int kTargetThreshold = 2;
 
@@ -64,7 +64,11 @@ Wrist extends Subsystem
 
   public enum WristMode
   {
-    UP(1830), DOWN(2895), INSIDE(1000), HIGH_CARGO(2000);
+    UP(kUpPosition),
+    DOWN(kDownPosition),
+    INSIDE(kInsidePosition),
+    COLLECT_CARGO(kDownExtendedPosition),
+    HIGH_CARGO(kCargoHighPosition);
     
     private final int position;
 
@@ -87,36 +91,33 @@ Wrist extends Subsystem
 
     master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
 
-    //limitswitches
-    master.overrideLimitSwitchesEnable(false);
+    // softlimits (if needed)
+    configForwardSoftLimitThreshold(kMaxTilt, true);
+    configReverseSoftLimitThreshold(kMinTilt, true);
 
-    //softlimits (if needed)
-    this.configForwardSoftLimitThreshold(kMaxTilt, true);
-    this.configReverseSoftLimitThreshold(kMinTilt, true);
-
-    //voltage
-    // this.configVoltageCompSaturation(kVoltage, false);
+    // voltage
+    configVoltageCompSaturation(kVoltage, false);
 
     //config motion magic
-    this.configMotionValues(500, 500);
+    configMotionValues(kMaxAcceleration, kMaxVelocity);
     
-    //config (if needed) pid loops
+    // config output
 		master.configNominalOutputForward(0);
 		master.configNominalOutputReverse(0);
 		master.configPeakOutputForward(1);
     master.configPeakOutputReverse(-1);
         
-    //Config direction of master and slaves
-    master.setSensorPhase(kInvertPot);
+    // config direction of master and slaves
+    master.setSensorPhase(kInvertEnc);
     master.setInverted(InvertType.InvertMotorOutput);
     
-    //motion parameters
-    master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
-    this.configProfileSlot(0, 1, 0, 0.1,2.046); // up
-    this.configProfileSlot(1, 0, 0, 0, 1); // TODO: check for down
-    this.setNeutralMode(kNeutralMode);
+    // motion parameters
+    master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+    configProfileSlot(kMagicUpSlot, kMagicUpSlot, kUpI, kUpD, kUpF); // up
+    configProfileSlot(kMagicDownSlot, kDownP, kDownI, kDownD, kDownF); // TODO: check for down
+    setNeutralMode(kNeutralMode);
 
-    //this.master.configOpenloopRamp(kRamp);
+    master.configOpenloopRamp(kRamp);
 
     controlMode = ControlMode.PercentOutput;
     set(0);
@@ -127,41 +128,28 @@ Wrist extends Subsystem
     master.setNeutralMode(neturalMode);
   }
 
-  // public void configReverseLimit(LimitSwitchSource switchSource, LimitSwitchNormal switchNormal)
-  // {
-  //     master.configReverseLimitSwitchSource(switchSource, switchNormal, 0);
-  // }
-  // public void configForwardLimit(LimitSwitchSource switchSource, LimitSwitchNormal switchNormal)
-  // {
-  //     master.configForwardLimitSwitchSource(switchSource, switchNormal, 0);
-  // }
-  // public void overrideLimitSwitchesEnable(boolean isSwitchesEnabled)
-  // {
-  //     master.overrideLimitSwitchesEnable(isSwitchesEnabled);
-  // }
-
   public void configForwardSoftLimitThreshold(int forwardSensorLimit, boolean enableForwardLimit)
   {
-      master.configForwardSoftLimitThreshold(forwardSensorLimit);
-      master.configForwardSoftLimitEnable(enableForwardLimit);
+    master.configForwardSoftLimitThreshold(forwardSensorLimit);
+    master.configForwardSoftLimitEnable(enableForwardLimit);
   }
 
   public void configReverseSoftLimitThreshold(int reverseSensorLimit, boolean enableReverseLimit)
   {
-      master.configReverseSoftLimitThreshold(reverseSensorLimit);
-      master.configReverseSoftLimitEnable(enableReverseLimit);
+    master.configReverseSoftLimitThreshold(reverseSensorLimit);
+    master.configReverseSoftLimitEnable(enableReverseLimit);
   }
 
   public void overrideSoftLimitsEnable(boolean isLimitsEnabled)
   {
-      master.overrideSoftLimitsEnable(isLimitsEnabled);
+    master.overrideSoftLimitsEnable(isLimitsEnabled);
   }
 
-  // public void configVoltageCompSaturation(double voltage, boolean enableVoltageCompensation)
-  // {
-  //     master.configVoltageCompSaturation(voltage);
-  //     master.enableVoltageCompensation(enableVoltageCompensation);
-  // }
+  public void configVoltageCompSaturation(double voltage, boolean enableVoltageCompensation)
+  {
+    master.configVoltageCompSaturation(voltage);
+    master.enableVoltageCompensation(enableVoltageCompensation);
+  }
 
   public void setControlMode(ControlMode controlMode)
   {
@@ -202,33 +190,13 @@ Wrist extends Subsystem
 
   public int getCurrentPosition()
   {
-      return master.getSelectedSensorPosition();
+    return master.getSelectedSensorPosition();
   }
 
-  public int getWristVelocity()
+  public int getVelocity()
   {
-      return master.getSelectedSensorVelocity();
+    return master.getSelectedSensorVelocity();
   }
-
-	/*
-	 * controls the position of the collector between upPositionLimit and
-	 * downPositionLimit based on the scalar input between -1 and 1.
-	 */
-  public void motionMagicPositionControl(double positionScalar)
-  {
-		double encoderPosition = 0;
-
-    if (positionScalar > 0)
-    {
-			encoderPosition = positionScalar * this.maxPositionLimit;
-    }
-    else
-    {
-			encoderPosition = -positionScalar * this.minPositionLimit;
-		}
-    
-    master.set(ControlMode.MotionMagic, encoderPosition);
-	}
 
 	/*
 	 * choose which set of gains to use based on direction of travel.
@@ -237,40 +205,39 @@ Wrist extends Subsystem
   {  
     double currentPosition = getCurrentPosition();
 
-    if (currentPosition > kUpPosition) // outside robot
+    if (currentPosition > WristMode.UP.position) // outside robot
     {
-      selectProfileSlot(0);
-      /*
-      if (currentPosition < this.targetPosition) // moving down
+      if (currentPosition < this.targetPosition) // if moving down
       {
-				selectProfileSlot(0);
+				selectProfileSlot(kMagicDownSlot);
       }
-      else // moving up
+      else
       {
-				selectProfileSlot(1);
+				selectProfileSlot(kMagicUpSlot);
       }
-      */
     }
     else // outside robot
     {
-      selectProfileSlot(0);
-      /*
-      if (currentPosition > this.targetPosition) // moving down
+      if (currentPosition > this.targetPosition) // if moving down
       {
-				selectProfileSlot(0);
+				selectProfileSlot(kMagicDownSlot);
       }
       else // moving up
       {
-				selectProfileSlot(1);
+				selectProfileSlot(kMagicUpSlot);
       }
-      */
 		}
 	}
 
-	//Prevents wrist from moving behind the home position whilst elevator is not above first stage
+  /*
+   * limits wrist from colliding with the robot, the floor and the elevator.
+   */
   private void manageLimits()
   {
-    if (Robot.elevator.getCurrentPosition() < Elevator.kTopOfFirstLevel)
+    int elevatorPosition = Robot.elevator.getCurrentPosition();
+
+    // if elevator is within the first level, wrist can be rotated inside the robot. else, limit wrist to upright position:
+    if (elevatorPosition < Elevator.kTopOfFirstLevel)
     {
 			this.minPositionLimit = kMinTilt;
     }
@@ -283,67 +250,59 @@ Wrist extends Subsystem
         this.targetPosition = kUpPosition;
 			}
     }
+
+    // if elevator is a little up, wrist can be rotated further down. else, limit wrist to floor position:
+    if (elevatorPosition > Elevator.kLittleUpPosition)
+    {
+      this.maxPositionLimit = kDownExtendedPosition;
+    }
+    else
+    {
+      this.maxPositionLimit = kMaxTilt;
+
+      if (this.targetPosition > kMaxTilt)
+      {
+        this.targetPosition = kMaxTilt;
+			}
+    }
     
     this.master.configReverseSoftLimitThreshold(this.minPositionLimit);
-
+    this.master.configForwardSoftLimitThreshold(this.maxPositionLimit);
 	}
 
   public int getTargetPosition()
   {
 		return this.targetPosition;
-	}
+  }
 	
-	//if valid position is inverted return false else, return true
   public void setTargetPosition(int position)
-  {    
+  {
+    // if valid position is inverted return false. else, return true.    
     if (isValidPosition(position))
     {
       this.targetPosition = position;
     }
   }
   
-  public void setTargetPosition(WristMode position)
+  public void setTargetPosition(WristMode mode)
   {
-    switch (position)
-    {
-      case DOWN:
-      setTargetPosition(kDownPosition);
-      break;
-
-      case UP:
-      setTargetPosition(kUpPosition);
-      break;
-
-      case INSIDE:
-      setTargetPosition(kInsidePosition);
-      break;
-
-      case HIGH_CARGO:
-      setTargetPosition(kCargoHighPosition);
-      break;
-    }
-	}	
-	
-  public void incrementTargetPosition(int increment)
-  {
-		int newTargetPosition = this.targetPosition + increment;
-    
-    if (isValidPosition(newTargetPosition))
-    {
-			this.targetPosition = newTargetPosition;
-		}
-	}
-	
-  public void stopInPlace()
-  {
-    this.master.selectProfileSlot(2, 2);
-		this.master.set(ControlMode.MotionMagic, this.getCurrentPosition());
-	}
-	
+    setTargetPosition(mode.position);
+  }
+  	
   public boolean isValidPosition(int position)
   {
 		return (position >= this.minPositionLimit && position <= this.maxPositionLimit);
-	}
+  }	
+	
+  public void neutralOutput()
+  {
+    master.neutralOutput();
+  }
+
+  public int getWristDeviceId()
+  {
+    return master.getDeviceID();
+  }
 
   @Override
   public void initDefaultCommand()
@@ -359,18 +318,6 @@ Wrist extends Subsystem
     {
       manageMotion();
       master.set(ControlMode.MotionMagic, targetPosition);
-
     }
-
-  }
-
-  public void neutralOutput()
-  {
-    master.neutralOutput();
-  }
-
-  public int getWristDeviceId()
-  {
-    return master.getDeviceID();
   }
 }

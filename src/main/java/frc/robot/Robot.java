@@ -46,7 +46,7 @@ import poroslib.systems.Limelight.LimelightLedMode;
  */
 public class Robot extends TimedRobot
 {
-  private SendableChooser<String> autonomouChooser;
+  private SendableChooser<String> autonomousChooser;
 
   public static Drivetrain drivetrain;
   private WPI_TalonSRX masterLeft;
@@ -94,16 +94,15 @@ public class Robot extends TimedRobot
 
     lime = new Limelight();
 
-    autonomouChooser = new SendableChooser<String>();
-    autonomouChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
-    autonomouChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
-    autonomouChooser.addOption("LeftCargoHatch", RobotMap.LEFTSHIPHATCH);
-    autonomouChooser.addOption("RightShipHatch", RobotMap.RIGHTSHIPHATCH);
-    autonomouChooser.addOption("LeftShipCargo", RobotMap.LEFTSHIPCARGO);
-    autonomouChooser.addOption("RightShipCargo", RobotMap.RIGHTSHIPCARGO);
-    autonomouChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
-    autonomouChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
-
+    autonomousChooser = new SendableChooser<String>();
+    autonomousChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
+    autonomousChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
+    autonomousChooser.addOption("LeftCargoHatch", RobotMap.LEFTSHIPHATCH);
+    autonomousChooser.addOption("RightShipHatch", RobotMap.RIGHTSHIPHATCH);
+    autonomousChooser.addOption("LeftShipCargo", RobotMap.LEFTSHIPCARGO);
+    autonomousChooser.addOption("RightShipCargo", RobotMap.RIGHTSHIPCARGO);
+    autonomousChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
+    autonomousChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
   }
 
   /**
@@ -117,8 +116,6 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    //
-    // 
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
     // SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
@@ -144,13 +141,10 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("Ele sp", elevator.getTargetPosition());
     SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
 
+    SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
+    SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
 
-    // SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
-
-    // SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
-    // //Shuffleboard.getTab("SmartDashboard").add("Gyro", SmartDashboard.putData(drivetrain.getHeading()).withWidget(BuiltInWidgets.kGyro);
-
-    SmartDashboard.putBoolean("ElevatorLimit", Robot.drivetrain.getIsElevatorLimit());
+    SmartDashboard.putBoolean("Elevator Limit", Robot.drivetrain.getIsElevatorLimit());
 
 
   }

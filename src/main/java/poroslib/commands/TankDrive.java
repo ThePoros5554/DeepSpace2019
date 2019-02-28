@@ -16,7 +16,6 @@ public class TankDrive extends Command
 	private SmartJoystick rightJoy;
 	
     private double maxOutput = 1;
-    
     private double maxSpeed = 0;
 	
     public TankDrive(DiffDrivetrain drivetrain, SmartJoystick leftJoy, SmartJoystick rightJoy)
@@ -30,7 +29,6 @@ public class TankDrive extends Command
     // Called just before this Command runs the first time
     protected void initialize()
     {
-
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -50,8 +48,9 @@ public class TankDrive extends Command
         
         this.drivetrain.tankDrive(leftValue, rightValue, this.maxOutput);
         
-        int velocity = Robot.drivetrain.getDriveTrainVelocity();
-        if(this.maxSpeed < velocity)
+        int velocity = Robot.drivetrain.getVelocity();
+        
+        if (this.maxSpeed < velocity)
         {
             maxSpeed = velocity;
         }

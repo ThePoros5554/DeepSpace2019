@@ -26,28 +26,39 @@ import poroslib.subsystems.DiffDrivetrain;
 public class Drivetrain extends DiffDrivetrain
 {
   // ports
-  public static final int kFrontLeftPort = 0;
-  public static final int kFrontRightPort = 1;
-  private static final int kMiddleRightPort = 6; // 2
-  private static final int kRearRightPort = 3;
-  private static final int kMiddleLeftPort = 5; // 1
-  private static final int kRearLeftPort = 1;
+  public static final int kFrontLeftPort = 0; // Talon SRX with encoder
+  public static final int kFrontRightPort = 1; // Talon SRX with encoder
+  private static final int kMiddleLeftPort = 1; // Talon SRX
+  private static final int kMiddleRightPort = 3; // Talon SRX
+  private static final int kRearLeftPort = 5; // Victor SPX
+  private static final int kRearRightPort = 6; // Victor SPX
 
   // motion gains
-  private static final double kP = 0;
-  private static final double kI = 0;
-  private static final double kD = 0;
-  private static final double kF = 0;
+  
+  // motion magic
+  private static final int kMagicSlot = 0; 
+  private static final double kMagicP = 0.005; 
+  private static final double kMagicI = 0;
+  private static final double kMagicD = 0;
+  private static final double kMagicF = 0.132; //kf = 1023/7750
+  
+  // position
+  private static final int kPositionSlot = 1; 
+  private static final double kPositionP = 0.015; 
+  private static final double kPositionI = 0.0000015;
+  private static final int kPositionIMaxAccum = 60000;
+  private static final double kPositionD = 0.005;
+  private static final double kPositionF = 0;
 
   // config constants
   private static final double kVoltage = 12;
   private static final double kWheelDiameter = 10.16 * Math.PI;
   private static final double kEncoderTicks = 4096;
-  private static final boolean kInvertEncLeft = true;
+  private static final boolean kInvertEncLeft = false;
   private static final boolean kInvertEncRight = true;
   private static final double kRamp = 0;
   public static final double kEjectDriveBackDistance = 14.3;
-  public static final double TRACKWIDTH = 72.5;
+  //public static final double TRACKWIDTH = 72.5;
   private static final NeutralMode kNeutralMode = NeutralMode.Brake;
   private static final int kTargetThreshold = 0;
 
@@ -90,7 +101,7 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.setInverted(InvertType.FollowMaster);
 
     // ramp
-    this.configRamp(kRamp);
+    this.configOpenLoopRamp(kRamp);
 
     // sensors
     this.masterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
@@ -100,18 +111,18 @@ public class Drivetrain extends DiffDrivetrain
 
     // motion magic
     this.configMotionValues(2000, 1500);
-    this.configProfileSlot(0, 0.005, 0, 0.00, 0.132); //kf = 1023/7750
+    this.configProfileSlot(kMagicSlot, kMagicP, kMagicI, kMagicD, kMagicF); 
 
-    //position control
-    this.configProfileSlot(1, 0.015, 0.0000015, 0.005, 0);
-    this.masterLeft.configMaxIntegralAccumulator(1, 60000);
-    this.masterRight.configMaxIntegralAccumulator(1, 60000);
+    // position control
+    this.configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF);
+    this.masterLeft.configMaxIntegralAccumulator(kPositionSlot, kPositionIMaxAccum);
+    this.masterRight.configMaxIntegralAccumulator(kPositionSlot, kPositionIMaxAccum);
 
     // neutral mode
     this.setNeutralMode(kNeutralMode);
 
     // voltage compensation
-    this.configVoltageCompSaturation(kVoltage, false);
+    this.configVoltageCompensation(kVoltage, false);
 
     this.masterLeft.configNominalOutputForward(0);
 		this.masterLeft.configNominalOutputReverse(0);
@@ -135,7 +146,7 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.set(controlMode, valueRight);
   }
 
-  public void configVoltageCompSaturation(double voltage, boolean enableVoltageCompensation)
+  public void configVoltageCompensation(double voltage, boolean enableVoltageCompensation)
   {
     this.masterLeft.configVoltageCompSaturation(voltage);
     this.masterRight.configVoltageCompSaturation(voltage);
@@ -152,7 +163,7 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.enableVoltageCompensation(enableVoltageCompensation);
   }
 
-  public void configRamp(double rampRate)
+  public void configOpenLoopRamp(double rampRate)
   {
     this.masterLeft.configOpenloopRamp(rampRate);
     this.masterRight.configOpenloopRamp(rampRate);
@@ -201,14 +212,13 @@ public class Drivetrain extends DiffDrivetrain
   @Override
   public int getRawLeftPosition()
   {
-    return -this.masterLeft.getSelectedSensorPosition();
+    return this.masterLeft.getSelectedSensorPosition(); // TODO: if not good change left phase to true and add - here (though should work?)
   }
 
   @Override
   public int getRawRightPosition()
   {
     return this.masterRight.getSelectedSensorPosition();
-
   }
 
   public double getLeftPositionInCm()
@@ -265,17 +275,18 @@ public class Drivetrain extends DiffDrivetrain
     this.masterRight.selectProfileSlot(profileSlot, 0);
   }
 
-  public boolean isInTarget(double rightTarget, double leftTarget)
+  public boolean isInTarget(int rightTarget, int leftTarget)
   {
-    int rightpos = getRawRightPosition();
-    int leftpos = getRawLeftPosition();
-    boolean isInTargetRight = rightTarget >= (rightpos - kTargetThreshold) && rightTarget <= (rightpos + kTargetThreshold);
-    boolean isInTargetLeft = leftTarget >= (leftpos - kTargetThreshold) && leftTarget <= (leftpos + kTargetThreshold);
+    int rPositionError = Math.abs(getRawRightPosition() - rightTarget);
+    int lPositionError = Math.abs(getRawLeftPosition() - leftTarget);
+    
+    boolean isInTargetRight = rPositionError < kTargetThreshold;
+    boolean isInTargetLeft = lPositionError < kTargetThreshold;
 
     return isInTargetLeft && isInTargetRight;
   }
 
-  public int getDriveTrainVelocity()
+  public int getVelocity()
   {
     return (this.masterLeft.getSelectedSensorVelocity() + this.masterRight.getSelectedSensorVelocity()) / 2;
   }
@@ -287,9 +298,8 @@ public class Drivetrain extends DiffDrivetrain
 
   public boolean getIsElevatorLimit()
   {
-    return  !middleLeft.getSensorCollection().isRevLimitSwitchClosed();
+    return !middleLeft.getSensorCollection().isRevLimitSwitchClosed();
   }
-
 
   @Override
   public void initDefaultCommand()
