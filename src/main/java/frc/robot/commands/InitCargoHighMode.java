@@ -20,7 +20,7 @@ public class InitCargoHighMode extends CommandGroup
    */
   public InitCargoHighMode()
   {
-    addSequential(new AdjustElevator(ElevatorMode.HIGH_CARGO));
     addParallel(new AdjustWrist(WristMode.HIGH_CARGO));
+    addSequential(new AdjustElevator(ElevatorMode.HIGH_CARGO));
   }
 }

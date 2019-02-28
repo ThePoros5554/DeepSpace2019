@@ -8,19 +8,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import frc.robot.commands.elevator.AdjustElevator;
-import frc.robot.commands.wrist.AdjustWrist;
-import frc.robot.subsystems.Elevator.ElevatorMode;
-import frc.robot.subsystems.Wrist.WristMode;
+import frc.robot.commands.elevator.MoveElevator;
+import frc.robot.commands.lifter.LiftRobot;
 
-public class InitCargoMiddleMode extends CommandGroup
-{
+public class AutoLiftRobot extends CommandGroup {
   /**
    * Add your docs here.
    */
-  public InitCargoMiddleMode()
+  public AutoLiftRobot(double elevatorDownPower)
   {
-    addParallel(new AdjustWrist(WristMode.DOWN));
-    addSequential(new AdjustElevator(ElevatorMode.MIDDLE_CARGO));
+    addParallel(new LiftRobot());
+    //addSequential(new MoveElevator(elevatorDownPower));
   }
 }

@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.RobotMode;
 
-public class SetClimbMode extends Command
+public class ToggleClimbMode extends Command
 {
-  public SetClimbMode()
+  private RobotMode lastGamepieceMode;
+
+  public ToggleClimbMode()
   {
   }
 
@@ -21,7 +23,20 @@ public class SetClimbMode extends Command
   @Override
   protected void initialize()
   {
-    Robot.mode = RobotMode.CLIMB;
+    switch (Robot.mode)
+    {
+      case HATCH:
+        this.lastGamepieceMode = RobotMode.HATCH;
+        Robot.mode = RobotMode.CLIMB;
+        break;
+      case CARGO:
+        this.lastGamepieceMode = RobotMode.CARGO;
+        Robot.mode = RobotMode.CLIMB;
+        break;
+      case CLIMB:
+        Robot.mode = this.lastGamepieceMode;
+        break;
+    }
   }
 
   // Called repeatedly when this Command is scheduled to run

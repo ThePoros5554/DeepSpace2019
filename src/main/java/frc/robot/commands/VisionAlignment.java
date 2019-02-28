@@ -14,7 +14,7 @@ import poroslib.position.geometry.Twist2d;
 import poroslib.position.geometry.Kinematics.DriveVelocity;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-public class VisionAllignment extends Command
+public class VisionAlignment extends Command
 {
     private Drivetrain driveTrain;
     private RobotMonitor monitor;
@@ -26,7 +26,7 @@ public class VisionAllignment extends Command
 
     private final double maxDriveVelocity = 200;
 
-    public VisionAllignment()
+    public VisionAlignment()
     {
         driveTrain = Robot.drivetrain;
         monitor = RobotMonitor.getRobotMonitor();
@@ -45,28 +45,27 @@ public class VisionAllignment extends Command
     @Override
     protected void execute()
     {
-        if(monitor.getLastVisionReport() != null)
+        if (monitor.getLastVisionReport() != null)
         {
-            Pose2d out = new Pose2d();
             Entry<Double, VisionInfo> visionData = monitor.getLastVisionReport();
 
-            double proccesTimeStamp = visionData.getKey();
+            double processTimeStamp = visionData.getKey();
 
-            if(this.validateVisionTarget(visionData.getValue()))
+            if (this.validateVisionTarget(visionData.getValue()))
             {
                 bufferedVisionTarget = visionData.getValue();
             }
 
-            if(bufferedVisionTarget != null)
+            if (bufferedVisionTarget != null)
             {
-                Pose2d cameraToTargetAtProccesTime = bufferedVisionTarget.getHorizontalDisplacement();
-                Pose2d robotAtProccesTime = monitor.getPositionAtTime(proccesTimeStamp);
+                Pose2d cameraToTargetAtProcessTime = bufferedVisionTarget.getHorizontalDisplacement();
+                Pose2d robotAtProcessTime = monitor.getPositionAtTime(processTimeStamp);
                 Pose2d cameraDisplacementFromRobot = Robot.lime.getCameraHorizontalDisplacementFromRobot();
 
-                //this vector represents the position of the target
-                Pose2d target = (robotAtProccesTime.transformBy(cameraDisplacementFromRobot)).transformBy(cameraToTargetAtProccesTime);
+                // this vector represents the position of the target
+                Pose2d target = (robotAtProcessTime.transformBy(cameraDisplacementFromRobot)).transformBy(cameraToTargetAtProcessTime);
 
-                if(target.getTranslation().getY() >= 30 || bufferedTarget == null)
+                if (target.getTranslation().getY() >= 30 || bufferedTarget == null)
                 {
                     bufferedTarget = target;
                 }
@@ -74,17 +73,18 @@ public class VisionAllignment extends Command
                 Pose2d robotNow = monitor.getLastPositionReport().getValue();
                 Pose2d cameraNow = robotNow.transformBy(cameraDisplacementFromRobot);
 
-                //this vector represents the current position of the camera
-
+                // this vector represents the current position of the camera
                 Pose2d cameraToTargetNow = bufferedTarget.transformBy(cameraNow.inverse());
 
-                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getRadians());
+                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(),
+                    cameraToTargetNow.getTranslation().getY()), 0, cameraToTargetNow.getRotation().getRadians());
                 DriveVelocity velocity = Kinematics.inverseKinematics(cameraToTargetDelta, 250, 1);
 
                 double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
-                if(forwardSpeed > this.maxDriveVelocity)
+                
+                if (forwardSpeed > this.maxDriveVelocity)
                 {
-                    if(lastDriveSignal != null)
+                    if (lastDriveSignal != null)
                     {
                         velocity = lastDriveSignal;
                     } 
@@ -97,7 +97,6 @@ public class VisionAllignment extends Command
 
                 SmartDashboard.putNumber("go left: ", velocity.left);
                 SmartDashboard.putNumber("go right: ",  velocity.right);
-
 
                 int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
                 int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
@@ -113,12 +112,12 @@ public class VisionAllignment extends Command
     {
         boolean isValid = true;
 
-        if(value.getIsTarget() == false)
+        if (value.getIsTarget() == false)
         {
             isValid = false;
         }
 
-        if(value.getHorizontalSideLength() < value.getVerticalSideLength())
+        if (value.getHorizontalSideLength() < value.getVerticalSideLength())
         {
             isValid = false;
         }

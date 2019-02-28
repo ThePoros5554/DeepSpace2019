@@ -41,7 +41,7 @@ public class AdjustWrist extends Command
   @Override
   protected boolean isFinished()
   {
-    return false;
+    return Robot.wrist.isInMode(this.targetMode);
   }
 
   // Called once after isFinished returns true

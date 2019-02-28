@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import frc.robot.commands.drive.MagicDrive;
 import frc.robot.commands.hatch_launcher.ActivateLauncher;
 import frc.robot.commands.hatch_launcher.RetractLauncher;
+import poroslib.commands.auto.Timeout;
 
 public class EjectHatch extends CommandGroup {
   /**
@@ -18,8 +19,9 @@ public class EjectHatch extends CommandGroup {
    */
   public EjectHatch(double backDistance)
   {
-    addSequential(new ActivateLauncher());
-    addSequential(new MagicDrive(backDistance, backDistance, true));
-    addSequential(new RetractLauncher());
+    addParallel(new ActivateLauncher());
+    addParallel(new MagicDrive(backDistance, backDistance, true));
+    addSequential(new Timeout(0.5));
+    addParallel(new RetractLauncher());
   }
 }

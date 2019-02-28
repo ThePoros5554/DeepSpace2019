@@ -19,8 +19,8 @@ public class InitLiftMode extends CommandGroup {
    */
   public InitLiftMode()
   {
-    addSequential(new SetClimbMode());
-    addSequential(new AdjustElevator(ElevatorMode.FLOOR)); 
-    addSequential(new AdjustWrist(WristMode.INSIDE));
+    addParallel(new ToggleClimbMode());
+    addParallel(new AdjustWrist(WristMode.DOWN));
+    addSequential(new AdjustElevator(ElevatorMode.LIFT)); 
   }
 }

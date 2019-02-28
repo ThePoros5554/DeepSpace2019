@@ -20,7 +20,7 @@ public class InitCargoCollectMode extends CommandGroup
    */
   public InitCargoCollectMode()
   {
-    addParallel(new AdjustElevator(ElevatorMode.FLOOR));
-    addSequential(new AdjustWrist(WristMode.DOWN));
+    addParallel(new AdjustWrist(WristMode.COLLECT_CARGO));
+    addSequential(new AdjustElevator(ElevatorMode.COLLECT_CARGO));
   }
 }

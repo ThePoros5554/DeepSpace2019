@@ -19,13 +19,10 @@ public class MoveElevator extends Command
   private double power;
   private JoyAxis powerAxis;
 
-  private double velocity;
-
-
-  public MoveElevator(JoyAxis moveAxis)
+  public MoveElevator(JoyAxis axis)
   {
     requires(Robot.elevator);
-    this.powerAxis = moveAxis;
+    this.powerAxis = axis;
   }
 
   public MoveElevator(double power)
@@ -39,20 +36,19 @@ public class MoveElevator extends Command
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.PercentOutput);
-    this.velocity = 0;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
-    if (powerAxis == null)
+    if (powerAxis != null)
     {
-      Robot.elevator.set(power);
+      Robot.elevator.set(this.powerAxis.GetAxisValue());
     }
     else
     {
-       Robot.elevator.set(this.powerAxis.GetAxisValue());
+      Robot.elevator.set(this.power);
     }
 
     Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition());
@@ -69,7 +65,6 @@ public class MoveElevator extends Command
   @Override
   protected void end()
   {
-    System.out.println("end");
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
   }
 

@@ -18,18 +18,16 @@ public class MoveWrist extends Command
   private double power;
   private JoyAxis powerAxis;
 
-  private double velocity;
-
   public MoveWrist(double power)
   {
     requires(Robot.wrist);
     this.power = power;
   }
 
-  public MoveWrist(JoyAxis powerAxis)
+  public MoveWrist(JoyAxis axis)
   {
     requires(Robot.wrist);
-    this.powerAxis = powerAxis;
+    this.powerAxis = axis;
   }
 
   // Called just before this Command runs the first time
@@ -37,31 +35,22 @@ public class MoveWrist extends Command
   protected void initialize()
   {
     Robot.wrist.setControlMode(ControlMode.PercentOutput);
-    this.velocity = 0;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() 
   {
-      double currentVelocity = Robot.wrist.getWristVelocity(); 
-
-      if(currentVelocity > velocity)
-      {
-        velocity = currentVelocity;
-      }
-
-      if(this.powerAxis != null)
-      {
+    if (this.powerAxis != null)
+    {
       Robot.wrist.set(this.powerAxis.GetAxisValue());
-      }
-      else
-      {
-        Robot.wrist.set(this.power);
-      }
+    }
+    else
+    {
+      Robot.wrist.set(this.power);
+    }
 
-      Robot.wrist.setTargetPosition(Robot.wrist.getCurrentPosition());
-
+    Robot.wrist.setTargetPosition(Robot.wrist.getCurrentPosition());
   }
 
   // Make this return true when this Command no longer needs to run execute()
