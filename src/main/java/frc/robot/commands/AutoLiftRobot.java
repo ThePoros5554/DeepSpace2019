@@ -8,7 +8,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.lifter.LiftRobot;
 
 public class AutoLiftRobot extends CommandGroup {
@@ -18,6 +17,5 @@ public class AutoLiftRobot extends CommandGroup {
   public AutoLiftRobot(double elevatorDownPower)
   {
     addParallel(new LiftRobot());
-    //addSequential(new MoveElevator(elevatorDownPower));
   }
 }

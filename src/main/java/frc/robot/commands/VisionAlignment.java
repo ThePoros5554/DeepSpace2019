@@ -98,9 +98,13 @@ public class VisionAlignment extends Command
                 if(isDriverControl)
                 {
                     if (Robot.drivetrain.IsReversed())
+                    {  
                         forwardValue = -distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                    }
                     else
+                    {
                         forwardValue = distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                    }
                 }
                 else
                 {
@@ -122,8 +126,8 @@ public class VisionAlignment extends Command
                 //     }
                 // }
 
-                SmartDashboard.putNumber("go left: ", velocity.left);
-                SmartDashboard.putNumber("go right: ",  velocity.right);
+                SmartDashboard.putNumber("Go Left:", velocity.left);
+                SmartDashboard.putNumber("Go Right:",  velocity.right);
 
                 int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
                 int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);

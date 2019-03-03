@@ -58,6 +58,8 @@ public class Robot extends TimedRobot
   public static Limelight lime;
 
   private OI oi;
+
+  public static CameraThread rioCamThread;
   
   public enum RobotMode
   {
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot
   }
 
   public static RobotMode mode = RobotMode.HATCH;
-  public static boolean isHook = true;
+  public static boolean isHook = false;
 
   private UpdateRobotState updateRobotState;
 
@@ -78,11 +80,11 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    // subsystems
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
     drivetrain.SetIsReversed(true);
-
     elevator = new Elevator();
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
@@ -90,10 +92,16 @@ public class Robot extends TimedRobot
     hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
+    // oi
     oi = new OI();
 
+    // cameras
     lime = new Limelight();
+    rioCamThread = new CameraThread();
+		rioCamThread.setDaemon(true);
+		rioCamThread.start();
 
+    // autonomous chooser
     autonomousChooser = new SendableChooser<String>();
     autonomousChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
     autonomousChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
@@ -123,8 +131,8 @@ public class Robot extends TimedRobot
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
-     SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
-     SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+    SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
+    SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
 
     // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
@@ -134,13 +142,11 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
     SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
-
-    
     SmartDashboard.putNumber("Elevator Position:", elevator.getCurrentPosition());
 
     SmartDashboard.putNumber("Wrist Position:", wrist.getCurrentPosition());
 
-    SmartDashboard.putNumber("Elevatpr sp", elevator.getTargetPosition());
+    SmartDashboard.putNumber("Elevator sp", elevator.getTargetPosition());
     SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
 
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
@@ -149,7 +155,9 @@ public class Robot extends TimedRobot
 
     SmartDashboard.putBoolean("Elevator Limit", Robot.drivetrain.getIsElevatorLimit());
 
-
+    double timeLeft = 150 - (Timer.getFPGATimestamp() - gameStartTime);
+    SmartDashboard.putBoolean("30 Sec Mark:", timeLeft <= 30);
+    SmartDashboard.putNumber("Time Left:", timeLeft);
   }
 
   /**
@@ -195,7 +203,7 @@ public class Robot extends TimedRobot
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
 
-    if(updateRobotState == null)
+    if (updateRobotState == null)
     {
       updateRobotState = new UpdateRobotState();
     }
@@ -207,8 +215,6 @@ public class Robot extends TimedRobot
 
     elevator.neutralOutput();
     wrist.neutralOutput();
-
-
   }
 
   /**
@@ -224,7 +230,6 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
-
     gameStartTime = Timer.getFPGATimestamp();
 
     drivetrain.resetHeading();
@@ -253,11 +258,6 @@ public class Robot extends TimedRobot
   {
     lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
-
-
-    double currenttime = Timer.getFPGATimestamp() - gameStartTime;
-
-
   }
 
   /**

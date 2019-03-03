@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.Robot.RobotMode;
 import frc.robot.commands.InitHatchCollectMode;
+import frc.robot.commands.DriveStraight;
 import frc.robot.commands.InitCargoCollectMode;
 import frc.robot.commands.InitHatchLowMode;
 import frc.robot.commands.InitCargoLowMode;
@@ -30,7 +31,6 @@ import frc.robot.commands.VisionAlignment;
 import frc.robot.commands.cargo_intake.ActivateIntake;
 import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.hatch_launcher.EjectHatch;
-import frc.robot.commands.hatch_launcher.StopHatchLauncher;
 import frc.robot.commands.lifter.CloseFrontLifters;
 import frc.robot.commands.lifter.CloseRearLifters;
 import frc.robot.commands.lifter.LiftRobot;
@@ -51,6 +51,7 @@ import poroslib.triggers.SmartJoystick;
 public class OI
 {
     // Button Ports
+    private static final int kDriveStraightButton = 2; // TODO: check if right
     private static final int kCollectModeButton = 2; // B
     private static final int kLowModeButton = 1; // A
     private static final int kMiddleModeButton = 3; // X
@@ -81,6 +82,7 @@ public class OI
     private SmartJoystick operatorJoy;
 
     private Button modeButton;
+    private Button driveStraightButton;
     private Button climbModeButton;
     private Button prepareLiftButton;
     private Button moveToVisionTarget;
@@ -114,8 +116,8 @@ public class OI
     private JoyAxis elevatorUpAxis;
 
     private TankDrive defaultDrive;
+    private DriveStraight driveStraight;
     private EjectHatch ejectHatch;
-    private StopHatchLauncher closeHatchLauncher;
     private ActivateIntake collectCargo;
     private ActivateIntake ejectCargo;
     private InitHatchHookCollectMode prepareHatchHookCollect;
@@ -189,6 +191,7 @@ public class OI
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
         climbModeButton = new JoystickButton(operatorJoy, kClimbModeButton);
         moveToVisionTarget = new JoystickButton(rightJoy, kMoveToVisionTargetButton);
+        driveStraightButton = new JoystickButton(rightJoy, kDriveStraightButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
 
         // axis
@@ -199,12 +202,12 @@ public class OI
 
         // commands
         defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
+        driveStraight = new DriveStraight(leftJoy, rightJoy);
 
         prepareHatchCollect = new InitHatchCollectMode();
         prepareHatchLow = new InitHatchLowMode();
         prepareHatchMiddle = new InitHatchMiddleMode();
         prepareHatchHigh = new InitHatchHighMode();
-        closeHatchLauncher = new StopHatchLauncher(operatorJoy);
         ejectHatch = new EjectHatch(operatorJoy);
         
         prepareHatchHookCollect = new InitHatchHookCollectMode();
@@ -254,14 +257,13 @@ public class OI
         prepareHatchLowTrigger.whenActive(prepareHatchLow);
         prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
         prepareHatchHighTrigger.whenActive(prepareHatchHigh);
-        collectHatchTrigger.whenActive(closeHatchLauncher);
-        ejectHatchTrigger.whenActive(ejectHatch);
+        ejectHatchTrigger.whileActive(ejectHatch);
+        
+        // hatch with hook
         prepareHatchHookCollectTrigger.whenActive(prepareHatchHookCollect);
         prepareHatchHookLowTrigger.whenActive(prepareHatchHookLow);
         prepareHatchHookMiddleTrigger.whenActive(prepareHatchHookMiddle);
         prepareHatchHookHighTrigger.whenActive(prepareHatchHookHigh);
-        //collectHatchHookTrigger.whenActive(openSolenoid);
-        //ejectHatchHookTrigger.whenActive(closeSolenoid);
         hookToggleButton.whenActive(toggleHook);
 
         // cargo
@@ -270,7 +272,7 @@ public class OI
         prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
         prepareCargoHighTrigger.whenActive(prepareCargoHigh);
         collectCargoTrigger.whileActive(collectCargo);
-        collectCargoTrigger.whileActive(new RumbleJoystick(operatorJoy, 1));
+        collectCargoTrigger.whileActive(new RumbleJoystick(operatorJoy, 0.6, false));
         ejectCargoTrigger.whileActive(ejectCargo);
         prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
@@ -279,7 +281,7 @@ public class OI
         elevatorDownAxis.whileActive(elevatorDown);
         wristDownAxis.whileActive(wristDown);
         wristUpAxis.whileActive(wristUp);
-
+        driveStraightButton.whileActive(driveStraight);
         moveToVisionTarget.whileActive(visionAllignment);
     }
 }

@@ -17,11 +17,11 @@ public class RumbleJoystick extends Command {
   private double rumble = 0;
   private boolean onlyInit = false;
   
-  public RumbleJoystick(SmartJoystick joystick, double rumblePower)
+  public RumbleJoystick(SmartJoystick joystick, double rumblePower, boolean onlyInit)
   {
     this.joystick = joystick;
     this.rumble = rumblePower;
-    this.onlyInit = true;
+    this.onlyInit = onlyInit;
   }
 
   public RumbleJoystick(SmartJoystick joystick, double rumblePower, double seconds)
