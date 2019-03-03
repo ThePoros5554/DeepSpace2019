@@ -129,6 +129,8 @@ public class Wrist extends Subsystem
 
     master.configOpenloopRamp(kRamp);
 
+    this.targetPosition = getCurrentPosition();
+
     controlMode = ControlMode.PercentOutput;
     set(0);
   }

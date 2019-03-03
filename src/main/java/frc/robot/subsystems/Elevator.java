@@ -120,11 +120,11 @@ public class Elevator extends Subsystem
         // neutral mode
         setNeutralMode(kNeutralMode);
 
-        master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
+        master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
         configProfileSlot(kMotionMagicSlot, kMagicP, kMagicI, kMagicD, kMagicF); // up
-        configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF); // up
+        configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF);
 
-        targetPosition = ElevatorMode.FLOOR.position;
+        this.targetPosition = getCurrentPosition();
 
         controlMode = ControlMode.PercentOutput;
         set(0);
