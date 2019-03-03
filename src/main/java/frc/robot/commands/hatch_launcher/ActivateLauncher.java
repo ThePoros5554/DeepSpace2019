@@ -22,7 +22,8 @@ public class ActivateLauncher extends Command
   protected void initialize()
   {
     Robot.hatchLauncher.launch();
-    System.out.println("launch");
+    Robot.hatchLauncher.stop();
+    System.out.println("Hatch Launcher: launching");
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -35,14 +36,16 @@ public class ActivateLauncher extends Command
   @Override
   protected boolean isFinished()
   {
-    return true;
+    return false;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end()
   {
+    Robot.hatchLauncher.retract();
     Robot.hatchLauncher.stop();
+    System.out.println("Hatch Launcher: retracting");
   }
 
   // Called when another command which requires one or more of the same
