@@ -5,23 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.hatch_launcher;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import frc.robot.commands.elevator.AdjustElevator;
-import frc.robot.commands.wrist.AdjustWrist;
-import frc.robot.subsystems.Elevator.ElevatorMode;
-import frc.robot.subsystems.Wrist.WristMode;
-import poroslib.util.CompareType;
+import frc.robot.commands.drive.MagicDrive;
+import frc.robot.commands.hatch_launcher.ActivateLauncher;
+import poroslib.commands.RumbleJoystick;
+import poroslib.triggers.SmartJoystick;
 
-public class InitCargoCollectMode extends CommandGroup
-{
+public class EjectHatch extends CommandGroup {
   /**
    * Add your docs here.
    */
-  public InitCargoCollectMode()
+  public EjectHatch(SmartJoystick joystickForRumble)
   {
-    addParallel(new AdjustElevator(ElevatorMode.COLLECT_CARGO));
-    addSequential(new AdjustWrist(WristMode.COLLECT_CARGO, 1065, CompareType.GREATER_OR_EQUAL));
+    addParallel(new ActivateLauncher());
+    addParallel(new RumbleJoystick(joystickForRumble, 1));
+    //addSequential(new MagicDrive(backDistance, backDistance, true));
+    //addParallel(new RetractLauncher());
   }
 }

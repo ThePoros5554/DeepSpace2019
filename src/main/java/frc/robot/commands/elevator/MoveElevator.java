@@ -36,6 +36,7 @@ public class MoveElevator extends Command
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.PercentOutput);
+
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -65,7 +66,7 @@ public class MoveElevator extends Command
   @Override
   protected void end()
   {
-    Robot.elevator.setControlMode(ControlMode.MotionMagic);
+    Robot.elevator.setControlMode(ControlMode.Position);
   }
 
   // Called when another command which requires one or more of the same

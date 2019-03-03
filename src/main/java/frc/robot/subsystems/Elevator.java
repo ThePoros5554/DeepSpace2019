@@ -17,36 +17,39 @@ import frc.robot.subsystems.Wrist.WristMode;
 public class Elevator extends Subsystem
 {
     // ports
-    private static final int kElevatorMasterPort = 2;
-
-    // positions for practice robot:
-    private static final int kFloorPosition = 0;
-    private static final int kHatchLowPosition = 10;
-    private static final int kHatchMiddlePosition = 22000;
-    private static final int kHatchHighPosition = 480;
-    private static final int kCargoLowPosition = 50;
-    private static final int kCargoMiddlePosition = 245;
-    private static final int kCargoHighPosition = 500;
+    private final int kElevatorMasterPort = 2;
     
+    // positions
     public static final int kLittleUpPosition = 2000;
-    public static final int kTopOfFirstLevel = 15000;
+    public static final int kWristCanGo90FromHere = 22600;
+    public static final int kTopOfFirstLevel = 2800;
+    public final int kCompletelyDownThreshold = 1410;
     
     // motion gains
-    private static final int kMaxAcceleration = (int)(3126 * 0.8);
-    private static final int kMaxVelocity = (int)(3126 * 0.8);
-    private static final double kP = 0;
-    private static final double kI = 0;
-    private static final double kD = 0;
+    private final int kMotionMagicSlot = 0;
+    private final int kPositionSlot = 1;
+    private final int kMaxAcceleration = 3126;
+    private final int kMaxVelocity = 3126;
+    // private final int kMagicUpSlot = 0;
+    // private final int kMagicDownSlot = 1;
+    private final double kMagicP = 0.7;
+    private final double kMagicI = 0.007;
+    private final double kMagicD = 0;
+    private final double kMagicF =  0.9;
+    private final double kPositionP = 0.5;
+    private final double kPositionI = 0;
+    private final double kPositionD = 0;
+    private final double kPositionF = 0;
 
     // config constants
-    private static final double kVoltage = 10;
-    private static final boolean kInvertEnc = false;
-    private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-    private static final double kRamp = 0;
+    private final double kVoltage = 10;
+    private final boolean kInvertEnc = false;
+    private final NeutralMode kNeutralMode = NeutralMode.Brake;
+    private final double kRamp = 0;
 
-    private static final int kMaxHeight = 47500;
-    private static final int kMinHeight = 0;
-    private static final int kTargetThreshold = 10;
+    private final int kMaxHeight = 47800;
+    private final int kMinHeight = 0;
+    private final int kTargetThreshold = 15;
 
     private WPI_TalonSRX master;
     
@@ -54,15 +57,19 @@ public class Elevator extends Subsystem
 
     public enum ElevatorMode
     {
-        FLOOR(0),
-        COLLECT_CARGO(10),
+        FLOOR(0), //TODO: ADD FLOOR BUTTON
+        COLLECT_CARGO(3670),
+        COLLECT_HATCH_HOOK(1500), 
         COLLECT_HATCH(10),
-        LOW_HATCH(12000),
-        LOW_CARGO(13000),
-        MIDDLE_HATCH(22000),
-        MIDDLE_CARGO(23000),
-        HIGH_HATCH(30000),
-        HIGH_CARGO(31000),
+        LOW_HATCH_HOOK(6200),
+        LOW_HATCH(2150),
+        LOW_CARGO(8960),
+        MIDDLE_HATCH_HOOK(27570),
+        MIDDLE_HATCH(22890),
+        MIDDLE_CARGO(30280),
+        HIGH_HATCH(44000),
+        HIGH_HATCH_HOOK(47400),
+        HIGH_CARGO(47500),
         LIFT(11000);
 
         private final int position;
@@ -88,7 +95,6 @@ public class Elevator extends Subsystem
 
         // limitswitches
         master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyClosed, Robot.drivetrain.GetSwitchDeviceId(), 10);
-
         // softlimits
         configForwardSoftLimitThreshold(kMaxHeight, true);
 
@@ -115,7 +121,8 @@ public class Elevator extends Subsystem
         setNeutralMode(kNeutralMode);
 
         master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10); // TODO: WTF is this
-        configProfileSlot(0, 0.5, 0, 0, 0.6); // up
+        configProfileSlot(kMotionMagicSlot, kMagicP, kMagicI, kMagicD, kMagicF); // up
+        configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF); // up
 
         targetPosition = ElevatorMode.FLOOR.position;
 
@@ -265,9 +272,23 @@ public class Elevator extends Subsystem
 
     public void manageLimits()
     {
-        if (Robot.wrist.getCurrentPosition() < WristMode.UP.getPosition())
+        if (Robot.wrist.getCurrentPosition() < Wrist.kFurtherInLimit && getCurrentPosition() < kCompletelyDownThreshold)
         {
-            configForwardSoftLimitThreshold(0, true);
+            configForwardSoftLimitThreshold(kMinHeight, true);
+        }
+        else
+        {
+            configForwardSoftLimitThreshold(kMaxHeight, true);
+        }
+
+        if (getCurrentPosition() > 33000 && Robot.wrist.getCurrentPosition() < WristMode.UP.getPosition())
+        {
+            configReverseSoftLimitThreshold(33000, true);
+            System.out.println("limited");
+        }
+        else
+        {
+            configReverseSoftLimitThreshold(kMinHeight, false);
         }
     }
 
@@ -284,11 +305,17 @@ public class Elevator extends Subsystem
             this.setSensorPosition(0);
         }
 
-        manageLimits();
+       manageLimits();
 
         if (this.controlMode == ControlMode.MotionMagic)
         {
-          master.set(ControlMode.MotionMagic, targetPosition);
+            this.selectProfileSlot(kMotionMagicSlot);
+            master.set(ControlMode.MotionMagic, targetPosition);
+        }
+        else if(this.controlMode == ControlMode.Position)
+        {
+            this.selectProfileSlot(kPositionSlot);
+            master.set(ControlMode.Position, targetPosition);
         }
     }
 }

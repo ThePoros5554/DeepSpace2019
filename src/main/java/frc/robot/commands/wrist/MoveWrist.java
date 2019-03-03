@@ -43,7 +43,7 @@ public class MoveWrist extends Command
   {
     if (this.powerAxis != null)
     {
-      Robot.wrist.set(this.powerAxis.GetAxisValue());
+      Robot.wrist.set(this.powerAxis.GetAxisValue() * 0.7);
     }
     else
     {

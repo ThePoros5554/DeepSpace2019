@@ -65,6 +65,7 @@ public class Robot extends TimedRobot
   }
 
   public static RobotMode mode = RobotMode.HATCH;
+  public static boolean isHook = true;
 
   private UpdateRobotState updateRobotState;
 
@@ -80,12 +81,13 @@ public class Robot extends TimedRobot
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
     drivetrain = new Drivetrain(this.masterLeft, this.masterRight);
-    
+    drivetrain.SetIsReversed(true);
+
     elevator = new Elevator();
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
-    //hatchLauncher = new HatchLauncher();
+    hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
     oi = new OI();
@@ -116,31 +118,34 @@ public class Robot extends TimedRobot
   {
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
-    // SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+
+    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
-    // SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
-    // SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+     SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
+     SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
 
     // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
     // SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
 
-
     SmartDashboard.putNumber("target x: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getX());
     SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
     SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("Elevator Position", elevator.getCurrentPosition());
 
-    SmartDashboard.putNumber("Wrist Position", wrist.getCurrentPosition());
+    
+    SmartDashboard.putNumber("Elevator Position:", elevator.getCurrentPosition());
 
-    SmartDashboard.putNumber("Ele sp", elevator.getTargetPosition());
+    SmartDashboard.putNumber("Wrist Position:", wrist.getCurrentPosition());
+
+    SmartDashboard.putNumber("Elevatpr sp", elevator.getTargetPosition());
     SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
 
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
+    SmartDashboard.putBoolean("Hook Mode", Robot.isHook == true);
 
     SmartDashboard.putBoolean("Elevator Limit", Robot.drivetrain.getIsElevatorLimit());
 
@@ -169,6 +174,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledPeriodic()
   {
+    lime.setLedMode(LimelightLedMode.ForceOff);
     Scheduler.getInstance().run();
   }
 
@@ -186,8 +192,6 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
-    lime.setLedMode(LimelightLedMode.ForceOn);
-
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
 
@@ -213,13 +217,13 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousPeriodic()
   {
+    lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
   }
 
   @Override
   public void teleopInit()
   {
-    lime.setLedMode(LimelightLedMode.ForceOn);
 
     gameStartTime = Timer.getFPGATimestamp();
 
@@ -247,7 +251,7 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
-
+    lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
 
 

@@ -28,39 +28,39 @@ public class Drivetrain extends DiffDrivetrain
   // ports
   public static final int kFrontLeftPort = 0; // Talon SRX with encoder
   public static final int kFrontRightPort = 1; // Talon SRX with encoder
-  private static final int kMiddleLeftPort = 1; // Talon SRX
-  private static final int kMiddleRightPort = 3; // Talon SRX
-  private static final int kRearLeftPort = 5; // Victor SPX
-  private static final int kRearRightPort = 6; // Victor SPX
+  private final int kMiddleLeftPort = 5; // Talon SRX
+  private final int kMiddleRightPort = 6; // Talon SRX
+  private final int kRearLeftPort = 1; // Victor SPX
+  private final int kRearRightPort = 3; // Victor SPX
 
   // motion gains
   
   // motion magic
-  private static final int kMagicSlot = 0; 
-  private static final double kMagicP = 0.005; 
-  private static final double kMagicI = 0;
-  private static final double kMagicD = 0;
-  private static final double kMagicF = 0.132; //kf = 1023/7750
+  private final int kMagicSlot = 0; 
+  private final double kMagicP = 0.005; 
+  private final double kMagicI = 0;
+  private final double kMagicD = 0;
+  private final double kMagicF = 0.132; //kf = 1023/7750
   
   // position
-  private static final int kPositionSlot = 1; 
-  private static final double kPositionP = 0.03; 
-  private static final double kPositionI = 0.000002;
-  private static final int kPositionIZone = 30000;
-  private static final double kPositionD = 0.1;
-  private static final double kPositionF = 0;
+  private final int kPositionSlot = 1; 
+  private final double kPositionP = 0.025; 
+  private final double kPositionI = 0.00003;
+  private final int kPositionIZone = 40000;
+  private final double kPositionD = 0.1;
+  private final double kPositionF = 0;
 
   // config constants
-  private static final double kVoltage = 12;
+  private final double kVoltage = 12;
   private static final double kWheelDiameter = 10.16 * Math.PI;
   private static final double kEncoderTicks = 4096;
-  private static final boolean kInvertEncLeft = false;
-  private static final boolean kInvertEncRight = true;
-  private static final double kRamp = 0;
-  public static final double kEjectDriveBackDistance = 14.3;
+  private final boolean kInvertEncLeft = true;
+  private final boolean kInvertEncRight = true;
+  private final double kRamp = 0;
+  public final double kEjectDriveBackDistance = 14.3;
   //public static final double TRACKWIDTH = 72.5;
-  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final int kTargetThreshold = 0;
+  private final NeutralMode kNeutralMode = NeutralMode.Brake;
+  private final int kTargetThreshold = 0;
 
   //
 
@@ -96,8 +96,8 @@ public class Drivetrain extends DiffDrivetrain
     this.rearRight.follow(this.masterRight);
 
     // invertion
-    this.masterLeft.setInverted(InvertType.InvertMotorOutput);
-    this.masterRight.setInverted(InvertType.InvertMotorOutput);
+    this.masterLeft.setInverted(InvertType.None);
+    this.masterRight.setInverted(InvertType.None);
     this.middleLeft.setInverted(InvertType.FollowMaster);
     this.middleRight.setInverted(InvertType.FollowMaster);
     this.rearLeft.setInverted(InvertType.FollowMaster);
@@ -215,7 +215,7 @@ public class Drivetrain extends DiffDrivetrain
   @Override
   public int getRawLeftPosition()
   {
-    return this.masterLeft.getSelectedSensorPosition(); // TODO: if not good change left phase to true and add - here (though should work?)
+    return -this.masterLeft.getSelectedSensorPosition(); // TODO: if not good change left phase to true and add - here (though should work?)
   }
 
   @Override
@@ -226,7 +226,7 @@ public class Drivetrain extends DiffDrivetrain
 
   public double getLeftPositionInCm()
   {
-    return rotationsToCm(getRawLeftPosition());
+    return -rotationsToCm(getRawLeftPosition());
   }
 
   public double getRightPositionInCm()
@@ -234,7 +234,7 @@ public class Drivetrain extends DiffDrivetrain
     return rotationsToCm(getRawRightPosition());
   }
 
-  public double rotationsToCm(int rotations)
+  public static double rotationsToCm(int rotations)
   {
     return rotations * kWheelDiameter / kEncoderTicks;
   }

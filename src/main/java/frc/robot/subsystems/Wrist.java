@@ -20,43 +20,50 @@ import frc.robot.Robot;
 public class Wrist extends Subsystem
 {
   // ports
-  private static final int kWristPort = 3;
+  private final int kWristPort = 3;
 
   // positions
-  private static final int kDownPosition = 2895;
-  private static final int kInsidePosition = 1000;
-  private static final int kUpPosition = 1830;
-  private static final int kCargoHighPosition = 2000;
-  private static final int kDownExtendedPosition = 3100;
+  private final int kBackLimitForElevatorPosition = 1980;
+  public static final int kFurtherInLimit = 1410;
 
   // motion gains
-  public static final int kMagicUpSlot = 0;
-  public static final int kMagicDownSlot = 1;
-  public static final double kUpP = 1;
-  public static final double kUpI = 0;
-  public static final double kUpD = 0.1;
-  public static final double kUpF = 2.046;
-  public static final double kDownP = 1;
-  public static final double kDownI = 0;
-  public static final double kDownD = 0.1;
-  public static final double kDownF = 2.046;
+  private final int kPositionSlot = 2;
+  private final int kMagicSlot = 0;
+  // private final int kMagicUpSlot = 0;
+  // private final int kMagicDownSlot = 1;
+  private final double kMagicP = 1;
+  private final double kMagicI = 0;
+  private final double kMagicD = 0.1;
+  private final double kMagicF = 2.046;
+  private final double kPositionP = 0.1;
+  private final double kPositionI = 0;
+  private final double kPositionD = 0;
+  private final double kPositionF = 0;
+  // private final double kUpP = 1;
+  // private final double kUpI = 0;
+  // private final double kUpD = 0.1;
+  // private final double kUpF = 2.046;
+  // private final double kDownP = 1;
+  // private final double kDownI = 0;
+  // private final double kDownD = 0.1;
+  // private final double kDownF = 2.046;
   
 
   // config constants
-  private static final int kMaxTilt = 2885;
-  private static final int kMinTilt = 1000;
-  private static final double kVoltage = 10;
+  private final int kMaxTilt = 2825;
+  private final int kMinTilt = 1000;
+  private final double kVoltage = 10;
 
   private int maxPositionLimit = kMaxTilt;
   private int minPositionLimit = kMinTilt;
 
-  private static final int kMaxAcceleration = 500;
-  private static final int kMaxVelocity = 500;
+  private final int kMaxAcceleration = 500;
+  private final int kMaxVelocity = 500;
 
-  private static final NeutralMode kNeutralMode = NeutralMode.Brake;
-  private static final boolean kInvertEnc = true;
-  private static final double kRamp = 0.2;
-  private static final int kTargetThreshold = 2;
+  private final NeutralMode kNeutralMode = NeutralMode.Brake;
+  private final boolean kInvertEnc = true;
+  private final double kRamp = 0.2;
+  private final int kTargetThreshold = 2;
 
   private WPI_TalonSRX master;
 
@@ -64,11 +71,11 @@ public class Wrist extends Subsystem
 
   public enum WristMode
   {
-    UP(kUpPosition),
-    DOWN(kDownPosition),
-    INSIDE(kInsidePosition),
-    COLLECT_CARGO(kDownExtendedPosition),
-    HIGH_CARGO(kCargoHighPosition);
+    UP(1780),
+    DOWN(2825),
+    INSIDE(1000),
+    COLLECT_CARGO(3100),
+    HIGH_CARGO(2450);
     
     private final int position;
 
@@ -113,8 +120,11 @@ public class Wrist extends Subsystem
     
     // motion parameters
     master.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
-    configProfileSlot(kMagicUpSlot, kMagicUpSlot, kUpI, kUpD, kUpF); // up
-    configProfileSlot(kMagicDownSlot, kDownP, kDownI, kDownD, kDownF); // TODO: check for down
+    configProfileSlot(kPositionSlot, kPositionP, kPositionI, kPositionD, kPositionF);
+    configProfileSlot(kMagicSlot, kMagicP, kMagicI, kMagicD, kMagicF); // up
+    //configProfileSlot(kMagicUpSlot, kUpP, kUpI, kUpD, kUpF); // up
+    //configProfileSlot(kMagicDownSlot, kDownP, kDownI, kDownD, kDownF); // TODO: check for down
+
     setNeutralMode(kNeutralMode);
 
     master.configOpenloopRamp(kRamp);
@@ -201,33 +211,33 @@ public class Wrist extends Subsystem
 	/*
 	 * choose which set of gains to use based on direction of travel.
 	 */
-  public void manageMotion()
-  {  
-    double currentPosition = getCurrentPosition();
+  // public void manageMotion()
+  // {  
+  //   double currentPosition = getCurrentPosition();
 
-    if (currentPosition > WristMode.UP.position) // outside robot
-    {
-      if (currentPosition < this.targetPosition) // if moving down
-      {
-				selectProfileSlot(kMagicDownSlot);
-      }
-      else
-      {
-				selectProfileSlot(kMagicUpSlot);
-      }
-    }
-    else // outside robot
-    {
-      if (currentPosition > this.targetPosition) // if moving down
-      {
-				selectProfileSlot(kMagicDownSlot);
-      }
-      else // moving up
-      {
-				selectProfileSlot(kMagicUpSlot);
-      }
-		}
-	}
+  //   if (currentPosition > WristMode.UP.position) // outside robot
+  //   {
+  //     if (currentPosition < this.targetPosition) // if moving down
+  //     {
+	// 			selectProfileSlot(kMagicDownSlot);
+  //     }
+  //     else
+  //     {
+	// 			selectProfileSlot(kMagicUpSlot);
+  //     }
+  //   }
+  //   else // outside robot
+  //   {
+  //     if (currentPosition > this.targetPosition) // if moving down
+  //     {
+	// 			selectProfileSlot(kMagicDownSlot);
+  //     }
+  //     else // moving up
+  //     {
+	// 			selectProfileSlot(kMagicUpSlot);
+  //     }
+	// 	}
+	// }
 
   /*
    * limits wrist from colliding with the robot, the floor and the elevator.
@@ -237,24 +247,24 @@ public class Wrist extends Subsystem
     int elevatorPosition = Robot.elevator.getCurrentPosition();
 
     // if elevator is within the first level, wrist can be rotated inside the robot. else, limit wrist to upright position:
-    if (elevatorPosition < Elevator.kTopOfFirstLevel)
+    if (elevatorPosition > Elevator.kTopOfFirstLevel && elevatorPosition < Elevator.kWristCanGo90FromHere)
     {
-			this.minPositionLimit = kMinTilt;
+      this.minPositionLimit = kBackLimitForElevatorPosition;
+      
+      if (this.targetPosition < kBackLimitForElevatorPosition)
+      {
+        this.targetPosition = kBackLimitForElevatorPosition;
+			}
     }
     else
     {
-			this.minPositionLimit = kUpPosition;
-      
-      if (this.targetPosition < kUpPosition)
-      {
-        this.targetPosition = kUpPosition;
-			}
+			this.minPositionLimit = kMinTilt;
     }
 
     // if elevator is a little up, wrist can be rotated further down. else, limit wrist to floor position:
     if (elevatorPosition > Elevator.kLittleUpPosition)
     {
-      this.maxPositionLimit = kDownExtendedPosition;
+      this.maxPositionLimit = WristMode.COLLECT_CARGO.position;
     }
     else
     {
@@ -263,7 +273,7 @@ public class Wrist extends Subsystem
       if (this.targetPosition > kMaxTilt)
       {
         this.targetPosition = kMaxTilt;
-			}
+      }
     }
     
     this.master.configReverseSoftLimitThreshold(this.minPositionLimit);
@@ -316,8 +326,13 @@ public class Wrist extends Subsystem
 
     if (this.controlMode == ControlMode.MotionMagic)
     {
-      manageMotion();
+      this.selectProfileSlot(kMagicSlot); // switch with ManageMotion() if necessary
       master.set(ControlMode.MotionMagic, targetPosition);
+    }
+    else if(this.controlMode == ControlMode.Position)
+    {
+      this.selectProfileSlot(kPositionSlot);
+      master.set(ControlMode.Position, targetPosition);
     }
   }
 }

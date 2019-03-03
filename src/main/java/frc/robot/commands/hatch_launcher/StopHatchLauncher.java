@@ -5,21 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.hatch_launcher;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import frc.robot.commands.drive.MagicDrive;
-import frc.robot.commands.hatch_launcher.ActivateLauncher;
-import frc.robot.commands.hatch_launcher.RetractLauncher;
-import poroslib.commands.auto.Timeout;
+import poroslib.commands.RumbleJoystick;
+import poroslib.triggers.SmartJoystick;
 
-public class EjectHatch extends CommandGroup {
+public class StopHatchLauncher extends CommandGroup {
   /**
    * Add your docs here.
    */
-  public EjectHatch(double backDistance)
+  public StopHatchLauncher(SmartJoystick joystickForStopRumble)
   {
-    addParallel(new ActivateLauncher());
+    addParallel(new RetractLauncher());
+    addParallel(new RumbleJoystick(joystickForStopRumble, 0));
     //addSequential(new MagicDrive(backDistance, backDistance, true));
     //addParallel(new RetractLauncher());
   }

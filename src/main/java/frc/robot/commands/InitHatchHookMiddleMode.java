@@ -12,16 +12,15 @@ import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.wrist.AdjustWrist;
 import frc.robot.subsystems.Elevator.ElevatorMode;
 import frc.robot.subsystems.Wrist.WristMode;
-import poroslib.util.CompareType;
 
-public class InitCargoCollectMode extends CommandGroup
+public class InitHatchHookMiddleMode extends CommandGroup
 {
   /**
    * Add your docs here.
    */
-  public InitCargoCollectMode()
+  public InitHatchHookMiddleMode()
   {
-    addParallel(new AdjustElevator(ElevatorMode.COLLECT_CARGO));
-    addSequential(new AdjustWrist(WristMode.COLLECT_CARGO, 1065, CompareType.GREATER_OR_EQUAL));
+    addParallel(new AdjustWrist(WristMode.DOWN));
+    addSequential(new AdjustElevator(ElevatorMode.MIDDLE_HATCH_HOOK));
   }
 }

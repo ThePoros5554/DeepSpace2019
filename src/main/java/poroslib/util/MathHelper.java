@@ -22,6 +22,7 @@ public class MathHelper
     	}
     	
         return newValue;
-    }
+	}
+	
 }
 

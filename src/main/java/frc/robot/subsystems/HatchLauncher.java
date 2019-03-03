@@ -7,16 +7,19 @@
 
 package frc.robot.subsystems;
 
-import poroslib.subsystems.DoubleSolenoidSys;
+import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 /**
  * Add your docs here.
  */
-public class HatchLauncher extends DoubleSolenoidSys {
+public class HatchLauncher extends Subsystem
+{
 
   // ports
-  public static final int kSolenoidForwardPort = 7;
-  public static final int kSolenoidReversePort = 6;
+  public static final int kSolenoidPort = 0;
+
+  private DoubleSolenoid launcher;
 
   public enum LauncherPistonsMode
   {
@@ -27,15 +30,30 @@ public class HatchLauncher extends DoubleSolenoidSys {
 
   public HatchLauncher()
   {
-    super(kSolenoidForwardPort, kSolenoidReversePort);
+    launcher = new DoubleSolenoid(6,7);
 
     this.currentMode = LauncherPistonsMode.CLOSED;
-    off();
+    stop();
   }
 
   public LauncherPistonsMode getCurrentMode()
   {
     return this.currentMode;
+  }
+
+  public void launch()
+  {
+    this.launcher.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void retract()
+  {
+    this.launcher.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  public void stop()
+  {
+    this.launcher.set(DoubleSolenoid.Value.kOff);
   }
 
   @Override

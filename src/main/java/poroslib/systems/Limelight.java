@@ -11,7 +11,6 @@ import poroslib.position.geometry.Translation2d;
 
 public class Limelight
 {
-
     private NetworkTable limelightTable;
 
     private NetworkTableEntry tHorizontalOffset;

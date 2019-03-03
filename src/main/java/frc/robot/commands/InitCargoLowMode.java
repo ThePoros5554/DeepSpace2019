@@ -20,7 +20,7 @@ public class InitCargoLowMode extends CommandGroup
    */
   public InitCargoLowMode()
   {
-    addParallel(new AdjustWrist(WristMode.DOWN));
+    addParallel(new AdjustWrist(WristMode.HIGH_CARGO));
     addSequential(new AdjustElevator(ElevatorMode.LOW_CARGO));
   }
 }

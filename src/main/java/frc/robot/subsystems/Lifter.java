@@ -8,8 +8,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
@@ -18,10 +16,10 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Lifter extends Subsystem
 { 
   // ports
-  private static final int kFrontSolenoidForwardPort = 0;
-  private static final int kFrontSolenoidReversePort = 0;
-  private static final int kRearSolenoidForwardPort = 0;
-  private static final int kRearSolenoidReversePort = 0;
+  private final int kFrontSolenoidForwardPort = 0;
+  private final int kFrontSolenoidReversePort = 0;
+  private final int kRearSolenoidForwardPort = 0;
+  private final int kRearSolenoidReversePort = 0;
 
   private DoubleSolenoid frontPistons;
   private DoubleSolenoid rearPistons;

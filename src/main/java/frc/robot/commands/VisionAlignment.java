@@ -8,7 +8,6 @@ import frc.robot.Robot;
 import frc.robot.RobotMonitor;
 import frc.robot.subsystems.Drivetrain;
 import poroslib.position.VisionInfo;
-import poroslib.position.geometry.Kinematics;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Twist2d;
 import poroslib.position.geometry.Kinematics.DriveVelocity;
@@ -31,14 +30,16 @@ public class VisionAlignment extends Command
     private final double distanceGain = 0.5;
 
     private SmartJoystick leftJoy;
+    private SmartJoystick rightJoy;
     private boolean isDriverControl;
 
 
-    public VisionAlignment(SmartJoystick leftJoy, boolean isDriverControl)
+    public VisionAlignment(SmartJoystick leftJoy, SmartJoystick rightJoy, boolean isDriverControl)
     {
         driveTrain = Robot.drivetrain;
         monitor = RobotMonitor.getRobotMonitor();
         this.leftJoy = leftJoy;
+        this.rightJoy = rightJoy;
         this.isDriverControl = isDriverControl;
 
         requires(driveTrain);
@@ -57,6 +58,7 @@ public class VisionAlignment extends Command
     {
         if (monitor.getLastVisionReport() != null)
         {
+
             Entry<Double, VisionInfo> visionData = monitor.getLastVisionReport();
 
             double processTimeStamp = visionData.getKey();
@@ -90,17 +92,21 @@ public class VisionAlignment extends Command
 
                 //angle portion for the position loop
                 double delta_v = headingGain * cameraToTargetDelta.dtheta;
+
                 
                 double forwardValue;
                 if(isDriverControl)
                 {
-                    forwardValue = distanceGain * (leftJoy.GetSpeedAxis() * -250);
+                    if (Robot.drivetrain.IsReversed())
+                        forwardValue = -distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                    else
+                        forwardValue = distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
                 }
                 else
                 {
                     forwardValue = distanceGain * cameraToTargetDelta.dx;
                 }
-                DriveVelocity velocity = new DriveVelocity(forwardValue + delta_v, forwardValue -delta_v);
+                DriveVelocity velocity = new DriveVelocity(forwardValue - delta_v, forwardValue + delta_v);
 
                 // double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
                 // if(forwardSpeed > this.maxDriveVelocity)
