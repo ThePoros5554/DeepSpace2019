@@ -18,7 +18,7 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     public DiffDrivetrain(SpeedController leftController, SpeedController rightController)
     {
     	driver = new DifferentialDriver(leftController , rightController);
-    }
+		}
     
     public DiffDrivetrain(SpeedController leftController, SpeedController rightController, boolean isReversed)
     {
@@ -40,6 +40,12 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     	{
     		driver.arcadeDrive(speed, rotate, this.isSquared);
     	}
+		}
+		
+		public void curvatureDrive(double speed, double rotate, boolean rotateInPlace, double maxOutput)
+    {
+			this.driver.setMaxOutput(maxOutput);
+    	this.driver.curvatureDrive(speed, rotate, rotateInPlace);
     }
     
     public void tankDrive(double leftSpeed ,double rightSpeed, double maxOutput)
