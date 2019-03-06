@@ -44,10 +44,10 @@ public class Drivetrain extends DiffDrivetrain
   
   // position
   private final int kPositionSlot = 1; 
-  private final double kPositionP = 0.025; 
-  private final double kPositionI = 0.00003;
-  private final int kPositionIZone = 40000;
-  private final double kPositionD = 0.1;
+  private final double kPositionP = 0.02; 
+  private final double kPositionI = 0.000009;
+  private final int kPositionIZone = 80000;
+  private final double kPositionD = 0;
   private final double kPositionF = 0;
 
   // config constants

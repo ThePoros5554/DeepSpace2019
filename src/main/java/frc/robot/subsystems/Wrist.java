@@ -57,8 +57,10 @@ public class Wrist extends Subsystem
   private int maxPositionLimit = kMaxTilt;
   private int minPositionLimit = kMinTilt;
 
-  private final int kMaxAcceleration = 500;
-  private final int kMaxVelocity = 500;
+  public static final int kMaxAcceleration = 500;
+  public static int kMaxVelocity = 500;
+  public static final int kMaxAccelerationSpecial = 200;
+  public static final int kMaxVelocitySpecial = 200;
 
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final boolean kInvertEnc = true;

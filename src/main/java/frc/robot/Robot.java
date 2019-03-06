@@ -11,7 +11,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.IMUProtocol.GyroUpdate;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GyroBase;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -60,6 +62,8 @@ public class Robot extends TimedRobot
   private OI oi;
 
   public static CameraThread rioCamThread;
+  private Notifier cameraLoop;
+
   
   public enum RobotMode
   {
@@ -67,11 +71,15 @@ public class Robot extends TimedRobot
   }
 
   public static RobotMode mode = RobotMode.HATCH;
-  public static boolean isHook = false;
+  public static boolean isHook = true;
 
   private UpdateRobotState updateRobotState;
 
   private double gameStartTime;
+
+  public Robot()
+  {
+  }
 
   /**
    * This function is run when the robot is first started up and should be
@@ -92,14 +100,15 @@ public class Robot extends TimedRobot
     hatchLauncher = new HatchLauncher();
     // lifter = new Lifter();
 
+
     // oi
     oi = new OI();
 
     // cameras
     lime = new Limelight();
     rioCamThread = new CameraThread();
-		rioCamThread.setDaemon(true);
-		rioCamThread.start();
+    rioCamThread.setDaemon(true);
+    rioCamThread.start();
 
     // autonomous chooser
     autonomousChooser = new SendableChooser<String>();
@@ -127,12 +136,12 @@ public class Robot extends TimedRobot
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
 
-    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    // SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
-    SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
-    SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+    // SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
+    // SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
 
     // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
@@ -146,8 +155,8 @@ public class Robot extends TimedRobot
 
     SmartDashboard.putNumber("Wrist Position:", wrist.getCurrentPosition());
 
-    SmartDashboard.putNumber("Elevator sp", elevator.getTargetPosition());
-    SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
+    // SmartDashboard.putNumber("Elevator sp", elevator.getTargetPosition());
+    // SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
 
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
@@ -182,7 +191,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledPeriodic()
   {
-    lime.setLedMode(LimelightLedMode.ForceOff);
+    lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
   }
 
