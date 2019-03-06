@@ -58,7 +58,7 @@ public class Elevator extends Subsystem
     public enum ElevatorMode
     {
         FLOOR(0), //TODO: ADD FLOOR BUTTON
-        COLLECT_CARGO(3670),
+        COLLECT_CARGO(4780),
         COLLECT_HATCH_HOOK(1500), 
         COLLECT_HATCH(10),
         LOW_HATCH_HOOK(6200),
@@ -68,7 +68,7 @@ public class Elevator extends Subsystem
         MIDDLE_HATCH(22890),
         MIDDLE_CARGO(30280),
         HIGH_HATCH(44000),
-        HIGH_HATCH_HOOK(47400),
+        HIGH_HATCH_HOOK(45150),
         HIGH_CARGO(47500),
         LIFT(11000);
 
