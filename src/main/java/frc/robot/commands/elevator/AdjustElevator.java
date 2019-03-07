@@ -16,11 +16,18 @@ import frc.robot.subsystems.Elevator.ElevatorMode;
 public class AdjustElevator extends Command
 {
   private ElevatorMode targetMode;
+  private int fromCurrentPosition;
   
   public AdjustElevator(ElevatorMode mode)
   {
     requires(Robot.elevator);
     this.targetMode = mode;
+  }
+    
+  public AdjustElevator(int valueToGoFromCurrentPosition)
+  {
+    requires(Robot.elevator);
+    this.fromCurrentPosition = valueToGoFromCurrentPosition;
   }
 
   // Called just before this Command runs the first time
@@ -28,7 +35,15 @@ public class AdjustElevator extends Command
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    Robot.elevator.setTargetMode(this.targetMode);
+    
+    if (this.targetMode == null)
+    {
+      Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition() + this.fromCurrentPosition);
+    }
+    else
+    {
+      Robot.elevator.setTargetMode(this.targetMode);
+    }
   }
 
   // Called repeatedly when this Command is scheduled to run
