@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.Robot.RobotMode;
 import frc.robot.commands.InitHatchCollectMode;
+import frc.robot.commands.CollectHatchFromFloor;
 import frc.robot.commands.DriveStraight;
 import frc.robot.commands.InitCargoCollectMode;
 import frc.robot.commands.InitHatchLowMode;
@@ -29,6 +30,7 @@ import frc.robot.commands.ToggleGamepieceMode;
 import frc.robot.commands.ToggleHookMode;
 import frc.robot.commands.VisionAlignment;
 import frc.robot.commands.cargo_intake.ActivateIntake;
+import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.hatch_launcher.EjectHatch;
 import frc.robot.commands.lifter.CloseFrontLifters;
@@ -40,7 +42,6 @@ import frc.robot.subsystems.CargoIntake;
 import frc.robot.triggers.HatchModeTrigger;
 import frc.robot.triggers.ModeTrigger;
 import poroslib.commands.CurvatureDrive;
-import poroslib.commands.GTADrive;
 import poroslib.commands.RumbleJoystick;
 import poroslib.commands.TankDrive;
 import poroslib.triggers.JoyAxis;
@@ -54,7 +55,7 @@ import poroslib.triggers.SmartJoystick;
 public class OI
 {
     // Button Ports
-    private static final int kDriveStraightButton = 2; // TODO: check if right
+    private static final int kDriveStraightButton = 2; // SIDE BUTTON
     private static final int kCollectModeButton = 2; // B
     private static final int kLowModeButton = 1; // A
     private static final int kMiddleModeButton = 3; // X
@@ -75,14 +76,16 @@ public class OI
     private static final int kMoveToVisionTargetButton = 1; // DRIVER TRIGGER
 
     // Joystick Ports
-    private static final int kDriverLeftJoystickPort = 0;
-    private static final int kDriverRightJoystickPort = 1;
-    private static final int kOperatorJoystickPort = 2;
+    // private static final int kDriverLeftJoystickPort = 0;
+    // private static final int kDriverRightJoystickPort = 1;
+    private static final int kDriverJoyPort = 0;
+    private static final int kOperatorJoystickPort = 1; // change to 2 if using logitech joysticks again
     
     //
 
-    private SmartJoystick leftJoy;
-    private SmartJoystick rightJoy;
+    // private SmartJoystick leftJoy;
+    // private SmartJoystick rightJoy;
+    private SmartJoystick driverJoy;
     private SmartJoystick operatorJoy;
 
     private Button modeButton;
@@ -121,9 +124,12 @@ public class OI
     private JoyAxis elevatorUpAxis;
 
     //private TankDrive defaultDrive;
-    private CurvatureDrive gtaDrive;
+    private CurvatureDrive poroDrive;
     private DriveStraight driveStraight;
+    private CollectHatchFromFloor collectHatch;
     private EjectHatch ejectHatch;
+    private AdjustElevator collectHatchHook;
+    private AdjustElevator ejectHatchHook;
     private ActivateIntake collectCargo;
     private ActivateIntake ejectCargo;
     private InitHatchHookCollectMode prepareHatchHookCollect;
@@ -159,13 +165,14 @@ public class OI
         /************** Initialize **************/
 
         // joysticks
-        leftJoy = new SmartJoystick(kDriverLeftJoystickPort);
-        rightJoy = new SmartJoystick(kDriverRightJoystickPort);
-        operatorJoy = new SmartJoystick(kOperatorJoystickPort);
+        //leftJoy = new SmartJoystick(kDriverLeftJoystickPort);
+        //rightJoy = new SmartJoystick(kDriverRightJoystickPort);
         //leftJoy.SetSpeedAxis(1);
         //rightJoy.SetSpeedAxis(1);
-        leftJoy.SetSpeedAxis(1);
-        leftJoy.SetRotateAxis(4);
+        driverJoy = new SmartJoystick(kDriverJoyPort);
+        operatorJoy = new SmartJoystick(kOperatorJoystickPort);
+        driverJoy.SetSpeedAxis(1);
+        driverJoy.SetRotateAxis(4);
         Robot.drivetrain.SetIsRanged(true);
 
         // buttons and triggers
@@ -173,7 +180,7 @@ public class OI
         prepareHatchLowTrigger = new HatchModeTrigger(operatorJoy, kLowModeButton, false);
         prepareHatchMiddleTrigger = new HatchModeTrigger(operatorJoy, kMiddleModeButton, false);
         prepareHatchHighTrigger = new HatchModeTrigger(operatorJoy, kHighModeButton, false);
-        // collectHatchTrigger = new HatchModeTrigger(operatorJoy, kCollectPartButton, false);
+        collectHatchTrigger = new HatchModeTrigger(operatorJoy, kCollectPartButton, false);
         ejectHatchTrigger = new HatchModeTrigger(operatorJoy, kEjectPartButton, false);
 
         wristDownStart = new WristDownStart();
@@ -201,8 +208,8 @@ public class OI
         hookToggleButton = new ModeTrigger(operatorJoy, kHatchModeButton, RobotMode.HATCH);
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
         climbModeButton = new JoystickButton(operatorJoy, kClimbModeButton);
-        moveToVisionTarget = new JoystickButton(leftJoy, kMoveToVisionTargetButton);
-        driveStraightButton = new JoystickButton(rightJoy, kDriveStraightButton);
+        moveToVisionTarget = new JoystickButton(driverJoy, kMoveToVisionTargetButton);
+        // driveStraightButton = new JoystickButton(rightJoy, kDriveStraightButton);
         // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
 
         // axis
@@ -212,20 +219,23 @@ public class OI
         wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, -1, -0.2);
 
         // commands
-        gtaDrive = new CurvatureDrive(Robot.drivetrain, leftJoy);
-        //defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
-        driveStraight = new DriveStraight(leftJoy, rightJoy);
+        poroDrive = new CurvatureDrive(Robot.drivetrain, driverJoy);
+        // defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
+        // driveStraight = new DriveStraight(leftJoy, rightJoy);
 
         prepareHatchCollect = new InitHatchCollectMode();
         prepareHatchLow = new InitHatchLowMode();
         prepareHatchMiddle = new InitHatchMiddleMode();
         prepareHatchHigh = new InitHatchHighMode();
+        collectHatch = new CollectHatchFromFloor();
         ejectHatch = new EjectHatch(operatorJoy);
         
         prepareHatchHookCollect = new InitHatchHookCollectMode();
         prepareHatchHookLow = new InitHatchHookLowMode();
         prepareHatchHookMiddle = new InitHatchHookMiddleMode();
         prepareHatchHookHigh = new InitHatchHookHighMode();
+        collectHatchHook = new AdjustElevator(-800);
+        ejectHatchHook = new AdjustElevator(800);
 
         prepareCargoCollect = new InitCargoCollectMode();
         prepareCargoLow = new InitCargoLowMode();
@@ -248,53 +258,57 @@ public class OI
 
         toggleGamepiece = new ToggleGamepieceMode();
         toggleHook = new ToggleHookMode();
-        visionAllignment = new VisionAlignment(leftJoy, rightJoy, true);
+        // visionAllignment = new VisionAlignment(leftJoy, rightJoy, true);
+        visionAllignment = new VisionAlignment(driverJoy, true);
 
         /****************************************/
-        Robot.drivetrain.setDefaultCommand(gtaDrive);
+        Robot.drivetrain.setDefaultCommand(poroDrive);
         //Robot.drivetrain.setDefaultCommand(defaultDrive);
-        // modeButton.whenPressed(toggleGamepiece);
-        // // climbModeButton.whenPressed(toggleClimb);
+        modeButton.whenPressed(toggleGamepiece);
+        // climbModeButton.whenPressed(toggleClimb);
         
-        // // // climb
-        // // prepareLiftButton.whenPressed(prepareLift);
-        // // liftRobotTrigger.whenActive(liftRobot);
-        // // liftCloseFrontTrigger.whenActive(closeFrontLifters);
-        // // liftCloseRearTrigger.whenActive(closeRearLifters);
-        // // moveForwardLifterTrigger.whenActive(moveForwardLifter);
-        // // moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
+        // // climb
+        // prepareLiftButton.whenPressed(prepareLift);
+        // liftRobotTrigger.whenActive(liftRobot);
+        // liftCloseFrontTrigger.whenActive(closeFrontLifters);
+        // liftCloseRearTrigger.whenActive(closeRearLifters);
+        // moveForwardLifterTrigger.whenActive(moveForwardLifter);
+        // moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
 
-        // // hatch
-        // startButton.whenPressed(wristDownStart);
-        // prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
-        // prepareHatchLowTrigger.whenActive(prepareHatchLow);
-        // prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
-        // prepareHatchHighTrigger.whenActive(prepareHatchHigh);
-        // ejectHatchTrigger.whileActive(ejectHatch);
+        // hatch
+        startButton.whenPressed(wristDownStart);
+        prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
+        prepareHatchLowTrigger.whenActive(prepareHatchLow);
+        prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
+        prepareHatchHighTrigger.whenActive(prepareHatchHigh);
+        collectHatchTrigger.whenActive(collectHatch);
+        ejectHatchTrigger.whileActive(ejectHatch);
         
-        // // hatch with hook
-        // prepareHatchHookCollectTrigger.whenActive(prepareHatchHookCollect);
-        // prepareHatchHookLowTrigger.whenActive(prepareHatchHookLow);
-        // prepareHatchHookMiddleTrigger.whenActive(prepareHatchHookMiddle);
-        // prepareHatchHookHighTrigger.whenActive(prepareHatchHookHigh);
-        // hookToggleButton.whenActive(toggleHook);
+        // hatch with hook
+        prepareHatchHookCollectTrigger.whenActive(prepareHatchHookCollect);
+        prepareHatchHookLowTrigger.whenActive(prepareHatchHookLow);
+        prepareHatchHookMiddleTrigger.whenActive(prepareHatchHookMiddle);
+        prepareHatchHookHighTrigger.whenActive(prepareHatchHookHigh);
+        collectHatchHookTrigger.whenActive(collectHatchHook);
+        ejectHatchHookTrigger.whenActive(ejectHatchHook);
+        hookToggleButton.whenActive(toggleHook);
 
-        // // cargo
-        // prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
-        // prepareCargoLowTrigger.whenActive(prepareCargoLow);
-        // prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
-        // prepareCargoHighTrigger.whenActive(prepareCargoHigh);
-        // collectCargoTrigger.whileActive(collectCargo);
-        // ejectCargoTrigger.whileActive(new RumbleJoystick(operatorJoy, 0.6, false));
-        // ejectCargoTrigger.whileActive(ejectCargo);
-        // prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
+        // cargo
+        prepareCargoCollectTrigger.whenActive(prepareCargoCollect);
+        prepareCargoLowTrigger.whenActive(prepareCargoLow);
+        prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
+        prepareCargoHighTrigger.whenActive(prepareCargoHigh);
+        collectCargoTrigger.whileActive(collectCargo);
+        ejectCargoTrigger.whileActive(new RumbleJoystick(operatorJoy, 0.6, false));
+        ejectCargoTrigger.whileActive(ejectCargo);
+        prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);
 
-        // // manual
-        // elevatorUpAxis.whileActive(elevatorUp);
-        // elevatorDownAxis.whileActive(elevatorDown);
-        // wristDownAxis.whileActive(wristDown);
-        // wristUpAxis.whileActive(wristUp);
+        // manual
+        elevatorUpAxis.whileActive(elevatorUp);
+        elevatorDownAxis.whileActive(elevatorDown);
+        wristDownAxis.whileActive(wristDown);
+        wristUpAxis.whileActive(wristUp);
         // driveStraightButton.whileActive(driveStraight);
-         moveToVisionTarget.whileActive(visionAllignment);
+        moveToVisionTarget.whileActive(visionAllignment);
     }
 }

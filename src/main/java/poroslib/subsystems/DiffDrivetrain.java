@@ -45,7 +45,15 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
 		public void curvatureDrive(double speed, double rotate, boolean rotateInPlace, double maxOutput)
     {
 			this.driver.setMaxOutput(maxOutput);
-    	this.driver.curvatureDrive(speed, rotate, rotateInPlace);
+			
+			if (speed > 0)
+			{
+				this.driver.curvatureDrive(speed, rotate, rotateInPlace);
+			}
+			else
+			{
+				this.driver.curvatureDrive(speed, -rotate, rotateInPlace);
+			}
     }
     
     public void tankDrive(double leftSpeed ,double rightSpeed, double maxOutput)

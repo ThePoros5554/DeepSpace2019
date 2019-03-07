@@ -31,6 +31,7 @@ public class VisionAlignment extends Command
 
     private SmartJoystick leftJoy;
     private SmartJoystick rightJoy;
+    private SmartJoystick driverJoy;
     private boolean isDriverControl;
 
 
@@ -40,6 +41,16 @@ public class VisionAlignment extends Command
         monitor = RobotMonitor.getRobotMonitor();
         this.leftJoy = leftJoy;
         this.rightJoy = rightJoy;
+        this.isDriverControl = isDriverControl;
+
+        requires(driveTrain);
+    }
+
+    public VisionAlignment(SmartJoystick driverJoy, boolean isDriverControl)
+    {
+        driveTrain = Robot.drivetrain;
+        monitor = RobotMonitor.getRobotMonitor();
+        this.driverJoy = driverJoy;
         this.isDriverControl = isDriverControl;
 
         requires(driveTrain);
@@ -94,16 +105,30 @@ public class VisionAlignment extends Command
                 double delta_v = headingGain * cameraToTargetDelta.dtheta;
 
                 
-                double forwardValue;
-                if(isDriverControl)
+                double forwardValue = 0;
+                if (isDriverControl)
                 {
                     if (Robot.drivetrain.IsReversed())
                     {  
-                        forwardValue = -distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                        if (driverJoy != null)
+                        {
+                            forwardValue = -distanceGain * (driverJoy.GetSpeedAxis() * -250);
+                        }
+                        else if (rightJoy != null && leftJoy != null)
+                        {
+                            forwardValue = -distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                        }
                     }
                     else
                     {
-                        forwardValue = distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                        if (driverJoy != null)
+                        {
+                            forwardValue = distanceGain * (driverJoy.GetSpeedAxis() * -250);
+                        }
+                        else if (rightJoy != null && leftJoy != null)
+                        {
+                            forwardValue = distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
+                        }
                     }
                 }
                 else

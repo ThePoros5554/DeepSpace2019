@@ -12,12 +12,34 @@ public class CurvatureDrive extends Command
 	private DiffDrivetrain drivetrain;
 	private SmartJoystick joy;
 	
-	private double maxOutput = 1;
+    private double maxOutput = 1;
+    private double boostMaxOutput = 1;
+    private double aimMaxOutput = 1;
 	
+    public CurvatureDrive(DiffDrivetrain drivetrain, SmartJoystick joy, double sensitivity, double boostSensitivity, double aimSensitivity)
+    {
+    	this.drivetrain = drivetrain;
+        this.joy = joy;
+        this.maxOutput = sensitivity;
+        this.boostMaxOutput = boostSensitivity;
+        this.aimMaxOutput = aimSensitivity;
+        requires(this.drivetrain);
+    }
+
+    public CurvatureDrive(DiffDrivetrain drivetrain, SmartJoystick joy, double sensitivity)
+    {
+    	this.drivetrain = drivetrain;
+        this.joy = joy;
+        this.maxOutput = sensitivity;
+        this.boostMaxOutput = sensitivity;
+        this.aimMaxOutput = sensitivity;
+        requires(this.drivetrain);
+    }
+
     public CurvatureDrive(DiffDrivetrain drivetrain, SmartJoystick joy)
     {
     	this.drivetrain = drivetrain;
-    	this.joy = joy;
+        this.joy = joy;
         requires(this.drivetrain);
     }
 
@@ -31,8 +53,19 @@ public class CurvatureDrive extends Command
     {
     	double speedValue = this.joy.GetSpeedAxis();
     	double rotateValue =  this.joy.GetRotateAxis();
-    	
-		this.drivetrain.curvatureDrive(-speedValue, rotateValue, joy.getRawAxis(3) >= 0.8, 0.6);
+        
+        if (joy.getRawAxis(3) >= 0.8)
+        {
+            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), boostMaxOutput);
+        }
+        else if (joy.getRawAxis(2) >= 0.8)
+        {
+            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), aimMaxOutput);
+        }
+        else
+        {
+            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), maxOutput);
+        }
     }
 
     protected boolean isFinished()
