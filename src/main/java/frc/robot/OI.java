@@ -219,7 +219,7 @@ public class OI
         wristDownAxis = new JoyAxisPart(operatorJoy, kWristAxis, -1, 1, 1, -1, -1, -0.2);
 
         // commands
-        poroDrive = new CurvatureDrive(Robot.drivetrain, driverJoy);
+        poroDrive = new CurvatureDrive(Robot.drivetrain, driverJoy, 0.6, 1, 0.3);
         // defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
         // driveStraight = new DriveStraight(leftJoy, rightJoy);
 
@@ -234,8 +234,8 @@ public class OI
         prepareHatchHookLow = new InitHatchHookLowMode();
         prepareHatchHookMiddle = new InitHatchHookMiddleMode();
         prepareHatchHookHigh = new InitHatchHookHighMode();
-        collectHatchHook = new AdjustElevator(-800);
-        ejectHatchHook = new AdjustElevator(800);
+        collectHatchHook = new AdjustElevator(-4000);
+        ejectHatchHook = new AdjustElevator(4000);
 
         prepareCargoCollect = new InitCargoCollectMode();
         prepareCargoLow = new InitCargoLowMode();

@@ -10,7 +10,7 @@ import frc.robot.subsystems.Drivetrain;
 import poroslib.position.VisionInfo;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Twist2d;
-import poroslib.position.geometry.Kinematics.DriveVelocity;
+import poroslib.systems.PIDProcessor;
 import poroslib.triggers.SmartJoystick;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -23,45 +23,40 @@ public class VisionAlignment extends Command
     private Pose2d bufferedTarget;
     private VisionInfo bufferedVisionTarget;
 
-    private DriveVelocity lastDriveSignal;
+    // private DriveVelocity lastDriveSignal;
 
-    private final double maxDriveVelocity = 1000;
-    private final double headingGain = 4;
+    // private final double maxDriveVelocity = 1000;
+    // private final double headingGain = 4;
     private final double distanceGain = 0.5;
 
-    private SmartJoystick leftJoy;
-    private SmartJoystick rightJoy;
-    private SmartJoystick driverJoy;
+    private SmartJoystick joy;
+
     private boolean isDriverControl;
 
+    private PIDProcessor angleController;
 
-    public VisionAlignment(SmartJoystick leftJoy, SmartJoystick rightJoy, boolean isDriverControl)
+    public static double delta_v;
+
+
+    public VisionAlignment(SmartJoystick joy, boolean isDriverControl)
     {
         driveTrain = Robot.drivetrain;
         monitor = RobotMonitor.getRobotMonitor();
-        this.leftJoy = leftJoy;
-        this.rightJoy = rightJoy;
+        this.joy = joy;
         this.isDriverControl = isDriverControl;
 
         requires(driveTrain);
-    }
 
-    public VisionAlignment(SmartJoystick driverJoy, boolean isDriverControl)
-    {
-        driveTrain = Robot.drivetrain;
-        monitor = RobotMonitor.getRobotMonitor();
-        this.driverJoy = driverJoy;
-        this.isDriverControl = isDriverControl;
-
-        requires(driveTrain);
+        angleController = new PIDProcessor(0.015, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController.setInputRange(-180, 180);
+        angleController.setContinuous(true);
     }
 
     @Override
     protected void initialize()
     {
         bufferedTarget = null;
-        driveTrain.setControlMode(ControlMode.Position);
-        driveTrain.selectProfileSlot(1);
+
     }
 
     @Override
@@ -88,10 +83,7 @@ public class VisionAlignment extends Command
                 // this vector represents the position of the target
                 Pose2d target = (robotAtProcessTime.transformBy(cameraDisplacementFromRobot)).transformBy(cameraToTargetAtProcessTime);
 
-                if (target.getTranslation().getY() >= 30 || bufferedTarget == null)
-                {
-                    bufferedTarget = target;
-                }
+                bufferedTarget = target;
 
                 Pose2d robotNow = monitor.getLastPositionReport().getValue();
                 Pose2d cameraNow = robotNow.transformBy(cameraDisplacementFromRobot);
@@ -99,43 +91,34 @@ public class VisionAlignment extends Command
                 // this vector represents the current position of the camera
                 Pose2d cameraToTargetNow = bufferedTarget.transformBy(cameraNow.inverse());
 
-                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, cameraToTargetNow.getRotation().getDegrees());
+                Twist2d cameraToTargetDelta = new Twist2d(Math.hypot(cameraToTargetNow.getTranslation().getX(), cameraToTargetNow.getTranslation().getY()),0, bufferedTarget.getRotation().getDegrees());
 
                 //angle portion for the position loop
-                double delta_v = headingGain * cameraToTargetDelta.dtheta;
-
-                
+                delta_v = cameraToTargetDelta.dtheta;
+                         
                 double forwardValue = 0;
+
                 if (isDriverControl)
                 {
-                    if (Robot.drivetrain.IsReversed())
-                    {  
-                        if (driverJoy != null)
-                        {
-                            forwardValue = -distanceGain * (driverJoy.GetSpeedAxis() * -250);
-                        }
-                        else if (rightJoy != null && leftJoy != null)
-                        {
-                            forwardValue = -distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
-                        }
+                    if(driveTrain.IsReversed())
+                    {
+                        forwardValue = -joy.GetSpeedAxis();
                     }
                     else
                     {
-                        if (driverJoy != null)
-                        {
-                            forwardValue = distanceGain * (driverJoy.GetSpeedAxis() * -250);
-                        }
-                        else if (rightJoy != null && leftJoy != null)
-                        {
-                            forwardValue = distanceGain * (((leftJoy.GetSpeedAxis() + rightJoy.GetSpeedAxis()) / 2) * -250);
-                        }
+                        forwardValue = joy.GetSpeedAxis();
                     }
+
+                    angleController.setSetpoint(delta_v);
+                    angleController.enable();
                 }
                 else
                 {
                     forwardValue = distanceGain * cameraToTargetDelta.dx;
                 }
-                DriveVelocity velocity = new DriveVelocity(forwardValue - delta_v, forwardValue + delta_v);
+
+
+                // DriveVelocity velocity = new DriveVelocity(forwardValue - delta_v, forwardValue + delta_v);
 
                 // double forwardSpeed = (Math.abs(velocity.left) + Math.abs(velocity.right)) / 2;
                 // if(forwardSpeed > this.maxDriveVelocity)
@@ -151,16 +134,14 @@ public class VisionAlignment extends Command
                 //     }
                 // }
 
-                SmartDashboard.putNumber("Go Left:", velocity.left);
-                SmartDashboard.putNumber("Go Right:",  velocity.right);
+                // int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
+                // int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
 
-                int leftTicksToGo = Drivetrain.cmToRotations(velocity.left);
-                int rightTicksToGo = Drivetrain.cmToRotations(velocity.right);
+                // driveTrain.selectProfileSlot(1);
+                // driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
 
-                driveTrain.selectProfileSlot(1);
-                driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
-
-                lastDriveSignal = velocity;
+                // lastDriveSignal = velocity;
+                driveTrain.curvatureDrive(forwardValue, angleController.GetOutputValue(), true, 1);
             }
         }
     }
@@ -193,6 +174,7 @@ public class VisionAlignment extends Command
     {
       driveTrain.setControlMode(ControlMode.PercentOutput);
       driveTrain.set(0, 0);
+      angleController.reset();
     }
       
     @Override

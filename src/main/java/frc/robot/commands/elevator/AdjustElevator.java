@@ -17,6 +17,7 @@ public class AdjustElevator extends Command
 {
   private ElevatorMode targetMode;
   private int fromCurrentPosition;
+  private int targetPosition;
   
   public AdjustElevator(ElevatorMode mode)
   {
@@ -28,6 +29,7 @@ public class AdjustElevator extends Command
   {
     requires(Robot.elevator);
     this.fromCurrentPosition = valueToGoFromCurrentPosition;
+    this.targetMode = null;
   }
 
   // Called just before this Command runs the first time
@@ -35,10 +37,10 @@ public class AdjustElevator extends Command
   protected void initialize()
   {
     Robot.elevator.setControlMode(ControlMode.MotionMagic);
-    
     if (this.targetMode == null)
     {
-      Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition() + this.fromCurrentPosition);
+      targetPosition = Robot.elevator.getCurrentPosition() + this.fromCurrentPosition;
+      Robot.elevator.setTargetPosition(this.targetPosition);
     }
     else
     {
@@ -56,7 +58,14 @@ public class AdjustElevator extends Command
   @Override
   protected boolean isFinished()
   {
-    return Robot.elevator.isInMode(this.targetMode);
+    if (this.targetMode == null)
+    {
+      return Robot.elevator.isInTarget(this.targetPosition);
+    }
+    else
+    {
+      return Robot.elevator.isInMode(this.targetMode);
+    }
   }
 
   // Called once after isFinished returns true

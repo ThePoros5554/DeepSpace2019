@@ -56,15 +56,15 @@ public class CurvatureDrive extends Command
         
         if (joy.getRawAxis(3) >= 0.8)
         {
-            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), boostMaxOutput);
+            this.drivetrain.curvatureDrive(-speedValue, rotateValue, joy.getRawButton(5), boostMaxOutput);
         }
         else if (joy.getRawAxis(2) >= 0.8)
         {
-            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), aimMaxOutput);
+            this.drivetrain.curvatureDrive(-speedValue, rotateValue, joy.getRawButton(5), aimMaxOutput);
         }
         else
         {
-            this.drivetrain.curvatureDrive(speedValue, rotateValue, joy.getRawButton(2), maxOutput);
+            this.drivetrain.curvatureDrive(-speedValue, rotateValue, joy.getRawButton(5), maxOutput);
         }
     }
 

@@ -22,6 +22,8 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
 import poroslib.subsystems.DiffDrivetrain;
+import poroslib.systems.PIDProcessor;
+import poroslib.util.MathHelper;
 
 public class Drivetrain extends DiffDrivetrain
 {
@@ -58,11 +60,14 @@ public class Drivetrain extends DiffDrivetrain
   private final boolean kInvertEncRight = true;
   private final double kRamp = 0;
   public final double kEjectDriveBackDistance = 14.3;
-  //public static final double TRACKWIDTH = 72.5;
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final int kTargetThreshold = 0;
 
-  //
+  //DriveStaright
+  private PIDProcessor straightPID;
+  public double straightAngle;
+  private boolean isDrivingStraight = false;
+  private double angleDiffrenceTolerance = 1.5;
 
   private WPI_TalonSRX masterLeft;
   private WPI_TalonSRX masterRight;
@@ -141,6 +146,10 @@ public class Drivetrain extends DiffDrivetrain
     this.set(0, 0);
 
     this.navx = new AHRS(SPI.Port.kMXP);
+
+    //straight
+    straightPID = new PIDProcessor(0.09, 0, 0, navx, false);
+    this.setRotateDeadband(0.15);
   }
 
   public void set(double valueLeft, double valueRight)
@@ -298,6 +307,45 @@ public class Drivetrain extends DiffDrivetrain
   public int getVelocity()
   {
     return (this.masterLeft.getSelectedSensorVelocity() + this.masterRight.getSelectedSensorVelocity()) / 2;
+  }
+
+  @Override
+  public void curvatureDrive(double speed, double rotate, boolean rotateInPlace, double maxOutput)
+  {
+      if(MathHelper.handleDeadband(rotate, getRotateDeadband()) == 0 && !rotateInPlace)
+      {
+        if(!isDrivingStraight)
+        {
+          straightPID.enable();
+          straightAngle = getHeading();
+          straightPID.setSetpoint(straightAngle);
+        }
+        if(MathHelper.handleDeadband(angleDiffrenceTolerance, straightAngle - getHeading()) == 0)
+        {
+          straightAngle = getHeading();
+          straightPID.setSetpoint(straightAngle);
+        }
+
+
+        isDrivingStraight = true;
+        super.curvatureDrive(speed, straightPID.GetOutputValue(), rotateInPlace, maxOutput);
+      }
+      else
+      {
+        this.isDrivingStraight = false;
+        super.curvatureDrive(speed, rotate, rotateInPlace, maxOutput);
+      }
+
+
+      if(!isDrivingStraight)
+      {
+        straightPID.reset();
+      }
+  }
+
+  public AHRS getNavx()
+  {
+    return this.navx;
   }
 
   public int GetSwitchDeviceId()

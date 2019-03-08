@@ -9,24 +9,15 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.kauailabs.navx.IMUProtocol.GyroUpdate;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
+import frc.robot.commands.autoScripts.*;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
@@ -34,6 +25,7 @@ import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
 import poroslib.systems.Limelight;
+import poroslib.systems.RobotProfile;
 import poroslib.systems.Limelight.LimelightCamMode;
 import poroslib.systems.Limelight.LimelightLedMode;
 
@@ -62,8 +54,6 @@ public class Robot extends TimedRobot
   private OI oi;
 
   public static CameraThread rioCamThread;
-  private Notifier cameraLoop;
-
   
   public enum RobotMode
   {
@@ -88,6 +78,13 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    RobotProfile.getRobotProfile().setWheelbaseWidth(0.8);
+    RobotProfile.getRobotProfile().setWheelDiameter(0.1016);
+    RobotProfile.getRobotProfile().setAutoKV(6);
+    RobotProfile.getRobotProfile().setAutoKA(0);
+    RobotProfile.getRobotProfile().setPathTimeStep(0.05);
+    RobotProfile.getRobotProfile().setDriveEncTicksPerRevolution(0);
+
     // subsystems
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
     this.masterRight = new WPI_TalonSRX(Drivetrain.kFrontRightPort);
@@ -98,8 +95,7 @@ public class Robot extends TimedRobot
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
     hatchLauncher = new HatchLauncher();
-    // lifter = new Lifter();
-
+    lifter = new Lifter();
 
     // oi
     oi = new OI();
@@ -112,14 +108,9 @@ public class Robot extends TimedRobot
 
     // autonomous chooser
     autonomousChooser = new SendableChooser<String>();
-    autonomousChooser.addOption("LeftRocketHatch", RobotMap.LEFTROCKETHATCH);    
-    autonomousChooser.addOption("RightRocketHatch", RobotMap.RIGHTROCKETHATCH);
-    autonomousChooser.addOption("LeftCargoHatch", RobotMap.LEFTSHIPHATCH);
-    autonomousChooser.addOption("RightShipHatch", RobotMap.RIGHTSHIPHATCH);
-    autonomousChooser.addOption("LeftShipCargo", RobotMap.LEFTSHIPCARGO);
-    autonomousChooser.addOption("RightShipCargo", RobotMap.RIGHTSHIPCARGO);
-    autonomousChooser.addOption("RightRocketCargo", RobotMap.RIGHTROCKETCARGO);
-    autonomousChooser.addOption("LeftRocketCargo", RobotMap.LEFTROCKETCARGO);
+    autonomousChooser.addOption("Empty", RobotMap.EMPTY);
+    autonomousChooser.addOption("Test Path", RobotMap.TESTPATH);
+    SmartDashboard.putData("Autonomous Chooser", autonomousChooser);
   }
 
   /**
@@ -136,7 +127,8 @@ public class Robot extends TimedRobot
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
 
-    // SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
+    SmartDashboard.putNumber("straight", drivetrain.straightAngle);
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
@@ -147,9 +139,9 @@ public class Robot extends TimedRobot
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
     // SmartDashboard.putNumber("degrees: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("target x: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getX());
-    SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
-    SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
+    // SmartDashboard.putNumber("target x: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getX());
+    // SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
+    // SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
     SmartDashboard.putNumber("Elevator Position:", elevator.getCurrentPosition());
 
@@ -191,7 +183,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledPeriodic()
   {
-    lime.setLedMode(LimelightLedMode.ForceOn);
+    lime.setLedMode(LimelightLedMode.ForceOff);
     Scheduler.getInstance().run();
   }
 
@@ -275,5 +267,23 @@ public class Robot extends TimedRobot
   @Override
   public void testPeriodic()
   {
+  }
+
+  public CommandGroup getSelectedAutonomous(String value)
+  {
+    switch(value)
+    {
+      case RobotMap.EMPTY:
+
+        return new Empty();
+        
+      case RobotMap.TESTPATH:
+
+        return new TestPath();
+
+      default:
+
+        return new Empty();
+    }
   }
 }

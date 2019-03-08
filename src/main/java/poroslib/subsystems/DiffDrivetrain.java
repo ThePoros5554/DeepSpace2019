@@ -14,6 +14,7 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
 	private boolean isSquared;
 	
 	private double rotateDeadband = 0;
+	private double speedDeadband = 0;
 	
     public DiffDrivetrain(SpeedController leftController, SpeedController rightController)
     {
@@ -46,14 +47,7 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     {
 			this.driver.setMaxOutput(maxOutput);
 			
-			if (speed > 0)
-			{
-				this.driver.curvatureDrive(speed, rotate, rotateInPlace);
-			}
-			else
-			{
-				this.driver.curvatureDrive(speed, -rotate, rotateInPlace);
-			}
+			this.driver.curvatureDrive(speed, rotate, rotateInPlace);
     }
     
     public void tankDrive(double leftSpeed ,double rightSpeed, double maxOutput)
@@ -150,7 +144,17 @@ public class DiffDrivetrain extends Drivetrain implements PidActionSubsys
     {
     	return this.rotateDeadband;
     }
+		
+		public void setSpeedDeadband(double deadband)
+    {
+    	this.speedDeadband = deadband;
+    }
     
+    public double getSpeedDeadband()
+    {
+    	return this.speedDeadband;
+		}
+		
 	@Override
 	public void StopSystem()
 	{
