@@ -48,7 +48,7 @@ public class Robot extends TimedRobot
   public static Wrist wrist;
   public static CargoIntake cargoIntake;
   public static HatchLauncher hatchLauncher;
-  public static Lifter lifter;
+  // public static Lifter lifter;
   public static Limelight lime;
 
   private OI oi;
@@ -80,10 +80,10 @@ public class Robot extends TimedRobot
   {
     RobotProfile.getRobotProfile().setWheelbaseWidth(0.8);
     RobotProfile.getRobotProfile().setWheelDiameter(0.1016);
-    RobotProfile.getRobotProfile().setAutoKV(6);
+    RobotProfile.getRobotProfile().setAutoKV(0.1666);
     RobotProfile.getRobotProfile().setAutoKA(0);
     RobotProfile.getRobotProfile().setPathTimeStep(0.05);
-    RobotProfile.getRobotProfile().setDriveEncTicksPerRevolution(0);
+    RobotProfile.getRobotProfile().setDriveEncTicksPerRevolution(4096);
 
     // subsystems
     this.masterLeft = new WPI_TalonSRX(Drivetrain.kFrontLeftPort);
@@ -95,7 +95,7 @@ public class Robot extends TimedRobot
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
     hatchLauncher = new HatchLauncher();
-    lifter = new Lifter();
+    // lifter = new Lifter();
 
     // oi
     oi = new OI();
