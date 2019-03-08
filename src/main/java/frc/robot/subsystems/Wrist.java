@@ -50,7 +50,7 @@ public class Wrist extends Subsystem
   
 
   // config constants
-  private final int kMaxTilt = 4000;
+  private final int kMaxTilt = 2825;
   private final int kMinTilt = 1000;
   private final double kVoltage = 10;
 
