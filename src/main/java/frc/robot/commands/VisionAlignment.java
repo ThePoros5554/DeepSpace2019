@@ -30,6 +30,7 @@ public class VisionAlignment extends Command
     private final double distanceGain = 0.5;
 
     private SmartJoystick joy;
+    private double power;
 
     private boolean isDriverControl;
 
@@ -51,6 +52,37 @@ public class VisionAlignment extends Command
         angleController.setInputRange(-180, 180);
         angleController.setContinuous(true);
     }
+
+    public VisionAlignment(double power, boolean isDriverControl, double timeout)
+    {
+        super(timeout);
+        driveTrain = Robot.drivetrain;
+        monitor = RobotMonitor.getRobotMonitor();
+        this.power = power;
+        this.isDriverControl = isDriverControl;
+
+        requires(driveTrain);
+
+        angleController = new PIDProcessor(0.015, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController.setInputRange(-180, 180);
+        angleController.setContinuous(true);
+    }
+
+    public VisionAlignment(double power, boolean isDriverControl, double timeout, double specialP)
+    {
+        super(timeout);
+        driveTrain = Robot.drivetrain;
+        monitor = RobotMonitor.getRobotMonitor();
+        this.power = power;
+        this.isDriverControl = isDriverControl;
+
+        requires(driveTrain);
+
+        angleController = new PIDProcessor(specialP, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController.setInputRange(-180, 180);
+        angleController.setContinuous(true);
+    }
+
 
     @Override
     protected void initialize()
@@ -98,6 +130,9 @@ public class VisionAlignment extends Command
                          
                 double forwardValue = 0;
 
+                angleController.setSetpoint(delta_v);
+                angleController.enable();
+                
                 if (isDriverControl)
                 {
                     if(driveTrain.IsReversed())
@@ -109,12 +144,11 @@ public class VisionAlignment extends Command
                         forwardValue = joy.GetSpeedAxis();
                     }
 
-                    angleController.setSetpoint(delta_v);
-                    angleController.enable();
+
                 }
                 else
                 {
-                    forwardValue = distanceGain * cameraToTargetDelta.dx;
+                    forwardValue = power;
                 }
 
 
@@ -166,6 +200,10 @@ public class VisionAlignment extends Command
     @Override
     protected boolean isFinished()
     {
+        if(isDriverControl == false)
+        {
+            return isTimedOut();
+        }
         return false;
     }
 

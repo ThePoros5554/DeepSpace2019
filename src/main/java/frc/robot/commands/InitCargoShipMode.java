@@ -12,17 +12,15 @@ import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.wrist.AdjustWrist;
 import frc.robot.subsystems.Elevator.ElevatorMode;
 import frc.robot.subsystems.Wrist.WristMode;
-import poroslib.util.CompareType;
 
-public class InitCargoCollectMode extends CommandGroup
+public class InitCargoShipMode extends CommandGroup
 {
   /**
    * Add your docs here.
    */
-  public InitCargoCollectMode()
+  public InitCargoShipMode()
   {
-    addSequential(new AdjustWrist(WristMode.HIGH_CARGO), 0.2);
-    addParallel(new AdjustElevator(ElevatorMode.COLLECT_CARGO));
-    addSequential(new AdjustWrist(WristMode.COLLECT_CARGO, 1065, CompareType.GREATER_OR_EQUAL));
+    addParallel(new AdjustElevator(ElevatorMode.CARGO_SHIP));
+    addSequential(new AdjustWrist(WristMode.COLLECT_CARGO));
   }
 }

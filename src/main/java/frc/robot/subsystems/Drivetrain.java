@@ -58,7 +58,7 @@ public class Drivetrain extends DiffDrivetrain
   private static final double kEncoderTicks = 4096;
   private final boolean kInvertEncLeft = true;
   private final boolean kInvertEncRight = true;
-  private final double kRamp = 0;
+  private final double kRamp = 0.3;
   public final double kEjectDriveBackDistance = 14.3;
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final int kTargetThreshold = 0;
@@ -148,7 +148,8 @@ public class Drivetrain extends DiffDrivetrain
     this.navx = new AHRS(SPI.Port.kMXP);
 
     //straight
-    straightPID = new PIDProcessor(0.09, 0, 0, navx, false);
+    //straightPID = new PIDProcessor(0.09, 0, 0, navx, false);
+    straightPID = new PIDProcessor(0.05, 0, 0, navx, false);
     this.setRotateDeadband(0.15);
   }
 
@@ -224,7 +225,7 @@ public class Drivetrain extends DiffDrivetrain
   @Override
   public int getRawLeftPosition()
   {
-    return -this.masterLeft.getSelectedSensorPosition(); // TODO: if not good change left phase to true and add - here (though should work?)
+    return this.masterLeft.getSelectedSensorPosition(); // TODO: if not good change left phase to true and add - here (though should work?)
   }
 
   @Override
@@ -235,7 +236,7 @@ public class Drivetrain extends DiffDrivetrain
 
   public double getLeftPositionInCm()
   {
-    return -rotationsToCm(getRawLeftPosition());
+    return rotationsToCm(getRawLeftPosition());
   }
 
   public double getRightPositionInCm()

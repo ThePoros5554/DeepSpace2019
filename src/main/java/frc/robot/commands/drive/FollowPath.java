@@ -2,6 +2,7 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
+import frc.robot.subsystems.Drivetrain;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.followers.EncoderFollower;
 import jaci.pathfinder.modifiers.TankModifier;
@@ -11,7 +12,7 @@ import poroslib.util.Path;
 
 public class FollowPath extends Command{
 
-	private DiffDrivetrain dt;
+	private Drivetrain dt;
 	
 	private EncoderFollower left;
 	private EncoderFollower right;
@@ -23,7 +24,7 @@ public class FollowPath extends Command{
 	
 	private Notifier closedLoop;
 		
-	public FollowPath(DiffDrivetrain dt, Path path, double distanceKP, double distanceKD, double headingKP, double headingKD)
+	public FollowPath(Drivetrain dt, Path path, double distanceKP, double distanceKD, double headingKP, double headingKD)
 	{
 		requires(dt);
 		
@@ -44,7 +45,7 @@ public class FollowPath extends Command{
 		right.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
 	}
 	
-	public FollowPath(DiffDrivetrain dt, Path leftPath, Path rightLeft, double distanceKP, double distanceKD, double headingKP, double headingKD)
+	public FollowPath(Drivetrain dt, Path leftPath, Path rightLeft, double distanceKP, double distanceKD, double headingKP, double headingKD)
 	{
 		requires(dt);
 
@@ -76,20 +77,27 @@ public class FollowPath extends Command{
 			@Override
 			public void run() 
 			{
-				double l = left.calculate(dt.getRawLeftPosition());
-				double r = right.calculate(dt.getRawRightPosition());
+				System.out.println("pos: " + left.getSegment().position);
+				System.out.println("calcPos: " +  ((double) (dt.getRawLeftPosition() / 4096)
+				* 0.1016 * Math.PI));
 
-				double gyro_heading = dt.getHeading();
-				double desired_heading = Pathfinder.r2d(left.getHeading()); 
+				System.out.println("heading: " + left.getSegment().heading);
+				System.out.println("yaw: " + dt.getHeading());
+				double l = left.calculate(dt.getRawLeftPosition());
+				double r = right.calculate(-dt.getRawRightPosition());
+
+				double heading = dt.getHeading();
+				double desired_heading = Pathfinder.r2d(left.getHeading());
+				double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
+				System.out.println("heading_difference: " + heading_difference);
+
+				double turn =  heading_difference;
+
+				double turnOut = (headingKP * turn);
+
+				lastAngleDifference = heading_difference;
 				
-				
-				double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
-				double turn = (headingKP * angleDifference)
-						+ (headingKD * ((angleDifference - lastAngleDifference) / RobotProfile.getRobotProfile().getPathTimeStep()));
-				
-				lastAngleDifference = angleDifference;
-				
-				dt.tankDrive(l + turn, r - turn, 1);		
+				dt.tankDrive( -l - turnOut, -r + turnOut, 1);		
 			}
 		});
 		

@@ -59,8 +59,8 @@ public class Wrist extends Subsystem
 
   public static final int kMaxAcceleration = 500;
   public static int kMaxVelocity = 500;
-  public static final int kMaxAccelerationSpecial = 200;
-  public static final int kMaxVelocitySpecial = 200;
+  public static final int kMaxAccelerationSpecial = 100;
+  public static final int kMaxVelocitySpecial = 100;
 
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final boolean kInvertEnc = true;

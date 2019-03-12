@@ -13,6 +13,7 @@ import frc.robot.Robot.RobotMode;
 import frc.robot.commands.InitHatchCollectMode;
 import frc.robot.commands.CollectHatchFromFloor;
 import frc.robot.commands.DriveStraight;
+import frc.robot.commands.InitCargoCollectFeederMode;
 import frc.robot.commands.InitCargoCollectMode;
 import frc.robot.commands.InitHatchLowMode;
 import frc.robot.commands.InitCargoLowMode;
@@ -20,6 +21,7 @@ import frc.robot.commands.InitHatchMiddleMode;
 import frc.robot.commands.InitLiftMode;
 import frc.robot.commands.ToggleClimbMode;
 import frc.robot.commands.InitCargoMiddleMode;
+import frc.robot.commands.InitCargoShipMode;
 import frc.robot.commands.InitHatchHighMode;
 import frc.robot.commands.InitHatchHookCollectMode;
 import frc.robot.commands.InitHatchHookHighMode;
@@ -68,7 +70,8 @@ public class OI
     private static final int kElevatorDownAxis = 2; // LT
     private static final int kWristAxis = 1; // L 
     private static final int kRobotLiftModeButton = 0;
-    private static final int kStartButton = 8;
+    private static final int kCargoShipButton = 8;
+    private static final int kCollectCargoFeederModeButton = 7;
 
     private static final int kMoveToVisionTargetButton = 1; // DRIVER TRIGGER
 
@@ -90,12 +93,14 @@ public class OI
     private Button climbModeButton;
     private Button prepareLiftButton;
     private Button moveToVisionTarget;
-    private Button startButton;
+    //private Button startButton;
     private ModeTrigger hookToggleButton;
 
     private HatchModeTrigger prepareHatchCollectTrigger;
     private HatchModeTrigger prepareHatchHookCollectTrigger;
     private ModeTrigger prepareCargoCollectTrigger;
+    private ModeTrigger prepareCargoShipTrigger;
+    private ModeTrigger prepareCargoCollectFeederTrigger;
     private HatchModeTrigger prepareHatchLowTrigger;
     private HatchModeTrigger prepareHatchHookLowTrigger;
     private ModeTrigger prepareCargoLowTrigger;
@@ -124,6 +129,7 @@ public class OI
     private CurvatureDrive poroDrive;
     private DriveStraight driveStraight;
     private CollectHatchFromFloor collectHatch;
+    private InitCargoCollectFeederMode prepareCargoCollectFeeder;
     private EjectHatch ejectHatch;
     private AdjustElevator collectHatchHook;
     private AdjustElevator ejectHatchHook;
@@ -141,6 +147,7 @@ public class OI
     private InitCargoLowMode prepareCargoLow;
     private InitCargoMiddleMode prepareCargoMiddle;
     private InitCargoHighMode prepareCargoHigh;
+    private InitCargoShipMode prepareCargoShip;
     // private LiftRobot liftRobot;
     private InitLiftMode prepareLift;
     // private CloseFrontLifters closeFrontLifters;
@@ -181,7 +188,7 @@ public class OI
         ejectHatchTrigger = new HatchModeTrigger(operatorJoy, kEjectPartButton, false);
 
         wristDownStart = new WristDownStart();
-        startButton = new JoystickButton(operatorJoy, kStartButton);
+        //startButton = new JoystickButton(operatorJoy, kStartButton);
         prepareHatchHookCollectTrigger = new HatchModeTrigger(operatorJoy, kCollectModeButton, true);
         prepareHatchHookLowTrigger = new HatchModeTrigger(operatorJoy, kLowModeButton, true);
         prepareHatchHookMiddleTrigger = new HatchModeTrigger(operatorJoy, kMiddleModeButton, true);
@@ -190,9 +197,11 @@ public class OI
         ejectHatchHookTrigger = new HatchModeTrigger(operatorJoy, kEjectPartButton, true);
 
         prepareCargoCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.CARGO);
+        prepareCargoCollectFeederTrigger = new ModeTrigger(operatorJoy, kCollectCargoFeederModeButton, RobotMode.CARGO);
         prepareCargoLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.CARGO);
         prepareCargoMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.CARGO);
         prepareCargoHighTrigger = new ModeTrigger(operatorJoy, kHighModeButton, RobotMode.CARGO);
+        prepareCargoShipTrigger = new ModeTrigger(operatorJoy, kCargoShipButton, RobotMode.CARGO);
         collectCargoTrigger = new ModeTrigger(operatorJoy, kCollectPartButton, RobotMode.CARGO);
         ejectCargoTrigger = new ModeTrigger(operatorJoy, kEjectPartButton, RobotMode.CARGO);
 
@@ -228,6 +237,7 @@ public class OI
         ejectHatch = new EjectHatch(operatorJoy);
         
         prepareHatchHookCollect = new InitHatchHookCollectMode();
+
         prepareHatchHookLow = new InitHatchHookLowMode();
         prepareHatchHookMiddle = new InitHatchHookMiddleMode();
         prepareHatchHookHigh = new InitHatchHookHighMode();
@@ -235,9 +245,11 @@ public class OI
         ejectHatchHook = new AdjustElevator(4000);
 
         prepareCargoCollect = new InitCargoCollectMode();
+        prepareCargoCollectFeeder = new InitCargoCollectFeederMode();
         prepareCargoLow = new InitCargoLowMode();
         prepareCargoMiddle = new InitCargoMiddleMode();
         prepareCargoHigh = new InitCargoHighMode();
+        prepareCargoShip = new InitCargoShipMode();
         collectCargo = new ActivateIntake(CargoIntake.kIntakeInPower);
         ejectCargo = new ActivateIntake(CargoIntake.kIntakeOutPower);
 
@@ -273,7 +285,7 @@ public class OI
         // moveBackwardsLifterTrigger.whenActive(moveBackwardLifter);
 
         // hatch
-        startButton.whenPressed(wristDownStart);
+        //startButton.whenPressed(wristDownStart);
         prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
         prepareHatchLowTrigger.whenActive(prepareHatchLow);
         prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
@@ -296,6 +308,8 @@ public class OI
         prepareCargoMiddleTrigger.whenActive(prepareCargoMiddle);
         prepareCargoHighTrigger.whenActive(prepareCargoHigh);
         collectCargoTrigger.whileActive(collectCargo);
+        prepareCargoCollectFeederTrigger.whenActive(prepareCargoCollectFeeder);
+        prepareCargoShipTrigger.whenActive(prepareCargoShip);
         ejectCargoTrigger.whileActive(new RumbleJoystick(operatorJoy, 0.6, false));
         ejectCargoTrigger.whileActive(ejectCargo);
         prepareHatchCollectTrigger.whenActive(prepareHatchMiddle);

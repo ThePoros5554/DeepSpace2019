@@ -30,7 +30,7 @@ public class HatchLauncher extends Subsystem
 
   public HatchLauncher()
   {
-    launcher = new DoubleSolenoid(6,7);
+    launcher = new DoubleSolenoid(3,4);
 
     this.currentMode = LauncherPistonsMode.CLOSED;
     stop();

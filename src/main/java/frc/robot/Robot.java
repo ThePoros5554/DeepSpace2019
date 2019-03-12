@@ -39,6 +39,7 @@ import poroslib.systems.Limelight.LimelightLedMode;
 public class Robot extends TimedRobot
 {
   private SendableChooser<String> autonomousChooser;
+  private CommandGroup selectedCommand;
 
   public static Drivetrain drivetrain;
   private WPI_TalonSRX masterLeft;
@@ -78,9 +79,9 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
-    RobotProfile.getRobotProfile().setWheelbaseWidth(0.8);
-    RobotProfile.getRobotProfile().setWheelDiameter(0.1016);
-    RobotProfile.getRobotProfile().setAutoKV(0.1666);
+    RobotProfile.getRobotProfile().setWheelbaseWidth(0.75);
+    RobotProfile.getRobotProfile().setWheelDiameter(1.016);
+    RobotProfile.getRobotProfile().setAutoKV(0.215);
     RobotProfile.getRobotProfile().setAutoKA(0);
     RobotProfile.getRobotProfile().setPathTimeStep(0.05);
     RobotProfile.getRobotProfile().setDriveEncTicksPerRevolution(4096);
@@ -103,13 +104,14 @@ public class Robot extends TimedRobot
     // cameras
     lime = new Limelight();
     rioCamThread = new CameraThread();
-    rioCamThread.setDaemon(true);
-    rioCamThread.start();
+    // rioCamThread.setDaemon(true);
+    // rioCamThread.start();
 
     // autonomous chooser
     autonomousChooser = new SendableChooser<String>();
     autonomousChooser.addOption("Empty", RobotMap.EMPTY);
-    autonomousChooser.addOption("Test Path", RobotMap.TESTPATH);
+    autonomousChooser.addOption("Ramp To Left Rocket", RobotMap.RAMPTOLEFTROCKET);
+    autonomousChooser.addOption("Ramp To Center Cargo", RobotMap.RAMPTOCENTERCARGO);
     SmartDashboard.putData("Autonomous Chooser", autonomousChooser);
   }
 
@@ -132,8 +134,8 @@ public class Robot extends TimedRobot
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
     // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
 
-    // SmartDashboard.putNumber("leftEnc", drivetrain.getRawLeftPosition());
-    // SmartDashboard.putNumber("rightEnc", drivetrain.getRawRightPosition());
+    SmartDashboard.putNumber("leftEnc", drivetrain.getLeftPositionInCm());
+    SmartDashboard.putNumber("rightEnc", drivetrain.getRightPositionInCm());
 
     // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
@@ -174,6 +176,11 @@ public class Robot extends TimedRobot
       updateRobotState.cancel();
     }
 
+    if(selectedCommand != null)
+    {
+      selectedCommand.cancel();
+    }
+
     drivetrain.resetHeading();
 
     elevator.neutralOutput();
@@ -203,6 +210,7 @@ public class Robot extends TimedRobot
   {
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
+    drivetrain.configVoltageCompensation(12, true);
 
     if (updateRobotState == null)
     {
@@ -210,12 +218,16 @@ public class Robot extends TimedRobot
     }
 
     elevator.setControlMode(ControlMode.PercentOutput);
-    wrist.setTargetPosition(wrist.getCurrentPosition());
+    wrist.setControlMode(ControlMode.PercentOutput);
 
     updateRobotState.start();
 
     elevator.neutralOutput();
     wrist.neutralOutput();
+
+    System.out.println(autonomousChooser.getSelected());
+    selectedCommand = getSelectedAutonomous(autonomousChooser.getSelected());
+    selectedCommand.start();
   }
 
   /**
@@ -235,6 +247,7 @@ public class Robot extends TimedRobot
 
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
+    drivetrain.configVoltageCompensation(12, false);
 
 
     if(updateRobotState == null)
@@ -271,15 +284,24 @@ public class Robot extends TimedRobot
 
   public CommandGroup getSelectedAutonomous(String value)
   {
+    if(value == null)
+    {
+      return new Empty();
+    }
+
     switch(value)
     {
       case RobotMap.EMPTY:
 
         return new Empty();
         
-      case RobotMap.TESTPATH:
+      case RobotMap.RAMPTOLEFTROCKET:
 
-        return new TestPath();
+        return new RampToLeftRocket();
+
+      case RobotMap.RAMPTOCENTERCARGO:
+
+        return new RampToCenterCargo();
 
       default:
 

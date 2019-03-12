@@ -9,6 +9,7 @@ package frc.robot.commands.wrist;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.Wrist;
@@ -18,10 +19,20 @@ public class WristDownStart extends Command
 {
   private WristMode targetMode;
 
+  private double time;
+
   public WristDownStart()
   {
     requires(Robot.wrist);
     this.targetMode = WristMode.DOWN;
+    time = Timer.getFPGATimestamp();
+  }
+
+  public WristDownStart(double delay)
+  {
+    requires(Robot.wrist);
+    this.targetMode = WristMode.DOWN;
+    time = Timer.getFPGATimestamp() + delay;
   }
 
   // Called just before this Command runs the first time
@@ -29,7 +40,6 @@ public class WristDownStart extends Command
   protected void initialize()
   {
     Robot.wrist.configMotionValues(Wrist.kMaxAccelerationSpecial, Wrist.kMaxVelocitySpecial);
-    Robot.wrist.setControlMode(ControlMode.MotionMagic);
 
   }
 
@@ -37,7 +47,12 @@ public class WristDownStart extends Command
   @Override
   protected void execute()
   {
+    if(Timer.getFPGATimestamp() >= time)
+    {
+      Robot.wrist.setControlMode(ControlMode.MotionMagic);
+
       Robot.wrist.setTargetPosition(this.targetMode);
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()

@@ -33,7 +33,7 @@ public class Elevator extends Subsystem
     // private final int kMagicUpSlot = 0;
     // private final int kMagicDownSlot = 1;
     private final double kMagicP = 0.7;
-    private final double kMagicI = 0.007;
+    private final double kMagicI = 0.007; // 0
     private final double kMagicD = 0;
     private final double kMagicF =  0.9;
     private final double kPositionP = 0.5;
@@ -59,6 +59,7 @@ public class Elevator extends Subsystem
     {
         FLOOR(0), //TODO: ADD FLOOR BUTTON
         COLLECT_CARGO(4780),
+        COLLECT_CARGO_FEEDER(21300),
         COLLECT_HATCH_HOOK(1500), 
         COLLECT_HATCH(10),
         LOW_HATCH_HOOK(6200),
@@ -67,6 +68,7 @@ public class Elevator extends Subsystem
         MIDDLE_HATCH_HOOK(27570),
         MIDDLE_HATCH(22890),
         MIDDLE_CARGO(30280),
+        CARGO_SHIP(31500),
         HIGH_HATCH(44000),
         HIGH_HATCH_HOOK(45150),
         HIGH_CARGO(47500),
@@ -96,7 +98,7 @@ public class Elevator extends Subsystem
         // limitswitches
         master.configReverseLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyClosed, Robot.drivetrain.GetSwitchDeviceId(), 10);
         // softlimits
-        configForwardSoftLimitThreshold(kMaxHeight, true);
+        configForwardSoftLimitThreshold(kMaxHeight, false);
 
         //voltage
         configVoltageCompSaturation(kVoltage, false);
