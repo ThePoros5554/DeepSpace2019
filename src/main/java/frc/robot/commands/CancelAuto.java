@@ -7,20 +7,36 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import frc.robot.Robot;
 import frc.robot.commands.elevator.AdjustElevator;
 import frc.robot.commands.wrist.AdjustWrist;
 import frc.robot.subsystems.Elevator.ElevatorMode;
 import frc.robot.subsystems.Wrist.WristMode;
 
-public class InitHatchHookMiddleMode extends CommandGroup
+public class CancelAuto extends Command
 {
   /**
    * Add your docs here.
    */
-  public InitHatchHookMiddleMode()
+  public CancelAuto()
   {
-    addParallel(new AdjustWrist(WristMode.DOWN));
-    addSequential(new AdjustElevator(ElevatorMode.MIDDLE_HATCH_HOOK));
+ 
   }
+
+    @Override
+    protected void initialize()
+    {
+        if(Robot.selectedCommand != null)
+        {
+            Robot.selectedCommand.cancel();
+        }
+    }
+
+    @Override
+    protected boolean isFinished() 
+    {
+        return true;
+    }
 }

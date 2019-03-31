@@ -5,32 +5,35 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.hatch_launcher;
+package frc.robot.commands.lifter;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.Lifter;
+import poroslib.util.Speed;
 
-public class ActivateLauncher extends Command
+public class LiftBack extends Command
 {
-  public ActivateLauncher()
+  
+  private Speed speed;
+
+  public LiftBack(Speed speed)
   {
-    requires(Robot.hatchLauncher);
+    requires(Robot.lifter);
+    this.speed = speed;
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize()
   {
-    Robot.hatchLauncher.retract();
-
-    // Robot.hatchLauncher.stop();
-    System.out.println("Hatch Launcher: launching");
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute()
   {
+      Robot.lifter.setBack(speed.GetValue(), Lifter.kConstPowerBack);
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -44,9 +47,8 @@ public class ActivateLauncher extends Command
   @Override
   protected void end()
   {
-    Robot.hatchLauncher.launch();
-    // Robot.hatchLauncher.stop();
-    System.out.println("Hatch Launcher: retracting");
+    Robot.lifter.setBack(0, Lifter.kConstPowerBack);
+
   }
 
   // Called when another command which requires one or more of the same

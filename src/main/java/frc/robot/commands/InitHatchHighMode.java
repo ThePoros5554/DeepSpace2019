@@ -20,7 +20,7 @@ public class InitHatchHighMode extends CommandGroup
    */
   public InitHatchHighMode()
   {
-    addParallel(new AdjustWrist(WristMode.UP));
+    addParallel(new AdjustWrist(WristMode.DOWN));
     addSequential(new AdjustElevator(ElevatorMode.HIGH_HATCH));
   }
 }

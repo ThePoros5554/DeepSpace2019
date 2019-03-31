@@ -18,6 +18,8 @@ public class MechSys extends Subsystem implements PidActionSubsys, SafeSubsystem
 	
 	private LimitSensor limitSwitch;
 	private boolean isLimited = false;
+	private boolean stopOnTop = false;
+	private boolean stopOnButtom = false;
 
 	private boolean isReversed = false;
 
@@ -99,8 +101,11 @@ public class MechSys extends Subsystem implements PidActionSubsys, SafeSubsystem
 			
 		if(speed == 0)
 		{
-
-			speed = zeroValue;
+			if(!((stopOnButtom && limitSwitch.GetPosition() == SysPosition.Bottom)
+			|| (stopOnTop && limitSwitch.GetPosition() == SysPosition.Top)))
+			{
+				speed = zeroValue;
+			}
 		}
 		
 		if(this.safety != null && this.isSafetyEnabled)
@@ -169,7 +174,17 @@ public class MechSys extends Subsystem implements PidActionSubsys, SafeSubsystem
 	public void Stop() 
 	{
 		this.motor.set(0);
-    }
+	}
+	
+	public void SetStopOnTop(boolean stopOnTop)
+	{
+		this.stopOnTop = stopOnTop;
+	}
+
+	public void SetStopOnButtom(boolean stopOnButtom)
+	{
+		this.stopOnButtom = stopOnButtom;
+	}
 	
 	public void SetSystemCurrent(SystemCurrent monitor)
 	{

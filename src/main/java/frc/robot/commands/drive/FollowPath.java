@@ -1,13 +1,19 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.command.Command;
+import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.followers.EncoderFollower;
 import jaci.pathfinder.modifiers.TankModifier;
+import poroslib.sensors.NavxSource;
+import poroslib.sensors.NavxSource.NavxAxis;
 import poroslib.subsystems.DiffDrivetrain;
+import poroslib.systems.PIDProcessor;
 import poroslib.systems.RobotProfile;
+import poroslib.util.MathHelper;
 import poroslib.util.Path;
 
 public class FollowPath extends Command{
@@ -19,12 +25,16 @@ public class FollowPath extends Command{
 	
 	double distanceKP;
 	double distanceKD;
+
+	PIDProcessor angleController;
 	double headingKP;
 	double headingKD;
 	
 	private Notifier closedLoop;
+
+	private boolean isReversed;
 		
-	public FollowPath(Drivetrain dt, Path path, double distanceKP, double distanceKD, double headingKP, double headingKD)
+	public FollowPath(Drivetrain dt, Path path, double distanceKP, double distanceKD, double headingKP, double headingKD, boolean isReversed)
 	{
 		requires(dt);
 		
@@ -43,9 +53,11 @@ public class FollowPath extends Command{
 		
 		right = new EncoderFollower(modifier.getRightTrajectory());
 		right.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
+
+		this.isReversed = isReversed;
 	}
 	
-	public FollowPath(Drivetrain dt, Path leftPath, Path rightLeft, double distanceKP, double distanceKD, double headingKP, double headingKD)
+	public FollowPath(Drivetrain dt, Path leftPath, Path rightPath, double distanceKP, double distanceKD, double headingKP, double headingKD, boolean isReversed)
 	{
 		requires(dt);
 
@@ -59,9 +71,10 @@ public class FollowPath extends Command{
 		left = new EncoderFollower(leftPath.getTrajectory());
 		left.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
 		
-		right = new EncoderFollower(leftPath.getTrajectory());
+		right = new EncoderFollower(rightPath.getTrajectory());
 		right.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
 		
+		this.isReversed = isReversed;
 	}
 	
 	@Override
@@ -70,6 +83,10 @@ public class FollowPath extends Command{
 		left.configureEncoder(dt.getRawLeftPosition(), RobotProfile.getRobotProfile().getDriveEncTicksPerRevolution(), RobotProfile.getRobotProfile().getWheelDiameter());
 		right.configureEncoder(dt.getRawRightPosition(), RobotProfile.getRobotProfile().getDriveEncTicksPerRevolution(), RobotProfile.getRobotProfile().getWheelDiameter());
 	
+		angleController = new PIDProcessor(headingKP, 0, headingKD, new NavxSource(Robot.drivetrain.getNavx(), NavxAxis.yaw),false);
+		angleController.setInputRange(-180, 180);
+		angleController.setContinuous(false);
+
 		closedLoop = new Notifier(new Thread() 
 		{
 			private double lastAngleDifference = 0;
@@ -77,27 +94,43 @@ public class FollowPath extends Command{
 			@Override
 			public void run() 
 			{
-				System.out.println("pos: " + left.getSegment().position);
-				System.out.println("calcPos: " +  ((double) (dt.getRawLeftPosition() / 4096)
-				* 0.1016 * Math.PI));
 
-				System.out.println("heading: " + left.getSegment().heading);
-				System.out.println("yaw: " + dt.getHeading());
-				double l = left.calculate(dt.getRawLeftPosition());
-				double r = right.calculate(-dt.getRawRightPosition());
+				if(!angleController.isEnabled())
+				{
+					angleController.enable();
+				}
 
-				double heading = dt.getHeading();
-				double desired_heading = Pathfinder.r2d(left.getHeading());
-				double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
-				System.out.println("heading_difference: " + heading_difference);
+				double l;
+				double r;
 
-				double turn =  heading_difference;
+				if(isReversed)
+				{
+					l = left.calculate(-dt.getRawLeftPosition());
+					r = right.calculate(+dt.getRawRightPosition());				}
+				else
+				{
+					l = left.calculate(dt.getRawLeftPosition());
+					r = right.calculate(-dt.getRawRightPosition());
+				}
 
-				double turnOut = (headingKP * turn);
+				double distance_covered = ((double)(dt.getRawLeftPosition() - 0) / 4096)
+				* (Math.PI *0.1016);
+								
+				double angle = Pathfinder.r2d(left.getHeading());
+				double boundedAngle = Pathfinder.boundHalfDegrees(angle);
+				System.out.println("out: " + boundedAngle);
+				angleController.setSetpoint(boundedAngle);
+				lastAngleDifference = angle;
+				double turnOut = angleController.GetOutputValue();
 
-				lastAngleDifference = heading_difference;
-				
-				dt.tankDrive( -l - turnOut, -r + turnOut, 1);		
+				if(isReversed)
+				{
+					dt.tankDrive( +l - turnOut, +r + turnOut, 1);		
+				}
+				else
+				{
+					dt.tankDrive( -l - turnOut, -r + turnOut, 1);		
+				}
 			}
 		});
 		

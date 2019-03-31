@@ -20,7 +20,7 @@ public class InitHatchMiddleMode extends CommandGroup
    */
   public InitHatchMiddleMode()
   {
-    addParallel(new AdjustWrist(WristMode.UP));
+    addParallel(new AdjustWrist(WristMode.DOWN));
     addSequential(new AdjustElevator(ElevatorMode.MIDDLE_HATCH));
   }
 }

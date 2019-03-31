@@ -13,7 +13,6 @@ import frc.robot.Robot.RobotMode;
 
 public class ToggleClimbMode extends Command
 {
-  private RobotMode lastGamepieceMode;
 
   public ToggleClimbMode()
   {
@@ -23,20 +22,11 @@ public class ToggleClimbMode extends Command
   @Override
   protected void initialize()
   {
-    switch (Robot.mode)
+    if(Robot.mode != RobotMode.CLIMB)
     {
-      case HATCH:
-        this.lastGamepieceMode = RobotMode.HATCH;
-        Robot.mode = RobotMode.CLIMB;
-        break;
-      case CARGO:
-        this.lastGamepieceMode = RobotMode.CARGO;
-        Robot.mode = RobotMode.CLIMB;
-        break;
-      case CLIMB:
-        Robot.mode = this.lastGamepieceMode;
-        break;
+        Robot.lastRobotMode = Robot.mode;
     }
+        Robot.mode = RobotMode.CLIMB;
   }
 
   // Called repeatedly when this Command is scheduled to run

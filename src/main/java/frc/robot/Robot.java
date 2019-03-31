@@ -9,7 +9,6 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -17,13 +16,17 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
-import frc.robot.commands.autoScripts.*;
+import frc.robot.commands.autoScripts.RampToCenterCargo;
+import frc.robot.commands.autoScripts.Empty;
+import frc.robot.commands.autoScripts.RampToLeftRocket;
+import frc.robot.commands.autoScripts.RampToRightRocket;
 import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.HatchLauncher;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Wrist;
+import poroslib.sensors.SysPosition;
 import poroslib.systems.Limelight;
 import poroslib.systems.RobotProfile;
 import poroslib.systems.Limelight.LimelightCamMode;
@@ -39,7 +42,7 @@ import poroslib.systems.Limelight.LimelightLedMode;
 public class Robot extends TimedRobot
 {
   private SendableChooser<String> autonomousChooser;
-  private CommandGroup selectedCommand;
+  public static CommandGroup selectedCommand;
 
   public static Drivetrain drivetrain;
   private WPI_TalonSRX masterLeft;
@@ -49,7 +52,7 @@ public class Robot extends TimedRobot
   public static Wrist wrist;
   public static CargoIntake cargoIntake;
   public static HatchLauncher hatchLauncher;
-  // public static Lifter lifter;
+  public static Lifter lifter;
   public static Limelight lime;
 
   private OI oi;
@@ -61,12 +64,22 @@ public class Robot extends TimedRobot
     CARGO, HATCH, CLIMB
   }
 
+  public enum LifterMode
+  {
+    FORWARD, BACK
+  }
+
   public static RobotMode mode = RobotMode.HATCH;
+  public static RobotMode lastRobotMode = RobotMode.HATCH;
+  public static LifterMode liftMode = LifterMode.FORWARD;
+
   public static boolean isHook = true;
+  public static boolean teleopInit = false;
 
   private UpdateRobotState updateRobotState;
 
-  private double gameStartTime;
+  private double gameStartTime = 0;
+  public static double timeLeft = 135;
 
   public Robot()
   {
@@ -80,9 +93,12 @@ public class Robot extends TimedRobot
   public void robotInit()
   {
     RobotProfile.getRobotProfile().setWheelbaseWidth(0.75);
-    RobotProfile.getRobotProfile().setWheelDiameter(1.016);
-    RobotProfile.getRobotProfile().setAutoKV(0.215);
+    RobotProfile.getRobotProfile().setWheelDiameter(0.1016);
+    RobotProfile.getRobotProfile().setAutoKV(0.2222);
+    //RobotProfile.getRobotProfile().setAutoKV(0);
+
     RobotProfile.getRobotProfile().setAutoKA(0);
+    
     RobotProfile.getRobotProfile().setPathTimeStep(0.05);
     RobotProfile.getRobotProfile().setDriveEncTicksPerRevolution(4096);
 
@@ -95,8 +111,8 @@ public class Robot extends TimedRobot
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
-    hatchLauncher = new HatchLauncher();
-    // lifter = new Lifter();
+    // hatchLauncher = new HatchLauncher();
+    lifter = new Lifter();
 
     // oi
     oi = new OI();
@@ -112,6 +128,7 @@ public class Robot extends TimedRobot
     autonomousChooser.addOption("Empty", RobotMap.EMPTY);
     autonomousChooser.addOption("Ramp To Left Rocket", RobotMap.RAMPTOLEFTROCKET);
     autonomousChooser.addOption("Ramp To Center Cargo", RobotMap.RAMPTOCENTERCARGO);
+    autonomousChooser.addOption("Ramp To Right Rocket", RobotMap.RAMPTORIGHTROCKET);
     SmartDashboard.putData("Autonomous Chooser", autonomousChooser);
   }
 
@@ -129,13 +146,12 @@ public class Robot extends TimedRobot
     lime.setPipeline(7);
     lime.setCamMode(LimelightCamMode.VisionProcessor);
 
-    SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
-    SmartDashboard.putNumber("straight", drivetrain.straightAngle);
+   SmartDashboard.putNumber("Yaw", drivetrain.getHeading());
     // SmartDashboard.putNumber("Roll", drivetrain.getSideTipAngle());
-    // SmartDashboard.putNumber("Pitch", drivetrain.getForwardTipAngle());
+    // SmartDashboard.putNumber("pitch", drivetrain.getForwardTipAngle());
 
-    SmartDashboard.putNumber("leftEnc", drivetrain.getLeftPositionInCm());
-    SmartDashboard.putNumber("rightEnc", drivetrain.getRightPositionInCm());
+  //  SmartDashboard.putNumber("leftEnc", drivetrain.getLeftPositionInCm());
+  //  SmartDashboard.putNumber("rightEnc", drivetrain.getRightPositionInCm());
 
     // SmartDashboard.putNumber("x position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getX());
     // SmartDashboard.putNumber("y position: " , RobotMonitor.getRobotMonitor().getLastPositionReport().getValue().getTranslation().getY());
@@ -145,23 +161,30 @@ public class Robot extends TimedRobot
     // SmartDashboard.putNumber("target y: " , RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getTranslation().getY());
     // SmartDashboard.putNumber("target offset: " ,  RobotMonitor.getRobotMonitor().getLastVisionReport().getValue().getHorizontalDisplacement().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("Elevator Position:", elevator.getCurrentPosition());
+     SmartDashboard.putNumber("Elevator Position:", elevator.getCurrentPosition());
 
-    SmartDashboard.putNumber("Wrist Position:", wrist.getCurrentPosition());
+      SmartDashboard.putNumber("Wrist Position:", wrist.getCurrentPosition());
 
     // SmartDashboard.putNumber("Elevator sp", elevator.getTargetPosition());
     // SmartDashboard.putNumber("Wrist sp", wrist.getTargetPosition());
 
     SmartDashboard.putBoolean("Cargo Mode", Robot.mode == RobotMode.CARGO);
     SmartDashboard.putBoolean("Hatch Mode", Robot.mode == RobotMode.HATCH);
-    SmartDashboard.putBoolean("Hook Mode", Robot.isHook == true);
 
-    SmartDashboard.putBoolean("Elevator Limit", Robot.drivetrain.getIsElevatorLimit());
+    SmartDashboard.putString("Robot Mode", Robot.mode.toString());
 
-    double timeLeft = 150 - (Timer.getFPGATimestamp() - gameStartTime);
-    SmartDashboard.putBoolean("30 Sec Mark:", timeLeft <= 30);
-    SmartDashboard.putNumber("Time Left:", timeLeft);
+    // SmartDashboard.putBoolean("Elevator Limit", Robot.drivetrain.getIsElevatorLimit());
+    // SmartDashboard.putNumber("Time Left:", timeLeft);
+
+    SmartDashboard.putBoolean("FrontLeftSwitch:", (lifter.GetFrontLeftPos() == SysPosition.Top || lifter.GetFrontLeftPos() == SysPosition.Bottom|| lifter.GetFrontLeftPos() == SysPosition.Blocked));
+    SmartDashboard.putBoolean("FrontRightSwitch:", (lifter.GetFrontRightPos() == SysPosition.Top || lifter.GetFrontRightPos() == SysPosition.Bottom || lifter.GetFrontRightPos() == SysPosition.Blocked));
+    SmartDashboard.putBoolean("BackSwitch:", lifter.GetBackPos() == SysPosition.Bottom);
+
+    SmartDashboard.putString("FrontLeftPos:", lifter.GetFrontLeftPos().toString());
+    SmartDashboard.putString("FrontRightPos:", lifter.GetFrontRightPos().toString());
+
   }
+
 
   /**
    * This function is called once each time the robot enters Disabled mode.
@@ -171,6 +194,8 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
+    teleopInit = false;
+
     if(updateRobotState != null)
     {
       updateRobotState.cancel();
@@ -244,6 +269,7 @@ public class Robot extends TimedRobot
   public void teleopInit()
   {
     gameStartTime = Timer.getFPGATimestamp();
+    teleopInit = true;
 
     drivetrain.resetHeading();
     drivetrain.resetRawPosition();
@@ -270,8 +296,11 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
+    timeLeft = 135 - (Timer.getFPGATimestamp() - gameStartTime);
+
     lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
+
   }
 
   /**
@@ -302,6 +331,10 @@ public class Robot extends TimedRobot
       case RobotMap.RAMPTOCENTERCARGO:
 
         return new RampToCenterCargo();
+
+      case RobotMap.RAMPTORIGHTROCKET:
+
+        return new RampToRightRocket();
 
       default:
 

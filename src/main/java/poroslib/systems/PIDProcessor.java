@@ -10,7 +10,7 @@ import poroslib.util.ControllerOutput;
 
 public class PIDProcessor extends PIDController 
 {	
-	private PIDSource feedbackDevice;
+	public PIDSource feedbackDevice;
 	
 	private boolean resetWhenEnabled;
 	
@@ -114,6 +114,12 @@ public class PIDProcessor extends PIDController
 		
 		super.enable();
 	}
+
+	// @Override
+	// public void calculate()
+	// {
+		
+	// }
 
 
 

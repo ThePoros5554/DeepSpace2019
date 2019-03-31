@@ -47,7 +47,7 @@ public class Elevator extends Subsystem
     private final NeutralMode kNeutralMode = NeutralMode.Brake;
     private final double kRamp = 0;
 
-    private final int kMaxHeight = 47800;
+    private final int kMaxHeight = 48000;
     private final int kMinHeight = 0;
     private final int kTargetThreshold = 15;
 
@@ -60,19 +60,15 @@ public class Elevator extends Subsystem
         FLOOR(0), //TODO: ADD FLOOR BUTTON
         COLLECT_CARGO(4780),
         COLLECT_CARGO_FEEDER(21300),
-        COLLECT_HATCH_HOOK(1500), 
-        COLLECT_HATCH(10),
-        LOW_HATCH_HOOK(6200),
-        LOW_HATCH(2150),
+        COLLECT_HATCH(1500), 
+        LOW_HATCH(6200),
         LOW_CARGO(8960),
-        MIDDLE_HATCH_HOOK(27570),
-        MIDDLE_HATCH(22890),
+        MIDDLE_HATCH(27570),
         MIDDLE_CARGO(30280),
         CARGO_SHIP(31500),
-        HIGH_HATCH(44000),
-        HIGH_HATCH_HOOK(45150),
+        HIGH_HATCH(45850),
         HIGH_CARGO(47500),
-        LIFT(11000);
+        LIFT(17000);
 
         private final int position;
 

@@ -51,7 +51,7 @@ public class Wrist extends Subsystem
 
   // config constants
   private final int kMaxTilt = 2825;
-  private final int kMinTilt = 1000;
+  private final int kMinTilt = 1390;
   private final double kVoltage = 10;
 
   private int maxPositionLimit = kMaxTilt;
@@ -59,8 +59,8 @@ public class Wrist extends Subsystem
 
   public static final int kMaxAcceleration = 500;
   public static int kMaxVelocity = 500;
-  public static final int kMaxAccelerationSpecial = 100;
-  public static final int kMaxVelocitySpecial = 100;
+  public static final int kMaxAccelerationSpecial = 150;
+  public static final int kMaxVelocitySpecial = 150;
 
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final boolean kInvertEnc = true;
@@ -74,7 +74,7 @@ public class Wrist extends Subsystem
   public enum WristMode
   {
     UP(1780),
-    DOWN(2825),
+    DOWN(2775),
     INSIDE(1000),
     COLLECT_CARGO(3100),
     HIGH_CARGO(2450);

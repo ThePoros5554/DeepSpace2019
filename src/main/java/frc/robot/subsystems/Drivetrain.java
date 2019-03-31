@@ -8,9 +8,9 @@
 package frc.robot.subsystems;
 
 //robot width 85
+
 //robot length 66.5
 //robot max speed 7750 native/100ms
-
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -21,6 +21,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import poroslib.subsystems.DiffDrivetrain;
 import poroslib.systems.PIDProcessor;
 import poroslib.util.MathHelper;
@@ -58,13 +59,14 @@ public class Drivetrain extends DiffDrivetrain
   private static final double kEncoderTicks = 4096;
   private final boolean kInvertEncLeft = true;
   private final boolean kInvertEncRight = true;
-  private final double kRamp = 0.3;
+  private final double kRamp = 0;
   public final double kEjectDriveBackDistance = 14.3;
   private final NeutralMode kNeutralMode = NeutralMode.Brake;
   private final int kTargetThreshold = 0;
 
   //DriveStaright
-  private PIDProcessor straightPID;
+  private PIDProcessor straightFwdPID;
+  private PIDProcessor straightRvPID;
   public double straightAngle;
   private boolean isDrivingStraight = false;
   private double angleDiffrenceTolerance = 1.5;
@@ -149,8 +151,9 @@ public class Drivetrain extends DiffDrivetrain
 
     //straight
     //straightPID = new PIDProcessor(0.09, 0, 0, navx, false);
-    straightPID = new PIDProcessor(0.05, 0, 0, navx, false);
-    this.setRotateDeadband(0.15);
+    straightFwdPID = new PIDProcessor(0.1, 0, 0, navx, false);
+    straightRvPID = new PIDProcessor(0.1, 0, 0, navx, false); 
+    this.setRotateDeadband(0.2);
   }
 
   public void set(double valueLeft, double valueRight)
@@ -317,30 +320,46 @@ public class Drivetrain extends DiffDrivetrain
       {
         if(!isDrivingStraight)
         {
-          straightPID.enable();
           straightAngle = getHeading();
-          straightPID.setSetpoint(straightAngle);
+
+          straightFwdPID.setSetpoint(straightAngle);
+          straightFwdPID.enable();
+
+          straightRvPID.setSetpoint(straightAngle);
+          straightRvPID.enable();
         }
         if(MathHelper.handleDeadband(angleDiffrenceTolerance, straightAngle - getHeading()) == 0)
         {
           straightAngle = getHeading();
-          straightPID.setSetpoint(straightAngle);
+
+          straightFwdPID.setSetpoint(straightAngle);
+          straightRvPID.setSetpoint(straightAngle);
         }
 
-
         isDrivingStraight = true;
-        super.curvatureDrive(speed, straightPID.GetOutputValue(), rotateInPlace, maxOutput);
+
+        if(speed > 0)
+        {
+          super.curvatureDrive(speed, straightFwdPID.GetOutputValue(), rotateInPlace, maxOutput);
+        }
+        else
+        {
+          super.curvatureDrive(speed, straightRvPID.GetOutputValue(), rotateInPlace, maxOutput);
+        }
+        // super.curvatureDrive(speed, straightPID.GetOutputValue(), rotateInPlace, maxOutput);
       }
       else
       {
         this.isDrivingStraight = false;
         super.curvatureDrive(speed, rotate, rotateInPlace, maxOutput);
+        //super.curvatureDrive(speed, 0, rotateInPlace, 1);
       }
 
 
       if(!isDrivingStraight)
       {
-        straightPID.reset();
+        straightFwdPID.reset();
+        straightRvPID.reset();
       }
   }
 

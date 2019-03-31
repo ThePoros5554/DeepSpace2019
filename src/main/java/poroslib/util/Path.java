@@ -22,8 +22,8 @@ public class Path
 	//If at some point in the future, want to move to hash style, add boolean hash to this function
 	public Trajectory getTrajectory()
 	{
+		//File pathFile = new File(Filesystem.getDeployDirectory() + "/output/" + pathName + ".csv");
 		File pathFile = new File(Filesystem.getDeployDirectory() + "/output/" + pathName + ".pf1.csv");
-
 		Trajectory trajectory;
 
 		if (pathFile.exists()) 

@@ -16,7 +16,8 @@ public class CurvatureDrive extends Command
     private double boostMaxOutput = 1;
     private double aimMaxOutput = 1;
 	
-    public CurvatureDrive(DiffDrivetrain drivetrain, SmartJoystick joy, double sensitivity, double boostSensitivity, double aimSensitivity)
+    public 
+    CurvatureDrive(DiffDrivetrain drivetrain, SmartJoystick joy, double sensitivity, double boostSensitivity, double aimSensitivity)
     {
     	this.drivetrain = drivetrain;
         this.joy = joy;
@@ -52,7 +53,8 @@ public class CurvatureDrive extends Command
     protected void execute()
     {
     	double speedValue = this.joy.GetSpeedAxis();
-    	double rotateValue =  this.joy.GetRotateAxis();
+        double rotateValue =  this.joy.GetRotateAxis();
+        
         
         if (joy.getRawAxis(3) >= 0.8)
         {
@@ -64,6 +66,7 @@ public class CurvatureDrive extends Command
         }
         else
         {
+
             this.drivetrain.curvatureDrive(-speedValue, rotateValue, joy.getRawButton(5), maxOutput);
         }
     }

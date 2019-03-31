@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.Map.Entry;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMonitor;
 import frc.robot.subsystems.Drivetrain;
@@ -48,7 +47,7 @@ public class VisionAlignment extends Command
 
         requires(driveTrain);
 
-        angleController = new PIDProcessor(0.015, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController = new PIDProcessor(0.02, 0.00025, 0, driveTrain.getNavx(), false);
         angleController.setInputRange(-180, 180);
         angleController.setContinuous(true);
     }
@@ -63,7 +62,7 @@ public class VisionAlignment extends Command
 
         requires(driveTrain);
 
-        angleController = new PIDProcessor(0.015, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController = new PIDProcessor(0.02, 0.0002, 0, driveTrain.getNavx(), false);
         angleController.setInputRange(-180, 180);
         angleController.setContinuous(true);
     }
@@ -78,7 +77,7 @@ public class VisionAlignment extends Command
 
         requires(driveTrain);
 
-        angleController = new PIDProcessor(specialP, 0.0001, 0, driveTrain.getNavx(), false);
+        angleController = new PIDProcessor(specialP, 0.0002, 0, driveTrain.getNavx(), false);
         angleController.setInputRange(-180, 180);
         angleController.setContinuous(true);
     }
@@ -94,6 +93,7 @@ public class VisionAlignment extends Command
     @Override
     protected void execute()
     {
+        System.out.println("vision allignment");
         if (monitor.getLastVisionReport() != null)
         {
 
@@ -175,7 +175,7 @@ public class VisionAlignment extends Command
                 // driveTrain.set(-(driveTrain.getRawLeftPosition() + leftTicksToGo), (driveTrain.getRawRightPosition() + rightTicksToGo));
 
                 // lastDriveSignal = velocity;
-                driveTrain.curvatureDrive(forwardValue, angleController.GetOutputValue(), true, 1);
+                driveTrain.curvatureDrive(forwardValue, angleController.GetOutputValue(), true, 0.7);
             }
         }
     }

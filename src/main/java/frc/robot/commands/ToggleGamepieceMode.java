@@ -31,6 +31,7 @@ public class ToggleGamepieceMode extends Command
         Robot.mode = RobotMode.HATCH;
         break;
       case CLIMB:
+      Robot.mode = Robot.lastRobotMode;
         break;
     }
   }

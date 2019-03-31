@@ -23,7 +23,6 @@ public class ControllerOutput implements PIDOutput
 	@Override
 	public void pidWrite(double output) 
 	{
-		
 		if(this.isReversed)
 		{
 			this.outputValue = -output;
