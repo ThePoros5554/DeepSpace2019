@@ -70,7 +70,7 @@ public class Lifter extends Subsystem
     wheels = new MechSys(new Victor(kWheelsPort));
 
     frontRight.SetLimitSwitch(frontRightSwitches);
-    frontRight.SetStopOnButtom(true);
+    frontRight.SetStopOnBottom(true);
     frontLeft.SetLimitSwitch(frontLeftSwitches);
     frontLeft.SetStopOnTop(true);
     back.SetLimitSwitch(backSwitches);

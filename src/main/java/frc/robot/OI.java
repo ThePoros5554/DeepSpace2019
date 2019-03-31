@@ -9,11 +9,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import frc.robot.Robot.LifterMode;
 import frc.robot.Robot.RobotMode;
 import frc.robot.commands.InitHatchCollectMode;
+import frc.robot.commands.AutoLiftRobot;
 import frc.robot.commands.CancelAuto;
-import frc.robot.commands.ChangeLiftMode;
 import frc.robot.commands.DriveStraight;
 import frc.robot.commands.InitCargoCollectFeederMode;
 import frc.robot.commands.InitCargoCollectMode;
@@ -47,16 +46,11 @@ import frc.robot.subsystems.CargoIntake;
 import frc.robot.subsystems.Lifter;
 import frc.robot.triggers.ExceptionModeJoyAxis;
 import frc.robot.triggers.ExceptionModeJoyAxisPart;
-import frc.robot.triggers.HatchModeTrigger;
-import frc.robot.triggers.LiftTrigger;
 import frc.robot.triggers.ModeJoyAxis;
 import frc.robot.triggers.ModeJoyAxisPart;
 import frc.robot.triggers.ModeTrigger;
 import poroslib.commands.CurvatureDrive;
 import poroslib.commands.RumbleJoystick;
-import poroslib.commands.TankDrive;
-import poroslib.triggers.JoyAxis;
-import poroslib.triggers.JoyAxisPart;
 import poroslib.triggers.POVTrigger;
 import poroslib.triggers.SmartJoystick;
 
@@ -76,9 +70,6 @@ public class OI
     private static final int kEjectPartButton = 5; // LB
     private static final int kCollectPartButton = 6; // RB
     private static final int kClimbModeButton = 9; // BACK
-    // private static final int kHatchModeButton = 9; // LEFT AXIS BUTTON
-    private static final int kLiftCloseRearButton = 0;
-    private static final int kLiftCloseFrontButton = 0;
     private static final int kElevatorUpAxis = 3; // RT
     private static final int kElevatorDownAxis = 2; // LT
     private static final int kWristAxis = 1; // L 
@@ -119,12 +110,8 @@ public class OI
     private Button modeButton;
     private Button driveStraightButton;
     private Button climbModeButton;
-    private Button prepareLiftButton;
     private Button moveToVisionTarget;
     private Button cancelAuto;
-    private Button changeLiftBtn;
-    //private Button startButton;
-    // private ModeTrigger ToggleButton;
 
     private ModeTrigger prepareHatchCollectTrigger;
     private ModeTrigger prepareCargoCollectTrigger;
@@ -162,6 +149,7 @@ public class OI
     private ExceptionModeJoyAxis elevatorDownAxis;
     private ExceptionModeJoyAxis elevatorUpAxis;
 
+    private AutoLiftRobot autoClimb;
     private LiftFrontLeft fwdLiftFrontLeft;
     private LiftFrontRight fwdLiftFrontRight;
     private LiftBack fwdLiftBack;
@@ -197,18 +185,14 @@ public class OI
     private InitCargoMiddleMode prepareCargoMiddle;
     private InitCargoHighMode prepareCargoHigh;
     private InitCargoShipMode prepareCargoShip;
-    // private LiftRobot liftRobot;
     private InitLiftMode prepareLift;
     private MoveWrist wristDown;
     private MoveWrist wristUp;
     private MoveElevator elevatorUp;
     private MoveElevator elevatorDown;
-    private WristDownStart wristDownStart;
 
     private VisionAlignment visionAllignment;
-
     private ToggleGamepieceMode toggleGamepiece;
-    private ToggleClimbMode toggleClimb;
 
     public OI()
     {  
@@ -229,8 +213,6 @@ public class OI
         cancelAuto = new JoystickButton(driverJoy, 7);
 
         //rumbleAt10 = new RumbleInTime(driverJoy, 0.65, 2, 12);
-        wristDownStart = new WristDownStart();
-        //startButton = new JoystickButton(operatorJoy, kStartButton);
         prepareHatchCollectTrigger = new ModeTrigger(operatorJoy, kCollectModeButton, RobotMode.HATCH);
         prepareHatchLowTrigger = new ModeTrigger(operatorJoy, kLowModeButton, RobotMode.HATCH);
         prepareHatchMiddleTrigger = new ModeTrigger(operatorJoy, kMiddleModeButton, RobotMode.HATCH);
@@ -266,12 +248,10 @@ public class OI
         resetConstPowerBtn = new ModeTrigger(operatorJoy, kResetConstPower, RobotMode.CLIMB);
         resetConstBackBtn = new ModeTrigger(operatorJoy, kResetConstBack, RobotMode.CLIMB);
 
-        // ToggleButton = new ModeTrigger(operatorJoy, kHatchModeButton, RobotMode.HATCH);
         modeButton = new JoystickButton(operatorJoy, kRobotModeButton);
         climbModeButton = new JoystickButton(operatorJoy, kClimbModeButton);
         moveToVisionTarget = new JoystickButton(driverJoy, kMoveToVisionTargetButton);
         // driveStraightButton = new JoystickButton(rightJoy, kDriveStraightButton);
-        // prepareLiftButton = new JoystickButton(operatorJoy, kRobotLiftModeButton);
 
         // axis
         elevatorUpAxis = new ExceptionModeJoyAxis(operatorJoy, kElevatorDownAxis, 0, 1, -1, 0, RobotMode.CLIMB);
@@ -283,10 +263,8 @@ public class OI
         poroDrive = new CurvatureDrive(Robot.drivetrain, driverJoy, 0.6, 1, 0.3);
         // defaultDrive = new TankDrive(Robot.drivetrain, leftJoy, rightJoy);
         // driveStraight = new DriveStraight(leftJoy, rightJoy);
-        // ejectHatch = new EjectHatch(operatorJoy);
-        
-        prepareHatchCollect = new InitHatchCollectMode();
 
+        prepareHatchCollect = new InitHatchCollectMode();
         prepareHatchLow = new InitHatchLowMode();
         prepareHatchMiddle = new InitHatchMiddleMode();
         prepareHatchHigh = new InitHatchHighMode();
@@ -323,6 +301,8 @@ public class OI
         resetLiftConstPower = new ResetConstPower();
         resetLiftConstBack = new ResetConstBack();
 
+        autoClimb = new AutoLiftRobot();
+
         elevatorDown = new MoveElevator(elevatorDownAxis);
         elevatorUp = new MoveElevator(elevatorUpAxis);
         wristDown = new MoveWrist(wristDownAxis);
@@ -334,6 +314,7 @@ public class OI
         visionAllignment = new VisionAlignment(driverJoy, true);
 
         /****************************************/
+
         Robot.drivetrain.setDefaultCommand(poroDrive);
         // Robot.drivetrain.setDefaultCommand(defaultDrive);
         modeButton.whenPressed(toggleGamepiece);
@@ -345,6 +326,7 @@ public class OI
         fwdLiftFrontRightBtn.whileActive(fwdLiftFrontRight);
         rvLiftFrontRightBtn.whileActive(rvLiftFrontRight);
         fwdLiftRobotBtn.whileActive(fwdLiftRobot);
+        // fwdLiftRobotBtn.whenActive(autoClimb);
         rvLiftRobotBtn.whileActive(rvLiftRobot);
         fwdLiftBackAxis.whileActive(fwdLiftBack);
         rvLiftBackAxis.whileActive(rvLiftBack);
@@ -362,7 +344,6 @@ public class OI
         slowSpeedClimbAxis.whenInactive(climbFwdNormalSpeed);
 
         // hatch
-        //startButton.whenPressed(wristDownStart);
         prepareHatchCollectTrigger.whenActive(prepareHatchCollect);
         prepareHatchLowTrigger.whenActive(prepareHatchLow);
         prepareHatchMiddleTrigger.whenActive(prepareHatchMiddle);
