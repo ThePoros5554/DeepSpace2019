@@ -22,42 +22,46 @@ public class AutoLiftRobot extends CommandGroup {
   /**
    * Add your docs here.
    */
-  public AutoLiftRobot(double elevatorDownPower)
+  public AutoLiftRobot()
   {
 
     // climb up 
     addParallel(new LiftRobot(Lifter.fwdClimbSpeed));
-    addSequential(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
+    addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
     addSequential(new Timeout(1.5));
-    addSequential(new ChangeClimbSpeed(Lifter.normalSpeedClimb));
+    addParallel(new ChangeClimbSpeed(Lifter.normalSpeedClimb));
     addSequential(new Timeout(2.2));
-    addSequential(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
+    addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
     
     // wait for all switches to be pressed
     addSequential(new WaitForSwitches(false));
     
-    // go forward
-    addSequential(new RollWheels(Lifter.wheelFwdSpeed));
-    addSequential(new Timeout(1.3));
+    // // go forward
+    // addParallel(new RollWheels(Lifter.wheelFwdSpeed), 1.3);
 
-    // retract front lifters
-    addParallel(new LiftFront(Lifter.rvClimbSpeed));
-    addSequential(new ChangeClimbSpeed(Lifter.slowSpeedClimb), 1);
-    addSequential(new ChangeClimbSpeed(Lifter.normalSpeedClimb));
+    // // retract front lifters
+    // addParallel(new LiftFront(Lifter.rvClimbSpeed));
+    // addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
+    // addSequential(new Timeout(1));
+    // addParallel(new ChangeClimbSpeed(Lifter.normalSpeedClimb));
     
-    // wait for front lifters switches to be pressed
-    addSequential(new WaitForSwitches(true));
+    // // wait for front lifters switches to be pressed
+    // addSequential(new WaitForSwitches(true));
 
-    // drive into the ramp
-    addSequential(new MagicDrive(1000, 1000, false)); // gotta tune and find values
+    // // drive into the ramp
+    // addSequential(new MagicDrive(1000, 1000, false), 1.5); // gotta tune and find values
 
-    // lift back
-    addParallel(new LiftBack(Lifter.rvClimbSpeed)); // gotta tune and find values
-    addSequential(new ChangeClimbSpeed(Lifter.slowSpeedClimb), 0.5);
-    addSequential(new ChangeClimbSpeed(Lifter.normalSpeedClimb), 1);
-    addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb), 0.7);
+    // // lift back
+    // addParallel(new LiftBack(Lifter.rvClimbSpeed)); // gotta tune and find values
+    // addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
+    // addSequential(new Timeout(0.5));
+    // addParallel(new ChangeClimbSpeed(Lifter.normalSpeedClimb));
+    // addSequential(new Timeout(1));
+    // addParallel(new ChangeClimbSpeed(Lifter.slowSpeedClimb));
+    // addSequential(new Timeout(0.7));
+    // addParallel(new ChangeClimbSpeed(0));
 
-    // drive into the ramp fully
-    addSequential(new MagicDrive(100, 100, false)); // gotta tune and find values
+    // // drive into the ramp fully
+    // addSequential(new MagicDrive(100, 100, false), 0.7); // gotta tune and find values
   }
 }
