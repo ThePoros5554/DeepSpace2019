@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristMode;
 import poroslib.util.CompareType;
 
@@ -19,11 +20,19 @@ public class AdjustWrist extends Command
   private WristMode targetMode;
   private int elevatorHeightCondition;
   private CompareType condition;
+  private boolean slowSpeed = false;
 
   public AdjustWrist(WristMode mode)
   {
     requires(Robot.wrist);
     this.targetMode = mode;
+  }
+
+  public AdjustWrist(WristMode mode, boolean slow)
+  {
+    requires(Robot.wrist);
+    this.targetMode = mode;
+    this.slowSpeed = slow;
   }
 
   public AdjustWrist(WristMode mode, int elevatorHeightCondition, CompareType condition)
@@ -39,6 +48,15 @@ public class AdjustWrist extends Command
   protected void initialize()
   {
     Robot.wrist.setControlMode(ControlMode.MotionMagic);
+
+    if (this.slowSpeed)
+    {
+      Robot.wrist.configMotionValues(Wrist.kMaxAccelerationSpecial, Wrist.kMaxVelocitySpecial);
+    }
+    else
+    {
+      Robot.wrist.configMotionValues(Wrist.kMaxAcceleration, Wrist.kMaxVelocity);
+    }
 
   }
 
@@ -81,6 +99,7 @@ public class AdjustWrist extends Command
   @Override
   protected void end()
   {
+    Robot.wrist.configMotionValues(Wrist.kMaxAcceleration, Wrist.kMaxVelocity);
   }
 
   // Called when another command which requires one or more of the same

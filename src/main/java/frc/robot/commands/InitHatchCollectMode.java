@@ -20,7 +20,7 @@ public class InitHatchCollectMode extends CommandGroup
    */
   public InitHatchCollectMode()
   {
-    addParallel(new AdjustWrist(WristMode.DOWN));
+    addParallel(new AdjustWrist(WristMode.DOWN, true));
     addSequential(new AdjustElevator(ElevatorMode.COLLECT_HATCH));
   }
 }

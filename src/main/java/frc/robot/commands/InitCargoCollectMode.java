@@ -21,7 +21,7 @@ public class InitCargoCollectMode extends CommandGroup
    */
   public InitCargoCollectMode()
   {
-    addSequential(new AdjustWrist(WristMode.HIGH_CARGO), 0.2);
+    //addSequential(new AdjustWrist(WristMode.HIGH_CARGO), 0.2);
     addParallel(new AdjustElevator(ElevatorMode.COLLECT_CARGO));
     addSequential(new AdjustWrist(WristMode.COLLECT_CARGO, 1065, CompareType.GREATER_OR_EQUAL));
   }

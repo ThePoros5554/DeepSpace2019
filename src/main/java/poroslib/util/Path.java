@@ -26,16 +26,23 @@ public class Path
 		File pathFile = new File(Filesystem.getDeployDirectory() + "/output/" + pathName + ".pf1.csv");
 		Trajectory trajectory;
 
-		if (pathFile.exists()) 
-		{ 
-			trajectory = Pathfinder.readFromCSV(pathFile);
-		}
-		else
+		try
 		{
-			DriverStation.reportError("trajectory at pathFile wasn't found", false);
-			return null;
+			if (pathFile.exists()) 
+			{ 
+				trajectory = Pathfinder.readFromCSV(pathFile);
+				return trajectory;
+			}
+			else
+			{
+				DriverStation.reportError("trajectory at pathFile wasn't found", false);
+			}
 		}
-		
-		return trajectory;
+		catch(Exception ex)
+		{
+			DriverStation.reportError(ex.toString(), false);
+		}
+
+		return null;
 	}
 }

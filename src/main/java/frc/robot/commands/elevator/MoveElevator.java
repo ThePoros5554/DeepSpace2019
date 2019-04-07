@@ -18,6 +18,7 @@ public class MoveElevator extends Command
 
   private double power;
   private JoyAxis powerAxis;
+  private double speed = 0;
 
   public MoveElevator(JoyAxis axis)
   {
@@ -52,6 +53,11 @@ public class MoveElevator extends Command
       Robot.elevator.set(this.power);
     }
 
+    if (speed < Robot.elevator.getSelectedSensorVelocity())
+    {
+      speed = Robot.elevator.getSelectedSensorVelocity();
+    }
+
     Robot.elevator.setTargetPosition(Robot.elevator.getCurrentPosition());
   }
 
@@ -67,6 +73,7 @@ public class MoveElevator extends Command
   protected void end()
   {
     Robot.elevator.setControlMode(ControlMode.Position);
+    System.out.println("fastest:" + speed);
   }
 
   // Called when another command which requires one or more of the same

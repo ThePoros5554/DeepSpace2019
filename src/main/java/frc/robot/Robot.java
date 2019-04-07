@@ -111,7 +111,6 @@ public class Robot extends TimedRobot
     wrist = new Wrist();
     elevator.enableLimitSwitch(true);
     cargoIntake = new CargoIntake();
-    // hatchLauncher = new HatchLauncher();
     lifter = new Lifter();
 
     // oi
@@ -120,8 +119,8 @@ public class Robot extends TimedRobot
     // cameras
     lime = new Limelight();
     rioCamThread = new CameraThread();
-    // rioCamThread.setDaemon(true);
-    // rioCamThread.start();
+    rioCamThread.setDaemon(true);
+    rioCamThread.start();
 
     // autonomous chooser
     autonomousChooser = new SendableChooser<String>();
@@ -216,7 +215,7 @@ public class Robot extends TimedRobot
   public void disabledPeriodic()
   {
     lime.setLedMode(LimelightLedMode.ForceOff);
-    Scheduler.getInstance().run();
+    // Scheduler.getInstance().run();
   }
 
   /**
@@ -299,6 +298,7 @@ public class Robot extends TimedRobot
     timeLeft = 135 - (Timer.getFPGATimestamp() - gameStartTime);
 
     lime.setLedMode(LimelightLedMode.ForceOn);
+
     Scheduler.getInstance().run();
 
   }

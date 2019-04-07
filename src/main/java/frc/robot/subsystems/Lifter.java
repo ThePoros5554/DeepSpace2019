@@ -32,10 +32,10 @@ public class Lifter extends Subsystem
   private final int kBackDownSwitchPort = 4;
   private final int kWheelsPort = 3;
 
-  public static Speed fwdClimbSpeed = new Speed(-0.8);
-  public static Speed rvClimbSpeed = new Speed(0.8);
-  public static final double slowSpeedClimb = 0.3;
-  public static final double normalSpeedClimb = 0.8;
+  public static Speed fwdClimbSpeed = new Speed(-0.6);
+  public static Speed rvClimbSpeed = new Speed(0.6);
+  public static final double slowSpeedClimb = 0.4;
+  public static final double normalSpeedClimb = 0.6;
   public static final double wheelFwdSpeed = 0.8;
   public static final double wheelRvSpeed = -0.3;
   public static final double kConstPowerBack = -0.15;

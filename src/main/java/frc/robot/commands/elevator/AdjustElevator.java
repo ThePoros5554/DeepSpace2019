@@ -104,6 +104,7 @@ public class AdjustElevator extends Command
   @Override
   protected void end()
   {
+    Robot.elevator.setControlMode(ControlMode.Position);
   }
 
   // Called when another command which requires one or more of the same

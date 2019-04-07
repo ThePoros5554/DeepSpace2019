@@ -33,6 +33,8 @@ public class FollowPath extends Command{
 	private Notifier closedLoop;
 
 	private boolean isReversed;
+
+	private boolean isNull = false;
 		
 	public FollowPath(Drivetrain dt, Path path, double distanceKP, double distanceKD, double headingKP, double headingKD, boolean isReversed)
 	{
@@ -45,6 +47,8 @@ public class FollowPath extends Command{
 		this.headingKP = headingKP;
 		this.headingKD = headingKD;
 		
+		if (path != null)
+		{
 		TankModifier modifier = new TankModifier(path.getTrajectory());
 		modifier.modify((RobotProfile.getRobotProfile().getWheelbaseWidth()));
 		
@@ -53,7 +57,11 @@ public class FollowPath extends Command{
 		
 		right = new EncoderFollower(modifier.getRightTrajectory());
 		right.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
-
+		}
+		else
+		{
+			isNull = true;
+		}
 		this.isReversed = isReversed;
 	}
 	
@@ -68,18 +76,26 @@ public class FollowPath extends Command{
 		this.headingKP = headingKP;
 		this.headingKD = headingKD;
 		
+		if (leftPath != null && rightPath != null)
+		{
 		left = new EncoderFollower(leftPath.getTrajectory());
 		left.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
 		
 		right = new EncoderFollower(rightPath.getTrajectory());
 		right.configurePIDVA(distanceKP, 0, distanceKD, RobotProfile.getRobotProfile().getAutoKV(), RobotProfile.getRobotProfile().getAutoKA());
-		
+		}
+		else
+		{
+			isNull = true;
+		}
 		this.isReversed = isReversed;
 	}
 	
 	@Override
 	protected void initialize()
 	{
+		if (!isNull)
+		{
 		left.configureEncoder(dt.getRawLeftPosition(), RobotProfile.getRobotProfile().getDriveEncTicksPerRevolution(), RobotProfile.getRobotProfile().getWheelDiameter());
 		right.configureEncoder(dt.getRawRightPosition(), RobotProfile.getRobotProfile().getDriveEncTicksPerRevolution(), RobotProfile.getRobotProfile().getWheelDiameter());
 	
@@ -135,7 +151,7 @@ public class FollowPath extends Command{
 		});
 		
 		closedLoop.startPeriodic(RobotProfile.getRobotProfile().getPathTimeStep());
-		
+		}	
 	}
 	
 	@Override
@@ -146,6 +162,10 @@ public class FollowPath extends Command{
 	@Override
 	protected boolean isFinished() 
 	{
+		if (isNull)
+		{
+			return true;
+		}
 		return left.isFinished() && right.isFinished();
 	}
 	

@@ -20,7 +20,7 @@ public class RampToLeftRocket extends CommandGroup
         Path rr1rp = new Path(RobotMap.RAMPTOLEFTROCKET + ".right");
 
         addParallel(new WristDownStart(2));
-        addParallel(new AdjustElevator(5100 ,2.5));
+       addParallel(new AdjustElevator(5100 ,2.5));
         addSequential(new FollowPath(Robot.drivetrain, rr1rp, rr1lp, 0.001, 0.08, 0.005, 0.05, false));
         addSequential(new VisionAlignment(0.3, false, 1.5, 0.012));
         addParallel(new AdjustElevator(-4000));
