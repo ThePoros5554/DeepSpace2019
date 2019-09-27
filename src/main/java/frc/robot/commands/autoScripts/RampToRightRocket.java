@@ -16,13 +16,13 @@ public class RampToRightRocket extends CommandGroup
         Path rp = new Path(RobotMap.RAMPTORIGHTROCKET + ".left");
         Path lp = new Path(RobotMap.RAMPTORIGHTROCKET + ".right");
 
-        addParallel(new WristDownStart(1));
-        addParallel(new AdjustElevator(5100 ,2.5));
-        addSequential(new FollowPath(Robot.drivetrain, rp, lp, 0.0045, 0.0001, 0.005, 0, false));
-        addSequential(new VisionAlignment(0, false, 0.4));
-        addSequential(new VisionAlignment(0.195, false, 3));
-        // addSequential(new AdjustElevator(-4000));
+        // addParallel(new WristDownStart(1));
+        // addParallel(new AdjustElevator(5100 ,2.5));
+        // addSequential(new FollowPath(Robot.drivetrain, rp, lp, 0.0045, 0.0001, 0.005, 0, false));
+        // addSequential(new VisionAlignment(0, false, 0.4));
+        // addSequential(new VisionAlignment(0.195, false, 3));
+        // // addSequential(new AdjustElevator(-4000));
 
-
+        addSequential(new FollowPath(Robot.drivetrain, rp, lp, 0, 0, 0, 0, false));
     }
 }

@@ -17,8 +17,8 @@ public class RampToCenterCargo extends CommandGroup
         // Path rp = new Path(RobotMap.RAMPTOCENTERCARGO + ".left");
         // Path lp = new Path(RobotMap.RAMPTOCENTERCARGO + ".right");
 
-        Path rp = new Path(RobotMap.TEST + ".left");
-        Path lp = new Path(RobotMap.TEST + ".right");
+        Path rp = new Path(RobotMap.RAMPTOCENTERCARGO + ".left");
+        Path lp = new Path(RobotMap.RAMPTOCENTERCARGO + ".right");
 
       //  addParallel(new WristDownStart(1));
        // addParallel(new AdjustElevator(3500 ,1.5));

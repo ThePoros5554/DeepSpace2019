@@ -10,6 +10,7 @@ import poroslib.position.VisionInfo;
 import poroslib.position.geometry.Pose2d;
 import poroslib.position.geometry.Twist2d;
 import poroslib.systems.PIDProcessor;
+import poroslib.systems.Limelight.LimelightLedMode;
 import poroslib.triggers.SmartJoystick;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -86,6 +87,7 @@ public class VisionAlignment extends Command
     @Override
     protected void initialize()
     {
+        Robot.lime.setLedMode(LimelightLedMode.ForceOn);
         bufferedTarget = null;
 
     }
@@ -210,6 +212,7 @@ public class VisionAlignment extends Command
     @Override
     protected void end()
     {
+        Robot.lime.setLedMode(LimelightLedMode.ForceOff);
       driveTrain.setControlMode(ControlMode.PercentOutput);
       driveTrain.set(0, 0);
       angleController.reset();

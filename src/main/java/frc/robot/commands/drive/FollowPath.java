@@ -3,6 +3,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
 import jaci.pathfinder.Pathfinder;
@@ -106,11 +107,12 @@ public class FollowPath extends Command{
 		closedLoop = new Notifier(new Thread() 
 		{
 			private double lastAngleDifference = 0;
+			private double time = 0;
 			
 			@Override
 			public void run() 
 			{
-
+				time += RobotProfile.getRobotProfile().getPathTimeStep();
 				if(!angleController.isEnabled())
 				{
 					angleController.enable();
@@ -128,6 +130,9 @@ public class FollowPath extends Command{
 					l = left.calculate(dt.getRawLeftPosition());
 					r = right.calculate(-dt.getRawRightPosition());
 				}
+
+				SmartDashboard.putNumber("left", left.getSegment().velocity);
+				SmartDashboard.putNumber("right", right.getSegment().velocity);
 
 				double distance_covered = ((double)(dt.getRawLeftPosition() - 0) / 4096)
 				* (Math.PI *0.1016);
@@ -147,6 +152,7 @@ public class FollowPath extends Command{
 				{
 					dt.tankDrive( -l - turnOut, -r + turnOut, 1);		
 				}
+				SmartDashboard.putNumber("left real", dt.getLeftPositionInCm()*0.01 / time);
 			}
 		});
 		

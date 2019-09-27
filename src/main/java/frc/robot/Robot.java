@@ -17,7 +17,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.UpdateRobotState;
 import frc.robot.commands.autoScripts.RampToCenterCargo;
+import frc.robot.commands.autoScripts.CenterRampToCenterCargo;
+import frc.robot.commands.autoScripts.CenterRampToRightCenterCargo;
 import frc.robot.commands.autoScripts.Empty;
+import frc.robot.commands.autoScripts.LeftRampToCenterCargoTest;
 import frc.robot.commands.autoScripts.RampToLeftRocket;
 import frc.robot.commands.autoScripts.RampToRightRocket;
 import frc.robot.subsystems.CargoIntake;
@@ -128,6 +131,9 @@ public class Robot extends TimedRobot
     autonomousChooser.addOption("Ramp To Left Rocket", RobotMap.RAMPTOLEFTROCKET);
     autonomousChooser.addOption("Ramp To Center Cargo", RobotMap.RAMPTOCENTERCARGO);
     autonomousChooser.addOption("Ramp To Right Rocket", RobotMap.RAMPTORIGHTROCKET);
+    autonomousChooser.addOption("Test", RobotMap.LEFTRAMPTOCENTERCARGOTEST);
+    autonomousChooser.addOption("Center Ramp To Center Cargo", RobotMap.CENTERRAMPTOCENTERCARGO);
+    autonomousChooser.addOption("Center Ramp To Right Center Cargo", RobotMap.CENTERRAMPTORIGHTCENTERCARGO);
     SmartDashboard.putData("Autonomous Chooser", autonomousChooser);
   }
 
@@ -260,7 +266,6 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousPeriodic()
   {
-    lime.setLedMode(LimelightLedMode.ForceOn);
     Scheduler.getInstance().run();
   }
 
@@ -296,8 +301,6 @@ public class Robot extends TimedRobot
   public void teleopPeriodic()
   {
     timeLeft = 135 - (Timer.getFPGATimestamp() - gameStartTime);
-
-    lime.setLedMode(LimelightLedMode.ForceOn);
 
     Scheduler.getInstance().run();
 
@@ -335,6 +338,18 @@ public class Robot extends TimedRobot
       case RobotMap.RAMPTORIGHTROCKET:
 
         return new RampToRightRocket();
+
+      case RobotMap.LEFTRAMPTOCENTERCARGOTEST:
+
+        return new LeftRampToCenterCargoTest();
+        
+      case RobotMap.CENTERRAMPTOCENTERCARGO:
+
+        return new CenterRampToCenterCargo();
+      
+      case RobotMap.CENTERRAMPTORIGHTCENTERCARGO:
+
+        return new CenterRampToRightCenterCargo();
 
       default:
 

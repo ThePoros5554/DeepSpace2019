@@ -28,14 +28,14 @@ public class Elevator extends Subsystem
     // motion gains
     private final int kMotionMagicSlot = 0;
     private final int kPositionSlot = 1;
-    private final int kMaxAcceleration = 5000;
-    private final int kMaxVelocity = 5000;
+    private final int kMaxAcceleration = 8000;
+    private final int kMaxVelocity = 8000;
     // private final int kMagicUpSlot = 0;
     // private final int kMagicDownSlot = 1;
     private final double kMagicP = 0.3; // 0.7
     private final double kMagicI = 0.0001; // 0.007
     private final double kMagicD = 0;
-    private final double kMagicF =  0.25;
+    private final double kMagicF =  0.128;
     private final double kPositionP = 0.07; // 0.5
     private final double kPositionI = 0;
     private final double kPositionD = 0;
